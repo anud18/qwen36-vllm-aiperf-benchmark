@@ -47,9 +47,82 @@ chatbot: conc 16 / 100 req · rag: conc 32 / 300 req · coding & agent: conc 8 (
   with bounded counts in the sweep.
 
 ## Pass 2 — concurrency sweep (4, 8, 16, 32)
-See `python3 scripts/summarize.py --sweep` (filled in after the sweep completes).
-Per-workload counts kept modest so even concurrency 4 completes within budget:
-chatbot 40 req · rag 80 req · coding 10 conv · agent 12 conv · toolagent 40 req.
+Regenerate with `python3 scripts/summarize.py --sweep`. Counts kept modest so even
+concurrency 4 finishes within budget: chatbot 40 req · rag 80 req · coding 10 conv ·
+agent 12 conv · toolagent 40 req (output capped 128).
+
+**chatbot** (ShareGPT, thinking on)
+| metric | c4 | c8 | c16 | c32 |
+|---|--:|--:|--:|--:|
+| ISL (tok) | 486 | 439 | 192 | 73 |
+| OSL (tok) | 262 | 261 | 244 | 241 |
+| TTFT (ms) | 242 | 358 | 880 | 1,080 |
+| ITL (ms) | 34.7 | 54.0 | 72.4 | 98.6 |
+| Out tok/s | 109 | 132 | 162 | **195** |
+| Req/s | 0.42 | 0.51 | 0.67 | 0.81 |
+
+**coding** (codex traces, multi-turn, thinking off — high prefix-cache)
+| metric | c4 | c8 | c16 | c32 |
+|---|--:|--:|--:|--:|
+| ISL (tok) | 25,883 | 25,938 | 25,857 | 25,857 |
+| OSL (tok) | 177 | 202 | 188 | 165 |
+| TTFT (ms) | 2,899 | 2,542 | 2,920 | 3,382 |
+| ITL (ms) | 73.4 | 106.3 | 154.7 | 157.6 |
+| Out tok/s | 44.2 | 56.2 | 52.8 | 49.8 |
+| Req/s | 0.25 | 0.28 | 0.28 | 0.30 |
+
+→ ISL ≈ 26k (50 KB shared preamble accumulated across turns) but TTFT stays ~3 s
+instead of the ~25 s a cold 26k-token prefill costs — **prefix caching is doing its job.**
+
+**rag** (MultiHopRAG, single-turn, thinking off — long input, ~3-token answers)
+| metric | c4 | c8 | c16 | c32 |
+|---|--:|--:|--:|--:|
+| ISL (tok) | 6,958 | 6,958 | 6,958 | 6,958 |
+| OSL (tok) | 2.7 | 2.6 | 2.5 | 3.4 |
+| TTFT (ms) | 5,128 | 820 | 1,453 | 3,155 |
+| Req/s | 0.68 | **5.87** | 6.50 | 6.25 |
+
+→ Prefill-bound (OSL≈3); throughput is best read as req/s. c4 is cold-cache; c8+ pipeline
+the 7k-token prefills and req/s jumps ~9x.
+
+**agent** (ATBench-Claw, multi-turn, thinking on)
+| metric | c4 | c8 | c16 | c32 |
+|---|--:|--:|--:|--:|
+| ISL (tok) | 2,390 | 2,390 | 2,388 | 2,390 |
+| OSL (tok) | 197 | 197 | 196 | 197 |
+| TTFT (ms) | 506 | 673 | 1,027 | 1,063 |
+| ITL (ms) | 36.4 | 52.1 | 74.1 | 71.3 |
+| Out tok/s | 101 | 124 | 144 | **147** |
+| Req/s | 0.52 | 0.63 | 0.73 | 0.75 |
+
+**toolagent** (Mooncake FAST25 trace, length+hash_id replay, thinking on)
+| metric | c4 | c8 | c16 | c32 |
+|---|--:|--:|--:|--:|
+| ISL (tok) | 9,920 | 9,920 | 9,920 | 9,920 |
+| OSL (tok) | 79 | 79 | 79 | 79 |
+| TTFT (ms) | 4,445 | 657 | 1,300 | 2,986 |
+| ITL (ms) | 93.7 | 78.8 | 121.4 | 208.7 |
+| Out tok/s | 27.7 | 100.7 | 122.5 | **152** |
+| Req/s | 0.35 | 1.27 | 1.54 | 1.91 |
+
+→ Mooncake traces carry per-request `timestamp`s, which makes aiperf auto-select
+**fixed-schedule** mode (concurrency ignored, all 2000 entries replayed). To run a real
+concurrency sweep we strip timestamps and cap output (`datasets/aiperf/toolagent_concurrency.jsonl`).
+Use the original `toolagent_mooncake.jsonl` with `--fixed-schedule` for trace-faithful replay.
+
+### Cross-workload takeaways
+- **Decode-bound** workloads (chatbot, agent, toolagent): aggregate tok/s scales with
+  concurrency (chatbot 109→195, agent 101→147, toolagent 28→152). Per-user ITL grows
+  ~35→100 ms — single-stream decode on GB10 for this 35B-A3B MoE is ~10-30 tok/s/user.
+- **Prefill-bound** workloads (rag, coding): latency dominated by input. Prefix caching
+  keeps coding's 26k-token context cheap; RAG throughput is best measured in req/s.
+- **c4 cold-cache artifact**: the first level of rag/toolagent shows inflated TTFT before
+  the prefix cache warms; c8+ is representative.
+
+> Operational note: a prior fixed-schedule toolagent run left ~2000 in-flight requests on
+> the server (vLLM keeps generating after the client disconnects), saturating the GPU and
+> stalling later runs. Restarting the server cleared it. The sweep script now uses
+> `timeout -k` (SIGKILL) and bounded request counts to avoid this.
 
 ## Reproduce
 ```bash
