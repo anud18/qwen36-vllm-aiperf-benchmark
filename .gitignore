@@ -1,0 +1,6 @@
+hf/
+datasets/raw/
+results/
+*.safetensors
+__pycache__/
+.venv/
