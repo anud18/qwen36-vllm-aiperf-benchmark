@@ -22,7 +22,7 @@ declare -A SIZE=( [chatbot]="--request-count 40" [rag]="--request-count 80"
 declare -A SRC=( [coding]="multi_turn $DATA/coding_multiturn.jsonl"
   [rag]="single_turn $DATA/rag_singleturn.jsonl"
   [agent]="multi_turn $DATA/agent_multiturn.jsonl"
-  [toolagent]="mooncake_trace $DATA/toolagent_mooncake.jsonl" )
+  [toolagent]="mooncake_trace $DATA/toolagent_concurrency.jsonl" )
 
 run_one() {  # workload concurrency
   local wl=$1 c=$2 adir="results/sweep/$wl/c$c"
@@ -39,7 +39,7 @@ run_one() {  # workload concurrency
   local cname="aiperf-${wl}-c${c}"
   echo "---- $wl c=$c $(date +%T) ----"
   docker rm -f "$cname" >/dev/null 2>&1 || true
-  timeout "$BUDGET" docker run --rm --name "$cname" --network host \
+  timeout -k 30 "$BUDGET" docker run --rm --name "$cname" --network host \
     -v "${HF_DIR}:/hf" -e HF_HOME=/hf -e HF_HUB_OFFLINE=1 \
     -v "${ROOT}:/work" -w /work "$IMG" profile "${args[@]}" \
     > "$adir/run.log" 2>&1
