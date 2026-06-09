@@ -17,6 +17,11 @@ import argparse, json, os, sys
 RAW = os.path.join(os.path.dirname(__file__), "..", "datasets", "raw")
 OUT = os.path.join(os.path.dirname(__file__), "..", "datasets", "aiperf")
 CHARS_PER_TOK = 4.0  # rough token estimate for output caps only
+# Qwen3.6 is a reasoning model (emits chain-of-thought by default). For the
+# explicitly "short output" workloads (coding, RAG) we disable thinking so the
+# output length reflects the answer, not the reasoning trace. aiperf merges this
+# `extra` object into each request body; vLLM honors chat_template_kwargs.
+THINK_OFF = {"chat_template_kwargs": {"enable_thinking": False}}
 
 
 def est_tokens(s):
@@ -66,7 +71,7 @@ def build_coding(max_sessions, max_turns, out_cap):
                 text = conv[j].get("value", "")
                 nxt = conv[j + 1] if j + 1 < len(conv) else None
                 olen = est_tokens(nxt["value"]) if nxt and nxt.get("from") == "gpt" else 256
-                turns.append({"text": text, "output_length": clamp(olen, 1, out_cap)})
+                turns.append({"text": text, "output_length": clamp(olen, 1, out_cap), "extra": THINK_OFF})
                 j += 2
             else:
                 j += 1
@@ -97,7 +102,7 @@ def build_rag(max_queries, min_ctx_chars, max_ctx_chars, out_cap):
             "below, answer the question concisely (a few words).\n\n"
             f"=== DOCUMENTS ===\n{context}\n\n=== QUESTION ===\n{q['query']}\n\nAnswer:"
         )
-        rows.append({"text": prompt, "output_length": out_cap})
+        rows.append({"text": prompt, "output_length": out_cap, "extra": THINK_OFF})
         if len(rows) >= max_queries:
             break
     return "rag_singleturn.jsonl", rows
