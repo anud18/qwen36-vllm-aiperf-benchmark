@@ -30,7 +30,45 @@ def num(v):
         return "-"
 
 
+def sweep():
+    """Print per-workload concurrency-sweep tables from results/sweep/<wl>/c<level>/."""
+    base = os.path.join(os.path.dirname(__file__), "..", "results", "sweep")
+    if not os.path.isdir(base):
+        print("no sweep results yet"); return
+    metrics = [
+        ("ISL", "Input Sequence Length (tokens)", "avg"),
+        ("OSL", "Output Sequence Length (tokens)", "avg"),
+        ("TTFT ms", "Time to First Token (ms)", "avg"),
+        ("ITL ms", "Inter Token Latency (ms)", "avg"),
+        ("ReqLat ms", "Request Latency (ms)", "avg"),
+        ("Out tok/s", "Output Token Throughput (tokens/sec)", "avg"),
+        ("Req/s", "Request Throughput (requests/sec)", "avg"),
+    ]
+    for wl in ORDER:
+        wld = os.path.join(base, wl)
+        if not os.path.isdir(wld):
+            continue
+        levels = sorted((d for d in os.listdir(wld) if d.startswith("c")),
+                        key=lambda x: int(x[1:]))
+        cols = []
+        for lv in levels:
+            p = os.path.join(wld, lv, "profile_export_aiperf.csv")
+            if os.path.isfile(p):
+                cols.append((lv, load(p)))
+        if not cols:
+            continue
+        print(f"\n### {wl}  (concurrency sweep)")
+        print(f"{'metric':<12}" + "".join(f"{lv:>12}" for lv, _ in cols))
+        print("-" * (12 + 12 * len(cols)))
+        for label, metric, stat in metrics:
+            print(f"{label:<12}" + "".join(f"{num(d.get(metric,{}).get(stat)):>12}" for _, d in cols))
+    print()
+
+
 def main():
+    import sys
+    if "--sweep" in sys.argv:
+        return sweep()
     base = os.path.join(os.path.dirname(__file__), "..", "results")
     data = {}
     for wl in ORDER + sorted(os.listdir(base)):
