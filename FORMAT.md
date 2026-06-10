@@ -24,6 +24,28 @@ Long fields are truncated with their true length noted, e.g. `…(50,266 chars)`
 - Qwen3.6 emits chain-of-thought by default → thinking stays **on** for chatbot/agent/toolagent,
   **off** for the short-output coding/RAG workloads.
 
+## How many requests each dataset becomes
+
+Splitting rule (verified against `inputs.json` + run CSVs):
+
+- **single_turn / mooncake_trace**: 1 JSONL line → **1 request**.
+- **multi_turn**: 1 session line → **one request per turn** (a 6-turn session = 6 requests,
+  sent in order with accumulated history).
+- How much of the file actually runs is bounded by `--request-count` (total requests) or
+  `--conversation-num` (number of sessions; all their turns run). A trace with `timestamp`s
+  (fixed-schedule) ignores both and replays **every** line.
+
+| Workload | converted file | potential requests | pass-1 executed | sweep executed (per level) |
+|---|---|--:|--:|--:|
+| Chatbot | (ShareGPT built-in: 73,277 sessions / 252,196 turns loaded) | 252,196 | 100 (`--request-count 100`) | 40 (`--request-count 40`) |
+| Coding | `coding_multiturn.jsonl` — 100 sessions × 6 turns | 600 | 10 (default `--request-count 10`) | **60** = 10 conv × 6 turns (`--conversation-num 10`; 59 ok + 1 error) |
+| RAG | `rag_singleturn.jsonl` — 500 lines | 500 | 300 (`--request-count 300`) | 80 (`--request-count 80`) |
+| Agent | `agent_multiturn.jsonl` — 200 sessions / 887 turns (2–7 turns each) | 887 | 10 (default) | **53** = first 12 conv's turns (`--conversation-num 12`) |
+| Toolagent | `toolagent_mooncake.jsonl` — 2,000 lines / `toolagent_concurrency.jsonl` — 40 lines | 2,000 / 40 | 2,000 attempted (fixed-schedule, timed out) | 40 (39 ok + 1 error) |
+
+Note: `inputs.json` records the **entire loaded dataset** (all potential payloads), not just the
+executed subset — e.g. chatbot's `inputs.json` holds 252k payloads even though pass-1 sent 100.
+
 ---
 
 ## 1) Chatbot — ShareGPT  (`--public-dataset sharegpt`)
