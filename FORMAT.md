@@ -1,5 +1,7 @@
 # How each dataset is formatted and sent to the LLM
 
+> 中文版:[FORMAT.zh-TW.md](FORMAT.zh-TW.md)
+
 Three layers per workload, all excerpts below are **real data** taken from this repo:
 
 1. **Raw source** — verbatim from `datasets/raw/` (or aiperf's ShareGPT cache)
