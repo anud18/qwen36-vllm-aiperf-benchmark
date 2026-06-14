@@ -160,6 +160,16 @@ def build_toolagent(max_requests):
     return "toolagent_mooncake.jsonl", rows
 
 
+def uncap(rows):
+    """Strip output_length and extra so aiperf sends no max_completion_tokens and
+    leaves thinking on (model generates to natural EOS)."""
+    for r in rows:
+        for turn in (r["turns"] if "turns" in r else [r]):
+            turn.pop("output_length", None)
+            turn.pop("extra", None)
+    return rows
+
+
 def write(name, rows):
     os.makedirs(OUT, exist_ok=True)
     p = os.path.join(OUT, name)
@@ -188,17 +198,28 @@ def main():
     ap.add_argument("--agent-out-cap", type=int, default=512)
     ap.add_argument("--toolagent-requests", type=int, default=2000)
     ap.add_argument("--only", nargs="*", choices=["coding", "rag", "agent", "toolagent"])
+    ap.add_argument("--uncapped", action="store_true",
+                    help="omit output_length + extra (no max_completion_tokens, thinking on); "
+                         "write to *_uncapped.jsonl")
     a = ap.parse_args()
     sel = a.only or ["coding", "rag", "agent", "toolagent"]
+    suf = "_uncapped" if a.uncapped else ""
     print("Building aiperf datasets ->", os.path.abspath(OUT))
+
+    def emit(name, rows):
+        if a.uncapped:
+            rows = uncap(rows)
+            name = name.replace(".jsonl", "_uncapped.jsonl")
+        write(name, rows)
+
     if "coding" in sel:
-        write(*build_coding(a.coding_sessions, a.coding_turns, a.coding_out_cap))
+        emit(*build_coding(a.coding_sessions, a.coding_turns, a.coding_out_cap))
     if "rag" in sel:
-        write(*build_rag(a.rag_queries, a.rag_min_ctx_chars, a.rag_max_ctx_chars, a.rag_out_cap))
+        emit(*build_rag(a.rag_queries, a.rag_min_ctx_chars, a.rag_max_ctx_chars, a.rag_out_cap))
     if "agent" in sel:
-        write(*build_agent(a.agent_sessions, a.agent_turns, a.agent_out_cap))
+        emit(*build_agent(a.agent_sessions, a.agent_turns, a.agent_out_cap))
     if "toolagent" in sel:
-        write(*build_toolagent(a.toolagent_requests))
+        emit(*build_toolagent(a.toolagent_requests))
 
 
 if __name__ == "__main__":

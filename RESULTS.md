@@ -133,3 +133,40 @@ scripts/run_sweep.sh                  # concurrency 4,8,16,32 for all workloads
 python3 scripts/summarize.py          # pass-1 table
 python3 scripts/summarize.py --sweep  # sweep tables
 ```
+
+## Pass 3 — uncapped output + thinking ON (real generation lengths)
+
+To check whether the tiny OSL in Pass 1/2 was an artifact of capping, we re-ran with
+**no `output_length` cap and thinking left ON** (`build_datasets.py --uncapped` → only a
+`text` field; no `max_completion_tokens`, no `enable_thinking:false`). Model generates to
+natural EOS. Runs use no time budget (`BUDGET=0`). Datasets are small here because the
+generations are huge: rag 24 req · agent 12 conv (53 turns) · coding 8 conv (32 turns).
+
+Reference answer lengths in the raw data (Qwen3.6 tokenizer): **RAG answers are genuinely
+tiny** — median **1** token, mean 2.0, 53% are yes/no. Agent assistant turns median 57 / mean
+112 tokens. So the short capped OSL was faithful; the model is simply terse when thinking is off.
+
+Comparison at matching concurrency (capped = Pass-2 sweep; uncapped = thinking on, no cap):
+
+| workload (conc) | mode | OSL avg | OSL max | ISL | TTFT ms | ITL ms | ReqLat ms | out tok/s |
+|---|---|--:|--:|--:|--:|--:|--:|--:|
+| RAG (c8)    | capped   | 3   | 34     | 6,958  | 820   | 225  | 1,112   | 15  |
+| RAG (c8)    | **uncapped** | **1,263** | 2,991  | 6,718  | 3,663 | 63 | **81,619** | 114 |
+| Agent (c8)  | capped   | 197 | 512    | 2,390  | 673   | 52   | 10,399  | 124 |
+| Agent (c8)  | **uncapped** | **1,995** | 9,588  | 5,831  | 648   | 50 | **98,657** | 117 |
+| Coding (c4) | capped   | 177 | 512    | 25,883 | 2,899 | 73   | 14,549  | 44  |
+| Coding (c4) | **uncapped** | **7,163** | **50,911** | 28,312 | 3,490 | 43 | **314,881** | 85 |
+
+**Findings**
+- Removing the cap + enabling thinking blows up output length ~400× for RAG (3→1,263),
+  10× for agent (197→1,995), 40× for coding (177→7,163, with a single turn hitting **50,911**
+  tokens). The whole coding run took **42 min**; per-request latency averaged **315 s**.
+- **ITL is unchanged** (~50–65 ms/token) — per-token decode speed is the same; what explodes is
+  the *number* of tokens (the reasoning trace), so end-to-end latency scales with OSL.
+- ISL also grows on later turns (agent 2,390→5,831; coding 25,883→28,312) because the
+  auto-accumulated history now contains the model's long reasoning responses.
+- Confirms the Pass-1/2 short OSL was **not** a capping artifact for RAG — the dataset answers
+  really are 1–2 tokens; thinking-on just prepends a long chain-of-thought before that answer.
+
+Reproduce: `python3 scripts/build_datasets.py --uncapped --only rag coding agent …` then
+`BUDGET=0 scripts/run_uncapped.sh`. Results in `results/uncapped/<wl>/`.
