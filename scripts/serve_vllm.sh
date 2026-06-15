@@ -19,6 +19,9 @@ mkdir -p "$VLLM_CACHE"
 
 echo ">>> image=$IMAGE model=$MODEL served=$SERVED port=$PORT max_len=$MAXLEN"
 docker rm -f "$NAME" >/dev/null 2>&1 || true
+# kill any stray vLLM EngineCore still holding GPU memory from a previous container
+spid=$(nvidia-smi --query-compute-apps=pid,process_name --format=csv,noheader 2>/dev/null | awk -F', ' '/EngineCore/{print $1}')
+if [ -n "$spid" ]; then echo ">>> killing stray EngineCore pid(s): $spid"; kill -9 $spid 2>/dev/null || true; sleep 4; fi
 
 docker run -d --name "$NAME" \
   --gpus all --ipc=host \
