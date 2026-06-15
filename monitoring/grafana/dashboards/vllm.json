@@ -1,0 +1,65 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "schemaVersion": 39,
+  "title": "vLLM — Qwen3.6-35B-A3B-FP8 (GB10)",
+  "tags": ["vllm"],
+  "time": {"from": "now-15m", "to": "now"},
+  "refresh": "2s",
+  "templating": {"list": []},
+  "panels": [
+    {
+      "id": 1, "title": "Token throughput (tok/s)", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "fieldConfig": {"defaults": {"unit": "none"}, "overrides": []},
+      "targets": [
+        {"expr": "rate(vllm:generation_tokens_total[30s])", "legendFormat": "generation", "refId": "A"},
+        {"expr": "rate(vllm:prompt_tokens_total[30s])", "legendFormat": "prompt (prefill)", "refId": "B"}
+      ]
+    },
+    {
+      "id": 2, "title": "Running / Waiting requests", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "fieldConfig": {"defaults": {"unit": "none"}, "overrides": []},
+      "targets": [
+        {"expr": "vllm:num_requests_running", "legendFormat": "running", "refId": "A"},
+        {"expr": "vllm:num_requests_waiting", "legendFormat": "waiting", "refId": "B"}
+      ]
+    },
+    {
+      "id": 3, "title": "Prefix cache hit rate", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "fieldConfig": {"defaults": {"unit": "percentunit", "min": 0, "max": 1}, "overrides": []},
+      "targets": [
+        {"expr": "rate(vllm:prefix_cache_hits_total[1m]) / clamp_min(rate(vllm:prefix_cache_queries_total[1m]), 1)", "legendFormat": "hit rate (1m)", "refId": "A"},
+        {"expr": "vllm:prefix_cache_hits_total / clamp_min(vllm:prefix_cache_queries_total, 1)", "legendFormat": "hit rate (cumulative)", "refId": "B"}
+      ]
+    },
+    {
+      "id": 4, "title": "KV cache usage", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "fieldConfig": {"defaults": {"unit": "percentunit", "min": 0, "max": 1}, "overrides": []},
+      "targets": [
+        {"expr": "vllm:gpu_cache_usage_perc", "legendFormat": "KV usage", "refId": "A"}
+      ]
+    },
+    {
+      "id": 5, "title": "TTFT (s)", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+      "targets": [
+        {"expr": "histogram_quantile(0.5, sum(rate(vllm:time_to_first_token_seconds_bucket[1m])) by (le))", "legendFormat": "p50", "refId": "A"},
+        {"expr": "histogram_quantile(0.99, sum(rate(vllm:time_to_first_token_seconds_bucket[1m])) by (le))", "legendFormat": "p99", "refId": "B"}
+      ]
+    },
+    {
+      "id": 6, "title": "Inter-token latency (s)", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+      "targets": [
+        {"expr": "histogram_quantile(0.5, sum(rate(vllm:time_per_output_token_seconds_bucket[1m])) by (le))", "legendFormat": "p50", "refId": "A"},
+        {"expr": "histogram_quantile(0.99, sum(rate(vllm:time_per_output_token_seconds_bucket[1m])) by (le))", "legendFormat": "p99", "refId": "B"}
+      ]
+    }
+  ]
+}

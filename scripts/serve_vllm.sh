@@ -4,32 +4,38 @@
 #   IMAGE defaults to vllm/vllm-openai:latest; fallback: nvcr.io/nvidia/vllm:26.05.post1-py3
 set -euo pipefail
 
-IMAGE="${1:-${VLLM_IMAGE:-vllm/vllm-openai:latest}}"
+IMAGE="${1:-${VLLM_IMAGE:-ghcr.io/spark-arena/dgx-vllm-eugr-nightly-tf5:20260614}}"
 MODEL="${MODEL:-Qwen/Qwen3.6-35B-A3B-FP8}"
 SERVED="${SERVED_NAME:-qwen3.6}"
 PORT="${PORT:-8000}"
 MAXLEN="${MAX_MODEL_LEN:-65536}"
-GPU_UTIL="${GPU_UTIL:-0.90}"
+GPU_UTIL="${GPU_UTIL:-0.50}"
 HF_DIR="${HF_DIR:-/home/howard/.cache/huggingface}"
+VLLM_CACHE="${VLLM_CACHE:-/home/howard/.cache/vllm}"
 NAME="${CONTAINER_NAME:-vllm-qwen36}"
+mkdir -p "$VLLM_CACHE"
 
 echo ">>> image=$IMAGE model=$MODEL served=$SERVED port=$PORT max_len=$MAXLEN"
 docker rm -f "$NAME" >/dev/null 2>&1 || true
 
 docker run -d --name "$NAME" \
   --gpus all --ipc=host \
+  --add-host host.docker.internal:host-gateway \
+  --entrypoint vllm \
   -p "${PORT}:8000" \
   -v "${HF_DIR}:/root/.cache/huggingface" \
+  -v "${VLLM_CACHE}:/root/.cache/vllm" \
   -e HF_HUB_OFFLINE=1 \
   -e VLLM_USE_V1=1 \
   "$IMAGE" \
-  --model "$MODEL" \
+  serve "$MODEL" \
   --served-model-name "$SERVED" \
   --port 8000 \
   --max-model-len "$MAXLEN" \
   --gpu-memory-utilization "$GPU_UTIL" \
   --enable-prefix-caching \
   --trust-remote-code \
+  ${REASONING_PARSER:+--reasoning-parser $REASONING_PARSER} \
   ${EXTRA_ARGS:-}
 
 echo ">>> container started: $NAME"
