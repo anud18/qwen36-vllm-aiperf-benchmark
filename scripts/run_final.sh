@@ -41,8 +41,8 @@ run_point() {  # workload concurrency dtype file tlimit  extra-term-args...
     echo "   [skip] $wl c=$c already complete"; return 0
   fi
   local cname="aiperf-$wl-c$c"
-  local attempt rc
-  for attempt in 1 2; do
+  local attempt rc tries="${MAX_TRIES:-3}"
+  for attempt in $(seq 1 "$tries"); do
     docker rm -f "$cname" >/dev/null 2>&1 || true
     rm -f "$adir/profile_export_aiperf.json"
     local b a; b=$(prefix_metrics)
@@ -53,12 +53,34 @@ run_point() {  # workload concurrency dtype file tlimit  extra-term-args...
     if [ "$wl" = chatbot ]; then args+=(--public-dataset sharegpt --extra-inputs "$THINKOFF")
     elif [ "$wl" = toolagent ]; then args+=(--input-file "$file" --custom-dataset-type "$dtype" --extra-inputs "$THINKOFF")
     else args+=(--input-file "$file" --custom-dataset-type "$dtype"); fi
-    # hard cap: an intermittent vLLM EngineCore deadlock pins requests with 0 gen
-    # throughput and the streaming client blocks forever -> timeout + KILL bounds it.
-    timeout --signal=KILL "${tlim}" docker run --rm --name "$cname" --network host \
+    # Launch aiperf in the background and actively watchdog the engine. The
+    # intermittent vLLM V1 EngineCore deadlock pins requests with BOTH prompt and
+    # generation throughput at 0 while running>0, and the streaming client then
+    # blocks forever. Detect no-token-movement for WEDGE_S and kill in ~2 min
+    # instead of waiting out the full tlimit (which stays as a hard backstop).
+    docker run --rm --name "$cname" --network host \
       -v "${HF_DIR}:/hf" -e HF_HOME=/hf -e HF_HUB_OFFLINE=1 \
-      -v "${ROOT}:/work" -w /work "$IMG" profile "${args[@]}" >"$adir/run.log" 2>&1
-    rc=$?
+      -v "${ROOT}:/work" -w /work "$IMG" profile "${args[@]}" >"$adir/run.log" 2>&1 &
+    local dpid=$! start=$SECONDS frozen=0 lastg="" lastp="" wedged=0 g p r
+    while kill -0 "$dpid" 2>/dev/null; do
+      sleep 15
+      read g p r < <(curl -s -m3 "${URL}/metrics" 2>/dev/null | awk '
+        /^vllm:generation_tokens_total/{g=$2} /^vllm:prompt_tokens_total/{p=$2} /^vllm:num_requests_running/{r=$2}
+        END{printf "%s %s %s", g+0, p+0, r+0}')
+      if awk "BEGIN{exit !(${r:-0}>0)}" && [ "$g" = "$lastg" ] && [ "$p" = "$lastp" ]; then
+        frozen=$((frozen+15)); else frozen=0; fi
+      lastg="$g"; lastp="$p"
+      if [ "$frozen" -ge "${WEDGE_S:-120}" ]; then
+        echo "   !!! wedge: running=$r, no prompt/gen movement ${frozen}s — killing $(date +%T)"; wedged=1; break; fi
+      if [ $((SECONDS-start)) -ge "$tlim" ]; then
+        echo "   !!! hard tlimit ${tlim}s exceeded — killing $(date +%T)"; wedged=1; break; fi
+    done
+    if [ "$wedged" = 1 ]; then
+      docker rm -f "$cname" >/dev/null 2>&1 || true
+      kill -9 "$dpid" 2>/dev/null || true; wait "$dpid" 2>/dev/null; rc=137
+    else
+      wait "$dpid"; rc=$?
+    fi
     docker rm -f "$cname" >/dev/null 2>&1 || true
     if [ -s "$adir/profile_export_aiperf.json" ]; then
       a=$(prefix_metrics)
@@ -74,7 +96,7 @@ run_point() {  # workload concurrency dtype file tlimit  extra-term-args...
     # the wedged engine is dead for all future points; always restart before continuing
     restart_server "results/final/${wl}.serve.log" || { echo "   !!! restart failed; abandoning $wl c=$c"; return 1; }
   done
-  echo "   !!! $wl c=$c failed twice; recording failure, moving on"
+  echo "   !!! $wl c=$c failed $tries times; recording failure, moving on"
   echo '{"failed":true,"hits":0,"queries":0,"hit_rate":0}' > "$adir/prefix.json"
   return 1
 }
