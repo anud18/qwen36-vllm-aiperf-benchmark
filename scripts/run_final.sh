@@ -60,8 +60,8 @@ run_point() {  # workload concurrency dtype file  extra-term-args...
 
 workload() {  # name "levels" dtype file term-args...
   local wl=$1 levels=$2 dtype=$3 file=$4; shift 4
-  restart_server "results/final/${wl}.serve.log" || return
   mkdir -p "results/final/$wl"
+  restart_server "results/final/${wl}.serve.log" || return
   for c in $levels; do run_point "$wl" "$c" "$dtype" "$file" "$@"; done
 }
 
