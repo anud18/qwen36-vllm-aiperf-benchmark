@@ -163,8 +163,15 @@ Comparison at matching concurrency (capped = Pass-2 sweep; uncapped = thinking o
   tokens). The whole coding run took **42 min**; per-request latency averaged **315 s**.
 - **ITL is unchanged** (~50–65 ms/token) — per-token decode speed is the same; what explodes is
   the *number* of tokens (the reasoning trace), so end-to-end latency scales with OSL.
-- ISL also grows on later turns (agent 2,390→5,831; coding 25,883→28,312) because the
-  auto-accumulated history now contains the model's long reasoning responses.
+- The ISL that aiperf *reports* grows on later turns (agent 2,390→5,831; coding 25,883→28,312)
+  because aiperf tokenizes the history it assembled, which includes the model's reasoning.
+  **But this is an aiperf measurement artifact, not real prefill growth**: Qwen3.6's chat
+  template strips each historical assistant turn's `<think>…</think>` block before prefill
+  (verified: 666 reasoning tokens in history add +0 to vLLM's `prompt_tokens`). Since the
+  uncapped turns finish naturally (they contain `</think>`), the model does NOT re-attend to
+  prior reasoning — only the final answer carries forward. Reasoning leaks into history only
+  if a turn is truncated mid-thinking by `max_tokens` (no `</think>` to split on), or if served
+  without the chat template's reasoning handling / a `--reasoning-parser`.
 - Confirms the Pass-1/2 short OSL was **not** a capping artifact for RAG — the dataset answers
   really are 1–2 tokens; thinking-on just prepends a long chain-of-thought before that answer.
 
