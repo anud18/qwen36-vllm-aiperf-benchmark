@@ -14,7 +14,7 @@ services:
       - --storage.tsdb.retention.time=6h
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:11.6.5
     container_name: bench-grafana
     restart: unless-stopped
     ports:

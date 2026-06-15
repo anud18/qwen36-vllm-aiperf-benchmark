@@ -10,6 +10,8 @@ SERVED="${SERVED_NAME:-qwen3.6}"
 PORT="${PORT:-8000}"
 MAXLEN="${MAX_MODEL_LEN:-65536}"
 GPU_UTIL="${GPU_UTIL:-0.50}"
+MAX_NUM_SEQS="${MAX_NUM_SEQS:-}"
+MAX_NUM_BATCHED_TOKENS="${MAX_NUM_BATCHED_TOKENS:-}"
 HF_DIR="${HF_DIR:-/home/howard/.cache/huggingface}"
 VLLM_CACHE="${VLLM_CACHE:-/home/howard/.cache/vllm}"
 NAME="${CONTAINER_NAME:-vllm-qwen36}"
@@ -33,6 +35,8 @@ docker run -d --name "$NAME" \
   --port 8000 \
   --max-model-len "$MAXLEN" \
   --gpu-memory-utilization "$GPU_UTIL" \
+  ${MAX_NUM_SEQS:+--max-num-seqs $MAX_NUM_SEQS} \
+  ${MAX_NUM_BATCHED_TOKENS:+--max-num-batched-tokens $MAX_NUM_BATCHED_TOKENS} \
   --enable-prefix-caching \
   --trust-remote-code \
   ${REASONING_PARSER:+--reasoning-parser $REASONING_PARSER} \
