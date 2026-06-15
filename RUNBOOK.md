@@ -26,6 +26,11 @@ with NVIDIA aiperf, live Prometheus + Grafana, and per-workload prefix-cache-hit
 
 Resulting KV cache ≈ 1.3M tokens; max concurrency 5.27x @ 248K (≈218x @ 6K).
 
+> **Startup ~11 min per restart**: `max-num-batched-tokens 248320` makes the torch.compile
+> range `(1, 248320)`, whose cached AOT graph takes ~120 s to load (+ ~3.5 min weights +
+> cudagraph). `serve_vllm.sh` waits up to 1500 s for `/health` (was 600 s — too short, caused
+> all workloads to be skipped). With 5 per-workload restarts, budget ~1 h of restart overhead.
+
 Launch:
 ```bash
 REASONING_PARSER=qwen3 GPU_UTIL=0.85 MAX_NUM_SEQS=32 \

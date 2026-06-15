@@ -45,7 +45,7 @@ docker run -d --name "$NAME" \
 echo ">>> container started: $NAME"
 echo ">>> follow logs: docker logs -f $NAME"
 echo ">>> waiting for /health ..."
-for i in $(seq 1 120); do
+for i in $(seq 1 300); do  # up to 1500s: v6 (max-num-batched-tokens 248320) startup is ~11 min
   if curl -fsS "http://localhost:${PORT}/health" >/dev/null 2>&1; then
     echo ">>> READY after ~$((i*5))s"
     curl -s "http://localhost:${PORT}/v1/models" | head -c 400; echo
@@ -56,4 +56,4 @@ for i in $(seq 1 120); do
   fi
   sleep 5
 done
-echo "!!! not ready after 600s; logs:"; docker logs --tail 60 "$NAME"; exit 1
+echo "!!! not ready after 1500s; logs:"; docker logs --tail 60 "$NAME"; exit 1
