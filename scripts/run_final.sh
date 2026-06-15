@@ -33,46 +33,69 @@ restart_server() {
   grep -q "READY" "$log" || { echo "   !!! server not ready"; tail -6 "$log"; return 1; }
 }
 
-run_point() {  # workload concurrency dtype file  extra-term-args...
-  local wl=$1 c=$2 dtype=$3 file=$4; shift 4
+run_point() {  # workload concurrency dtype file tlimit  extra-term-args...
+  local wl=$1 c=$2 dtype=$3 file=$4 tlim=$5; shift 5
   local adir="results/final/$wl/c$c"; mkdir -p "$adir"
-  local cname="aiperf-$wl-c$c"; docker rm -f "$cname" >/dev/null 2>&1 || true
-  local b a; b=$(prefix_metrics)
-  echo "   [aiperf] $wl c=$c $* $(date +%T)"
-  local args=(--model "$MODEL" --url "$URL" --endpoint-type chat --streaming
-              --tokenizer "$TOKENIZER" --artifact-dir "$adir" --random-seed 42
-              --concurrency "$c" --warmup-request-count "$WARMUP" "$@")
-  if [ "$wl" = chatbot ]; then args+=(--public-dataset sharegpt --extra-inputs "$THINKOFF")
-  elif [ "$wl" = toolagent ]; then args+=(--input-file "$file" --custom-dataset-type "$dtype" --extra-inputs "$THINKOFF")
-  else args+=(--input-file "$file" --custom-dataset-type "$dtype"); fi
-  docker run --rm --name "$cname" --network host \
-    -v "${HF_DIR}:/hf" -e HF_HOME=/hf -e HF_HUB_OFFLINE=1 \
-    -v "${ROOT}:/work" -w /work "$IMG" profile "${args[@]}" >"$adir/run.log" 2>&1
-  docker rm -f "$cname" >/dev/null 2>&1 || true
-  a=$(prefix_metrics)
-  awk -v b="$b" -v a="$a" -v wl="$wl" -v c="$c" 'BEGIN{
-    split(b,B," "); split(a,A," "); dh=A[1]-B[1]; dq=A[2]-B[2];
-    r=(dq>0)?dh/dq*100:0;
-    printf "   [prefix-hit] %s c=%s: hits=%d queries=%d rate=%.1f%%\n", wl, c, dh, dq, r;
-    printf "{\"hits\":%d,\"queries\":%d,\"hit_rate\":%.4f}\n", dh, dq, (dq>0?dh/dq:0) > "results/final/" wl "/c" c "/prefix.json"
-  }'
+  # resume: skip a point that already has a non-empty summary
+  if [ -s "$adir/profile_export_aiperf.json" ]; then
+    echo "   [skip] $wl c=$c already complete"; return 0
+  fi
+  local cname="aiperf-$wl-c$c"
+  local attempt rc
+  for attempt in 1 2; do
+    docker rm -f "$cname" >/dev/null 2>&1 || true
+    rm -f "$adir/profile_export_aiperf.json"
+    local b a; b=$(prefix_metrics)
+    echo "   [aiperf] $wl c=$c (try $attempt, tlimit=${tlim}s) $* $(date +%T)"
+    local args=(--model "$MODEL" --url "$URL" --endpoint-type chat --streaming
+                --tokenizer "$TOKENIZER" --artifact-dir "$adir" --random-seed 42
+                --concurrency "$c" --warmup-request-count "$WARMUP" "$@")
+    if [ "$wl" = chatbot ]; then args+=(--public-dataset sharegpt --extra-inputs "$THINKOFF")
+    elif [ "$wl" = toolagent ]; then args+=(--input-file "$file" --custom-dataset-type "$dtype" --extra-inputs "$THINKOFF")
+    else args+=(--input-file "$file" --custom-dataset-type "$dtype"); fi
+    # hard cap: an intermittent vLLM EngineCore deadlock pins requests with 0 gen
+    # throughput and the streaming client blocks forever -> timeout + KILL bounds it.
+    timeout --signal=KILL "${tlim}" docker run --rm --name "$cname" --network host \
+      -v "${HF_DIR}:/hf" -e HF_HOME=/hf -e HF_HUB_OFFLINE=1 \
+      -v "${ROOT}:/work" -w /work "$IMG" profile "${args[@]}" >"$adir/run.log" 2>&1
+    rc=$?
+    docker rm -f "$cname" >/dev/null 2>&1 || true
+    if [ -s "$adir/profile_export_aiperf.json" ]; then
+      a=$(prefix_metrics)
+      awk -v b="$b" -v a="$a" -v wl="$wl" -v c="$c" 'BEGIN{
+        split(b,B," "); split(a,A," "); dh=A[1]-B[1]; dq=A[2]-B[2];
+        r=(dq>0)?dh/dq*100:0;
+        printf "   [prefix-hit] %s c=%s: hits=%d queries=%d rate=%.1f%%\n", wl, c, dh, dq, r;
+        printf "{\"hits\":%d,\"queries\":%d,\"hit_rate\":%.4f}\n", dh, dq, (dq>0?dh/dq:0) > "results/final/" wl "/c" c "/prefix.json"
+      }'
+      return 0
+    fi
+    echo "   !!! $wl c=$c FAILED (rc=$rc${rc:+ }$([ "$rc" = 137 ] && echo '=timeout/KILL'), no summary) — likely engine wedge"
+    # the wedged engine is dead for all future points; always restart before continuing
+    restart_server "results/final/${wl}.serve.log" || { echo "   !!! restart failed; abandoning $wl c=$c"; return 1; }
+  done
+  echo "   !!! $wl c=$c failed twice; recording failure, moving on"
+  echo '{"failed":true,"hits":0,"queries":0,"hit_rate":0}' > "$adir/prefix.json"
+  return 1
 }
 
-workload() {  # name "levels" dtype file term-args...
-  local wl=$1 levels=$2 dtype=$3 file=$4; shift 4
+workload() {  # name "levels" dtype file tlimit term-args...
+  local wl=$1 levels=$2 dtype=$3 file=$4 tlim=$5; shift 5
   mkdir -p "results/final/$wl"
   restart_server "results/final/${wl}.serve.log" || return
-  for c in $levels; do run_point "$wl" "$c" "$dtype" "$file" "$@"; done
+  for c in $levels; do run_point "$wl" "$c" "$dtype" "$file" "$tlim" "$@"; done
 }
 
+RC_TLIM="${RC_TLIM:-1200}"                 # hard cap for --request-count points
+DUR_TLIM=$((DURATION + GRACE + 600))       # hard cap for --benchmark-duration points
 SEL="${*:-chatbot rag toolagent agent coding}"
 for wl in $SEL; do
   case $wl in
-    chatbot)   workload chatbot   "4 8 16 32" public         ""                          --request-count 160 ;;
-    rag)       workload rag       "4 8 16 32" single_turn    "$DATA/final_rag.jsonl"      --request-count 160 ;;
-    toolagent) workload toolagent "4 8 16"    mooncake_trace "$DATA/final_toolagent.jsonl" --request-count 160 ;;
-    agent)     workload agent     "4 8 16"    multi_turn     "$DATA/final_agent.jsonl"    --benchmark-duration "$DURATION" --benchmark-grace-period "$GRACE" ;;
-    coding)    workload coding    "4 8 16"    multi_turn     "$DATA/final_coding.jsonl"   --benchmark-duration "$DURATION" --benchmark-grace-period "$GRACE" ;;
+    chatbot)   workload chatbot   "4 8 16 32" public         ""                          "$RC_TLIM"  --request-count 160 ;;
+    rag)       workload rag       "4 8 16 32" single_turn    "$DATA/final_rag.jsonl"      "$RC_TLIM"  --request-count 160 ;;
+    toolagent) workload toolagent "4 8 16"    mooncake_trace "$DATA/final_toolagent.jsonl" "$RC_TLIM" --request-count 160 ;;
+    agent)     workload agent     "4 8 16"    multi_turn     "$DATA/final_agent.jsonl"    "$DUR_TLIM" --benchmark-duration "$DURATION" --benchmark-grace-period "$GRACE" ;;
+    coding)    workload coding    "4 8 16"    multi_turn     "$DATA/final_coding.jsonl"   "$DUR_TLIM" --benchmark-duration "$DURATION" --benchmark-grace-period "$GRACE" ;;
   esac
 done
 echo "================ RUN_FINAL DONE $(date +%T) ================"
