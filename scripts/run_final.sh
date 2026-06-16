@@ -46,10 +46,14 @@ run_point() {  # workload concurrency dtype file tlimit  extra-term-args...
     docker rm -f "$cname" >/dev/null 2>&1 || true
     rm -f "$adir/profile_export_aiperf.json"
     local b a; b=$(prefix_metrics)
-    echo "   [aiperf] $wl c=$c (try $attempt, tlimit=${tlim}s) $* $(date +%T)"
+    # coding runs reasoning-ON (700-4000 tok/req); 32 warmup reqs at low concurrency
+    # take ~18 min and blow the whole time budget before profiling starts. Use a
+    # small warmup there — the 300s duration window is already steady-state.
+    local wu="$WARMUP"; [ "$wl" = coding ] && wu="${WARMUP_CODING:-8}"
+    echo "   [aiperf] $wl c=$c (try $attempt, warmup=$wu, tlimit=${tlim}s) $* $(date +%T)"
     local args=(--model "$MODEL" --url "$URL" --endpoint-type chat --streaming
                 --tokenizer "$TOKENIZER" --artifact-dir "$adir" --random-seed 42
-                --concurrency "$c" --warmup-request-count "$WARMUP" "$@")
+                --concurrency "$c" --warmup-request-count "$wu" "$@")
     if [ "$wl" = chatbot ]; then args+=(--public-dataset sharegpt --extra-inputs "$THINKOFF")
     elif [ "$wl" = toolagent ]; then args+=(--input-file "$file" --custom-dataset-type "$dtype" --extra-inputs "$THINKOFF")
     else args+=(--input-file "$file" --custom-dataset-type "$dtype"); fi
@@ -117,7 +121,7 @@ for wl in $SEL; do
     rag)       workload rag       "4 8 16 32" single_turn    "$DATA/final_rag.jsonl"      "$RC_TLIM"  --request-count 160 ;;
     toolagent) workload toolagent "4 8 16"    mooncake_trace "$DATA/final_toolagent.jsonl" "$RC_TLIM" --request-count 160 ;;
     agent)     workload agent     "4 8 16"    multi_turn     "$DATA/final_agent.jsonl"    "$DUR_TLIM" --benchmark-duration "$DURATION" --benchmark-grace-period "$GRACE" ;;
-    coding)    workload coding    "4 8 16"    multi_turn     "$DATA/final_coding.jsonl"   "$DUR_TLIM" --benchmark-duration "$DURATION" --benchmark-grace-period "$GRACE" ;;
+    coding)    workload coding    "4 8 16"    multi_turn     "$DATA/final_coding.jsonl"   "$((DURATION + GRACE + 900))" --benchmark-duration "$DURATION" --benchmark-grace-period "$GRACE" ;;
   esac
 done
 echo "================ RUN_FINAL DONE $(date +%T) ================"
