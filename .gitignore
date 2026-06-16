@@ -5,3 +5,4 @@ __pycache__/
 results/
 *.safetensors
 .venv/
+.venv-plot/
