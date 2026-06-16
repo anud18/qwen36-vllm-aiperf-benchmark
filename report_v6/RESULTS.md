@@ -3,7 +3,7 @@
 Definitive 17-point benchmark of `Qwen/Qwen3.6-35B-A3B-FP8` on vLLM (GB10 / aarch64) with NVIDIA
 aiperf. Server restarted before each workload; warmup per point; prefix-cache hit recorded per
 point. Raw exports in `results/final/` (gitignored); full per-metric tables in
-[`SUMMARY.txt`](SUMMARY.txt); request-format & counts in [`FORMAT.md`](FORMAT.md).
+[`SUMMARY.md`](SUMMARY.md); request-format & counts in [`FORMAT.md`](FORMAT.md).
 
 ## Setup
 
@@ -38,7 +38,7 @@ point. Raw exports in `results/final/` (gitignored); full per-metric tables in
 
 Selected shape metrics (avg): chatbot ISL ~370–510 / OSL ~220 · rag ISL 6,327 / OSL ~3 ·
 toolagent ISL 10,154 / OSL ~187 · agent ISL ~1.8–3.4k / OSL ~234–601 · coding ISL ~20–24k /
-OSL ~2.4–4.1k. Full tables: [`SUMMARY.txt`](SUMMARY.txt).
+OSL ~2.4–4.1k. Full tables: [`SUMMARY.md`](SUMMARY.md) (plain text: `SUMMARY.txt`).
 
 ## Figures
 
@@ -109,6 +109,7 @@ automatically. Details in `../RUNBOOK.md`.
 ```bash
 GPU_UTIL=0.85 MAX_NUM_SEQS=32 MAX_MODEL_LEN=248320 MAX_NUM_BATCHED_TOKENS=248320 \
   bash scripts/run_final.sh                # restarts server per workload, records prefix-hit
-python3 scripts/summarize_final.py         # -> SUMMARY_v6.txt
+python3 scripts/summarize_final.py         # -> text tables (SUMMARY_v6.txt)
+python3 scripts/summarize_final.py --md    # -> markdown tables (report_v6/SUMMARY.md)
 python3 scripts/plot_pareto.py             # -> report_v6/figures/*.png
 ```
