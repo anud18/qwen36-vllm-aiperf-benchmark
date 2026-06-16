@@ -69,6 +69,79 @@ TPU = "Output Token Throughput Per User (tokens/sec/user)"
 TTFT = "Time to First Token (ms)"
 ITL = "Inter Token Latency (ms)"
 RPS = "Request Throughput (requests/sec)"
+REQLAT = "Request Latency (ms)"
+
+
+# ------------------------------------------------ per-metric charts vs concurrency
+def tpot_ms(wl, c):
+    """TPOT = time per output token (ms) = 1000 / per-user output token throughput."""
+    tpu = get(csv_sweep(wl, c), TPU)
+    return 1000.0 / tpu if tpu else None
+
+
+# (title, value-fn(wl,c), y-label, log-y, p99-metric-or-None, lower_is_better, workloads)
+# ITL/TPOT are per-output-token decode latencies — undefined for rag (OSL≈3), so
+# those two charts cover only the decode-bound workloads.
+METRICS = [
+    ("TTFT (avg)",          lambda wl, c: get(csv_sweep(wl, c), TTFT),   "Time to First Token (ms)",     True,  TTFT,   True,  WLS),
+    ("ITL",                 lambda wl, c: get(csv_sweep(wl, c), ITL),    "Inter Token Latency (ms/tok)", False, ITL,    True,  DECODE),
+    ("TPOT",                tpot_ms,                                     "Time Per Output Token (ms)",   False, None,   True,  DECODE),
+    ("Request throughput",  lambda wl, c: get(csv_sweep(wl, c), RPS),    "Requests / sec",               False, None,   False, WLS),
+    ("Output token throughput", lambda wl, c: get(csv_sweep(wl, c), TOK), "System tokens / sec",         False, None,   False, WLS),
+    ("Request latency (avg)", lambda wl, c: get(csv_sweep(wl, c), REQLAT), "Request Latency (ms)",       True,  REQLAT, True,  WLS),
+]
+
+
+def _plot_metric(ax, title, vfn, ylabel, logy, p99m, lower_better, wls=WLS):
+    for wl in wls:
+        xy = [(c, vfn(wl, c)) for c in LEVELS]
+        xy = [(c, v) for c, v in xy if v is not None]
+        if not xy:
+            continue
+        X, Y = zip(*xy)
+        ax.plot(X, Y, "-o", color=COLORS[wl], label=wl, zorder=3)
+        if p99m is not None:  # faint p99 band for latency metrics
+            p = [(c, get(csv_sweep(wl, c), p99m, "p99")) for c in LEVELS]
+            p = [(c, v) for c, v in p if v is not None]
+            if p:
+                px, py = zip(*p)
+                ax.plot(px, py, "--", color=COLORS[wl], alpha=0.35, linewidth=1, zorder=2)
+    ax.set_xscale("log", base=2); ax.set_xticks(LEVELS); ax.set_xticklabels(LEVELS)
+    if logy:
+        ax.set_yscale("log")
+    ax.set_xlabel("concurrency")
+    ax.set_ylabel(ylabel)
+    arrow = "↓ lower better" if lower_better else "↑ higher better"
+    extra = "  (decode workloads)" if wls is DECODE else ""
+    ax.set_title(f"{title}  ({arrow}){extra}")
+    ax.grid(True, which="both", alpha=0.3)
+
+
+def fig_metrics():
+    # combined grid
+    fig, axes = plt.subplots(2, 3, figsize=(18, 10))
+    for ax, (title, vfn, ylabel, logy, p99m, lb, wls) in zip(axes.ravel(), METRICS):
+        _plot_metric(ax, title, vfn, ylabel, logy, p99m, lb, wls)
+    axes.ravel()[0].legend(fontsize=9, ncol=2)
+    fig.suptitle("Per-metric vs concurrency — solid = avg, dashed = p99 (latency metrics)", fontsize=14)
+    fig.tight_layout(rect=[0, 0, 1, 0.97])
+    fig.savefig(os.path.join(OUT_DIR, "metrics_grid.png"), dpi=130)
+    # individual charts
+    slug = {"TTFT (avg)": "ttft", "ITL": "itl", "TPOT": "tpot",
+            "Request throughput": "req_throughput",
+            "Output token throughput": "token_throughput",
+            "Request latency (avg)": "req_latency"}
+    written = []
+    for title, vfn, ylabel, logy, p99m, lb, wls in METRICS:
+        fig, ax = plt.subplots(figsize=(8, 5.5))
+        _plot_metric(ax, title, vfn, ylabel, logy, p99m, lb, wls)
+        ax.legend(fontsize=9)
+        fig.tight_layout()
+        name = "metric_%s.png" % slug[title]
+        fig.savefig(os.path.join(OUT_DIR, name), dpi=130)
+        plt.close(fig)
+        written.append(name)
+    return ["metrics_grid.png"] + written
 
 
 # ---------------------------------------------------------------- Fig 1: overview
@@ -196,8 +269,10 @@ if __name__ == "__main__":
     fig_per_gpu()
     fig_per_workload()
     wrote_uncapped = fig_uncapped()
-    names = ["pareto", "pareto_per_gpu", "pareto_per_workload"]
+    metric_files = fig_metrics()
+    names = ["pareto.png", "pareto_per_gpu.png", "pareto_per_workload.png"]
     if wrote_uncapped:
-        names.append("pareto_uncapped")
+        names.append("pareto_uncapped.png")
+    names += metric_files
     for f in names:
-        print("wrote %s" % os.path.relpath(os.path.join(OUT_DIR, f + ".png"), ROOT))
+        print("wrote %s" % os.path.relpath(os.path.join(OUT_DIR, f), ROOT))

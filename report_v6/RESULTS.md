@@ -54,6 +54,32 @@ OSL ~2.4–4.1k. Full tables: [`SUMMARY.txt`](SUMMARY.txt).
 **Capped sweep (○) vs uncapped + thinking-on operating points (★)** — from the earlier exploration
 ![uncapped](figures/pareto_uncapped.png)
 
+## Per-metric charts (vs concurrency)
+
+Every metric as its own chart, x = concurrency, one line per workload. Solid = avg; dashed = p99
+(latency metrics). TTFT and request-latency use a log y-axis (coding/rag are orders larger).
+**ITL** (Inter-Token Latency, aiperf-reported) and **TPOT** (Time Per Output Token = 1000 /
+per-user output throughput) are per-output-token decode latencies, so those two cover only the
+decode-bound workloads — rag's ~3-token answers make per-token latency undefined.
+
+![all metrics](figures/metrics_grid.png)
+
+Individual charts: [TTFT](figures/metric_ttft.png) · [ITL](figures/metric_itl.png) ·
+[TPOT](figures/metric_tpot.png) · [request throughput](figures/metric_req_throughput.png) ·
+[output token throughput](figures/metric_token_throughput.png) ·
+[request latency](figures/metric_req_latency.png).
+
+- **TTFT** rises with concurrency everywhere (more queued prefill); rag is worst (3.6 → 28.6 s)
+  and chatbot best (0.25 → 0.51 s).
+- **ITL / TPOT** grow ~30 → 140 ms/token as the decode batch fills — the per-user interactivity
+  cost of higher concurrency. chatbot/agent have the lowest per-token latency.
+- **Request throughput** is flat for the prefill-bound (rag ~0.9) and climbs for decode-bound
+  (chatbot → 1.0 req/s at c32).
+- **Output token throughput** climbs with concurrency for decode workloads (chatbot → 238 tok/s);
+  rag sits near zero (it barely generates).
+- **Request latency** is dominated by coding (reasoning ON, long outputs → minutes); short-output
+  workloads stay in the seconds.
+
 ## Reading it
 
 - **Prefix-cache hit tracks shared context**: toolagent ~21% (shared tool/system prefixes),
