@@ -66,7 +66,8 @@ decode-bound workloads — rag's ~3-token answers make per-token latency undefin
 
 Individual charts: [TTFT](figures/metric_ttft.png) · [ITL](figures/metric_itl.png) ·
 [TPOT](figures/metric_tpot.png) · [request throughput](figures/metric_req_throughput.png) ·
-[output token throughput](figures/metric_token_throughput.png) ·
+[output token throughput (system)](figures/metric_token_throughput.png) ·
+[output token throughput / user](figures/metric_token_throughput_per_user.png) ·
 [request latency](figures/metric_req_latency.png).
 
 - **TTFT** rises with concurrency everywhere (more queued prefill); rag is worst (3.6 → 28.6 s)
@@ -77,6 +78,9 @@ Individual charts: [TTFT](figures/metric_ttft.png) · [ITL](figures/metric_itl.p
   (chatbot → 1.0 req/s at c32).
 - **Output token throughput** climbs with concurrency for decode workloads (chatbot → 238 tok/s);
   rag sits near zero (it barely generates).
+- **Output token throughput / user** does the opposite — it *falls* (28 → ~9–13 tok/s/user) as the
+  decode batch fills: total throughput rises but each individual user is served more slowly. This is
+  the per-user interactivity number (the inverse of TPOT).
 - **Request latency** is dominated by coding (reasoning ON, long outputs → minutes); short-output
   workloads stay in the seconds.
 

@@ -27,7 +27,8 @@ this is the older exploration, kept for history.
 - Throughput-per-GPU frontier — `figures/pareto_per_gpu.png`
 - Capped sweep vs uncapped (★) — `figures/pareto_uncapped.png`
 - **Per-metric vs concurrency** — `figures/metrics_grid.png` plus individual
-  `metric_{ttft,itl,tpot,req_throughput,token_throughput,req_latency}.png`
+  `metric_{ttft,itl,tpot,req_throughput,token_throughput,token_throughput_per_user,req_latency}.png`
+  (output token throughput is charted both system-level and per-user)
 
 ![all metrics](figures/metrics_grid.png)
 ![overview](figures/pareto.png)

@@ -88,6 +88,7 @@ METRICS = [
     ("TPOT",                tpot_ms,                                     "Time Per Output Token (ms)",   False, None,   True,  DECODE),
     ("Request throughput",  lambda wl, c: get(csv_sweep(wl, c), RPS),    "Requests / sec",               False, None,   False, WLS),
     ("Output token throughput", lambda wl, c: get(csv_sweep(wl, c), TOK), "System tokens / sec",         False, None,   False, WLS),
+    ("Output token throughput / user", lambda wl, c: get(csv_sweep(wl, c), TPU), "Tokens / sec / user",   False, None,   False, WLS),
     ("Request latency (avg)", lambda wl, c: get(csv_sweep(wl, c), REQLAT), "Request Latency (ms)",       True,  REQLAT, True,  WLS),
 ]
 
@@ -118,11 +119,15 @@ def _plot_metric(ax, title, vfn, ylabel, logy, p99m, lower_better, wls=WLS):
 
 
 def fig_metrics():
-    # combined grid
-    fig, axes = plt.subplots(2, 3, figsize=(18, 10))
-    for ax, (title, vfn, ylabel, logy, p99m, lb, wls) in zip(axes.ravel(), METRICS):
+    # combined grid (adapts to the number of metrics)
+    n = len(METRICS); ncols = 4 if n > 6 else 3; nrows = math.ceil(n / ncols)
+    fig, axes = plt.subplots(nrows, ncols, figsize=(4.6 * ncols, 4.6 * nrows))
+    axes = axes.ravel()
+    for ax, (title, vfn, ylabel, logy, p99m, lb, wls) in zip(axes, METRICS):
         _plot_metric(ax, title, vfn, ylabel, logy, p99m, lb, wls)
-    axes.ravel()[0].legend(fontsize=9, ncol=2)
+    for ax in axes[n:]:
+        ax.set_visible(False)
+    axes[0].legend(fontsize=9, ncol=2)
     fig.suptitle("Per-metric vs concurrency — solid = avg, dashed = p99 (latency metrics)", fontsize=14)
     fig.tight_layout(rect=[0, 0, 1, 0.97])
     fig.savefig(os.path.join(OUT_DIR, "metrics_grid.png"), dpi=130)
@@ -130,6 +135,7 @@ def fig_metrics():
     slug = {"TTFT (avg)": "ttft", "ITL": "itl", "TPOT": "tpot",
             "Request throughput": "req_throughput",
             "Output token throughput": "token_throughput",
+            "Output token throughput / user": "token_throughput_per_user",
             "Request latency (avg)": "req_latency"}
     written = []
     for title, vfn, ylabel, logy, p99m, lb, wls in METRICS:
