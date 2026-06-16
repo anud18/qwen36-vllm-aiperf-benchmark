@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""Pareto curves from the concurrency sweep (results/sweep/<wl>/c<level>/).
+"""Pareto curves from the v6 concurrency sweep (results/final/<wl>/c<level>/).
+
+Reads the v6 run (IN_DIR) and writes figures into a dedicated OUT_DIR
+(report_v6/figures/), both overridable via SWEEP_DIR / OUT_DIR env vars.
 
 Produces:
-  results/pareto.png            - throughput vs interactivity + req/s vs TTFT (overview)
-  results/pareto_per_gpu.png    - tok/s (1x GB10) vs ITL and vs TTFT, knee marked
-  results/pareto_per_workload.png - small multiples, one per workload, knee marked
-  results/pareto_uncapped.png   - capped sweep vs uncapped(thinking-on) overlay
+  <OUT>/pareto.png            - throughput vs interactivity + req/s vs TTFT (overview)
+  <OUT>/pareto_per_gpu.png    - tok/s (1x GB10) vs ITL and vs TTFT, knee marked
+  <OUT>/pareto_per_workload.png - small multiples, one per workload, knee marked
+  <OUT>/pareto_uncapped.png   - capped sweep vs uncapped(thinking-on) overlay (if data present)
 """
 import csv, os, math
 import matplotlib
@@ -13,6 +16,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
+IN_DIR = os.environ.get("SWEEP_DIR", os.path.join(ROOT, "results", "final"))
+OUT_DIR = os.environ.get("OUT_DIR", os.path.join(ROOT, "report_v6", "figures"))
+os.makedirs(OUT_DIR, exist_ok=True)
 WLS = ["chatbot", "coding", "rag", "agent", "toolagent"]
 DECODE = ["chatbot", "coding", "agent", "toolagent"]  # decode-bound (meaningful tok/s)
 LEVELS = [4, 8, 16, 32]
@@ -33,7 +39,7 @@ def get(p, metric, stat="avg"):
 
 
 def csv_sweep(wl, c):
-    return os.path.join(ROOT, "results", "sweep", wl, f"c{c}", "profile_export_aiperf.csv")
+    return os.path.join(IN_DIR, wl, f"c{c}", "profile_export_aiperf.csv")
 
 
 def series(wl, metric):
@@ -93,7 +99,7 @@ def fig_overview():
     ax2.grid(True, alpha=0.3); ax2.legend()
     fig.suptitle("Qwen3.6-35B-A3B-FP8 on vLLM (GB10) — concurrency sweep", fontsize=13)
     fig.tight_layout(rect=[0, 0, 1, 0.96])
-    fig.savefig(os.path.join(ROOT, "results", "pareto.png"), dpi=130)
+    fig.savefig(os.path.join(OUT_DIR, "pareto.png"), dpi=130)
 
 
 # ------------------------------------------------ Fig 2: throughput-per-GPU frontier
@@ -119,7 +125,7 @@ def fig_per_gpu():
         ax.grid(True, alpha=0.3); ax.legend()
     fig.suptitle("Throughput-per-GPU frontier — knee = closest-to-utopia concurrency", fontsize=13)
     fig.tight_layout(rect=[0, 0, 1, 0.96])
-    fig.savefig(os.path.join(ROOT, "results", "pareto_per_gpu.png"), dpi=130)
+    fig.savefig(os.path.join(OUT_DIR, "pareto_per_gpu.png"), dpi=130)
 
 
 # ------------------------------------------------ Fig 3: per-workload small multiples
@@ -148,12 +154,15 @@ def fig_per_workload():
     axes[-1].set_visible(False)
     fig.suptitle("Per-workload throughput vs latency — ○ marks the knee (best concurrency)", fontsize=13)
     fig.tight_layout(rect=[0, 0, 1, 0.96])
-    fig.savefig(os.path.join(ROOT, "results", "pareto_per_workload.png"), dpi=130)
+    fig.savefig(os.path.join(OUT_DIR, "pareto_per_workload.png"), dpi=130)
 
 
 # ------------------------------------------------ Fig 4: capped vs uncapped overlay
 def fig_uncapped():
-    # uncapped runs: single operating point each (thinking ON, no cap)
+    # uncapped runs: single operating point each (thinking ON, no cap).
+    # These are from the earlier exploration; skip the figure if that data is absent.
+    if not os.path.isdir(os.path.join(ROOT, "results", "uncapped")):
+        return False
     unc_conc = {"rag": 8, "agent": 8, "coding": 4}
     fig, ax = plt.subplots(figsize=(11, 7))
     for wl in ["rag", "agent", "coding"]:
@@ -178,13 +187,17 @@ def fig_uncapped():
                  "tok/s is similar; what explodes is OSL → end-to-end latency")
     ax.grid(True, alpha=0.3); ax.legend(fontsize=8)
     fig.tight_layout()
-    fig.savefig(os.path.join(ROOT, "results", "pareto_uncapped.png"), dpi=130)
+    fig.savefig(os.path.join(OUT_DIR, "pareto_uncapped.png"), dpi=130)
+    return True
 
 
 if __name__ == "__main__":
     fig_overview()
     fig_per_gpu()
     fig_per_workload()
-    fig_uncapped()
-    for f in ("pareto", "pareto_per_gpu", "pareto_per_workload", "pareto_uncapped"):
-        print("wrote results/%s.png" % f)
+    wrote_uncapped = fig_uncapped()
+    names = ["pareto", "pareto_per_gpu", "pareto_per_workload"]
+    if wrote_uncapped:
+        names.append("pareto_uncapped")
+    for f in names:
+        print("wrote %s" % os.path.relpath(os.path.join(OUT_DIR, f + ".png"), ROOT))
