@@ -65,6 +65,11 @@ forwarded verbatim. Only `/v1/chat/completions` and `/v1/completions` produce tr
 (and still forwards every chunk to the client unchanged), so streamed requests always get exact
 token counts.
 
+## Example
+
+A committed sample (4 varied records + a reproduce script) lives in
+[`examples/trace/`](../examples/trace/) — run `examples/trace/record_sample.sh` to regenerate it.
+
 ## Inspect a trace
 
 ```bash
