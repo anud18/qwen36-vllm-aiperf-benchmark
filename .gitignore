@@ -8,3 +8,4 @@ results/
 .venv-plot/
 .venv-trace/
 traces/
+.venv-openllmetry/
