@@ -47,7 +47,10 @@ def main():
         ts = (r.get("ts") or "")[:26]
         pin = str(r.get("prompt_tokens") if r.get("prompt_tokens") is not None else "-")
         pout = str(r.get("completion_tokens") if r.get("completion_tokens") is not None else "-")
-        io = f"{preview(r.get('input'), 34)} -> {preview(r.get('output'), 34)}"
+        out = r.get("output")
+        if not out and r.get("tool_calls"):
+            out = "🔧 " + ", ".join(f"{t.get('name')}({t.get('arguments')})" for t in r["tool_calls"])
+        io = f"{preview(r.get('input'), 34)} -> {preview(out, 40)}"
         print(f"{ts:<27} {pin:>6} {pout:>6} {fmt(r.get('ttft_ms')):>8} {fmt(r.get('latency_ms')):>9}  {io}")
     if head is not None and len(recs) > head:
         print(f"... ({len(recs) - head} more)")

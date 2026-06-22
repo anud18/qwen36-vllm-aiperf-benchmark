@@ -51,10 +51,12 @@ forwarded verbatim. Only `/v1/chat/completions` and `/v1/completions` produce tr
 |---|---|
 | `ts`, `ts_epoch` | request received — ISO 8601 (UTC) and epoch seconds |
 | `request_id` | vLLM `x-request-id` response header, if present |
+| `response_id` | completion `id` (`chatcmpl-…`) — equals OTLP `gen_ai.request.id`, so content and timing join |
 | `endpoint`, `model`, `streamed` | which API, model name, streaming or not |
 | `input` | full request content — `{"messages": [...]}` (chat) or `{"prompt": "..."}` |
 | `output` | the assistant's full reassembled text |
 | `reasoning` | chain-of-thought text, recorded separately (null when thinking is off) |
+| `tool_calls` | list of `{id, name, arguments}` when the model calls a tool (null otherwise) |
 | `prompt_tokens`, `completion_tokens`, `total_tokens` | from vLLM `usage` |
 | `ttft_ms` | time to first token (streaming; first reasoning *or* content token) |
 | `latency_ms` | request received → last byte |
@@ -69,6 +71,46 @@ token counts.
 
 A committed sample (4 varied records + a reproduce script) lives in
 [`examples/trace/`](../examples/trace/) — run `examples/trace/record_sample.sh` to regenerate it.
+
+## Native vLLM OTLP tracing (alongside the proxy)
+
+The proxy captures **content**; vLLM's built-in OpenTelemetry tracing captures **authoritative,
+server-internal timings** (queue time, prefill/decode, e2e) and token counts as spans — with **no
+extra hop**. Run both and correlate by request id; they are complementary.
+
+```
+vLLM  --otlp-traces-endpoint grpc://host.docker.internal:4317
+      │  (gen_ai.* spans: tokens, time_in_queue, time_to_first_token, e2e)
+      ▼
+OTel Collector (monitoring/ : bench-otel-collector, :4317 gRPC / :4318 HTTP)
+      │  file exporter
+      ▼
+traces/vllm_spans.jsonl   ──►  scripts/otel_span_summary.py
+```
+
+Enable it:
+
+```bash
+# 1. start the collector (part of the monitoring stack)
+cd monitoring && docker compose up -d otel-collector && cd ..
+# 2. serve vLLM with the OTLP endpoint (+ tool flags here too)
+EXTRA_ARGS="--enable-auto-tool-choice --tool-call-parser hermes \
+  --otlp-traces-endpoint grpc://host.docker.internal:4317" \
+  REASONING_PARSER=qwen3 GPU_UTIL=0.85 MAX_NUM_SEQS=32 \
+  MAX_MODEL_LEN=248320 MAX_NUM_BATCHED_TOKENS=248320 bash scripts/serve_vllm.sh
+# 3. after traffic, read the spans
+python3 scripts/otel_span_summary.py traces/vllm_spans.jsonl
+```
+
+Spans land in `traces/vllm_spans.jsonl` (OTLP-JSON, one batch per line). The collector is pinned to
+`otel/opentelemetry-collector-contrib:0.119.0` and runs as root so it can write the host-mounted
+file. vLLM reaches the collector via `host.docker.internal` (the serve script already adds that host).
+
+| proxy (content) | OTLP (timing) |
+|---|---|
+| full input / output / reasoning / tool_calls | token counts only (no content) |
+| client-side TTFT / latency (+1 hop) | server-internal: queue, TTFT, e2e, scheduler (no hop) |
+| any OpenAI server, no vLLM change | vLLM-native, needs an OTLP collector |
 
 ## Inspect a trace
 

@@ -63,8 +63,8 @@ def req_input(path, body):
 
 
 def _accumulate(ev, st):
-    """Pull content/reasoning/usage out of one streamed chunk into state st.
-    TTFT = time of the first emitted token, whether reasoning or content."""
+    """Pull content/reasoning/tool_calls/usage out of one streamed chunk into st.
+    TTFT = time of the first emitted token (reasoning, content, or tool call)."""
     for ch in ev.get("choices") or []:
         d = ch.get("delta") or {}
         # streaming reasoning is `delta.reasoning` on this vLLM nightly
@@ -79,8 +79,38 @@ def _accumulate(ev, st):
             st["out"].append(txt)
             if st["ttft"] is None:
                 st["ttft"] = time.time()
+        # tool calls stream in fragments keyed by index; accumulate per index
+        for tc in d.get("tool_calls") or []:
+            idx = tc.get("index", 0)
+            slot = st["tools"].setdefault(idx, {"id": None, "name": None, "args": []})
+            if tc.get("id"):
+                slot["id"] = tc["id"]
+            fn = tc.get("function") or {}
+            if fn.get("name"):
+                slot["name"] = fn["name"]
+            if fn.get("arguments"):
+                slot["args"].append(fn["arguments"])
+            if st["ttft"] is None:
+                st["ttft"] = time.time()
+    if ev.get("id") and not st.get("id"):
+        st["id"] = ev["id"]            # completion id == OTLP gen_ai.request.id
     if ev.get("usage"):
         st["usage"] = ev["usage"]
+
+
+def _tools_from_state(tools):
+    if not tools:
+        return None
+    return [{"id": v["id"], "name": v["name"], "arguments": "".join(v["args"])}
+            for _, v in sorted(tools.items())]
+
+
+def _tools_from_message(msg):
+    tcs = msg.get("tool_calls")
+    if not tcs:
+        return None
+    return [{"id": t.get("id"), "name": (t.get("function") or {}).get("name"),
+             "arguments": (t.get("function") or {}).get("arguments")} for t in tcs]
 
 
 async def handle(request: web.Request):
@@ -126,8 +156,8 @@ async def handle(request: web.Request):
     if not (record and is_stream):
         data = await up.read()
         if record:
-            out = reason = None
-            usage = {}
+            out = reason = tool_calls = None
+            usage = {}; j = None
             try:
                 j = json.loads(data)
                 usage = j.get("usage") or {}
@@ -135,12 +165,16 @@ async def handle(request: web.Request):
                 msg = ch.get("message") or {}
                 out = msg.get("content") if "message" in ch else ch.get("text")
                 reason = msg.get("reasoning_content") or msg.get("reasoning")
+                tool_calls = _tools_from_message(msg)
             except Exception:
-                pass
+                tool_calls = None
             await write_trace({
-                "ts": ts_iso, "ts_epoch": t0, "request_id": rid, "endpoint": path,
+                "ts": ts_iso, "ts_epoch": t0, "request_id": rid,
+                "response_id": (j.get("id") if isinstance(j, dict) else None),
+                "endpoint": path,
                 "model": (reqj or {}).get("model"), "streamed": False,
                 "input": rec_in, "output": out, "reasoning": reason,
+                "tool_calls": tool_calls,
                 "prompt_tokens": usage.get("prompt_tokens"),
                 "completion_tokens": usage.get("completion_tokens"),
                 "total_tokens": usage.get("total_tokens"),
@@ -151,7 +185,7 @@ async def handle(request: web.Request):
     # ---- streaming (SSE): forward chunks, accumulate, record at end ----
     resp = web.StreamResponse(status=up.status, headers=resp_headers)
     await resp.prepare(request)
-    st = {"out": [], "reason": [], "usage": None, "ttft": None}
+    st = {"out": [], "reason": [], "usage": None, "ttft": None, "tools": {}, "id": None}
     try:
         async for raw in up.content:
             await resp.write(raw)
@@ -167,10 +201,12 @@ async def handle(request: web.Request):
         await resp.write_eof()
         usage = st["usage"] or {}
         await write_trace({
-            "ts": ts_iso, "ts_epoch": t0, "request_id": rid, "endpoint": path,
+            "ts": ts_iso, "ts_epoch": t0, "request_id": rid,
+            "response_id": st["id"], "endpoint": path,
             "model": (reqj or {}).get("model"), "streamed": True,
             "input": rec_in, "output": "".join(st["out"]),
             "reasoning": "".join(st["reason"]) or None,
+            "tool_calls": _tools_from_state(st["tools"]),
             "prompt_tokens": usage.get("prompt_tokens"),
             "completion_tokens": usage.get("completion_tokens"),
             "total_tokens": usage.get("total_tokens"),
