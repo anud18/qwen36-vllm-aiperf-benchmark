@@ -9,3 +9,5 @@ results/
 .venv-trace/
 traces/
 .venv-openllmetry/
+monitoring/langfuse/.env
+.venv-langfuse/

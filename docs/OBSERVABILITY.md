@@ -56,6 +56,45 @@ traceId 6a837b41776b563c..
 > Note: this build uses `opentelemetry-instrumentation-openai` ≥ the new gen_ai conventions, so
 > content is in `gen_ai.input.messages` / `output.messages` (not the older `gen_ai.prompt.N.content`).
 
+## 4. Langfuse — self-hosted UI + API
+
+[Langfuse](https://langfuse.com) is an LLM-observability **platform**: it stores traces with full
+content, token usage, latency, and cost in a searchable UI, plus evals/datasets. Self-hosted here
+(Postgres + ClickHouse + Redis + MinIO + web/worker) under `monitoring/langfuse/`.
+
+```bash
+cp monitoring/langfuse/.env.example monitoring/langfuse/.env   # fill in keys / secrets
+cd monitoring/langfuse && docker compose up -d && cd ../..      # UI at http://localhost:3001
+# instrument vLLM calls with Langfuse's OpenAI wrapper and send traces:
+set -a; . monitoring/langfuse/.env; set +a
+LANGFUSE_HOST=http://localhost:3001 \
+  LANGFUSE_PUBLIC_KEY=$LANGFUSE_INIT_PROJECT_PUBLIC_KEY \
+  LANGFUSE_SECRET_KEY=$LANGFUSE_INIT_PROJECT_SECRET_KEY \
+  .venv-langfuse/bin/python scripts/langfuse_client.py
+```
+
+- Web UI on **:3001** (Grafana keeps :3000; MinIO console remapped to 127.0.0.1:9190 to avoid
+  Prometheus :9090). The project + API keys are bootstrapped headlessly via `LANGFUSE_INIT_*` in
+  `.env` (no manual signup); the real `.env` is gitignored, `.env.example` is the template.
+- `scripts/langfuse_client.py` uses the drop-in wrapper `from langfuse.openai import openai`, so
+  each call becomes a Langfuse **generation** with input/output content, model, token usage, latency.
+
+Verified via the public API (`GET /api/public/traces`):
+
+```
+trace primary-colors  →  GENERATION  model=qwen3.6
+  input : [{"role":"user","content":"Name three primary colors."}]
+  output: {"role":"assistant","content":"The three primary colors …"}
+  usage : input=17 output=40 total=57   latency=0.868s
+```
+
+Tool calls are captured too (the `weather-tool` trace records the `get_weather` call). Langfuse can
+also ingest **OTLP** directly (point an OpenLLMetry/OTel exporter at
+`http://localhost:3001/api/public/otel/v1/traces` with basic auth) if you prefer instrumentation
+over the SDK wrapper.
+
+> Heaviest option (6 containers) but the only one with a real UI, search, evals, and cost tracking.
+
 ## When to use which
 
 - **Debugging / content capture / dataset capture** → proxy (any client) or OpenLLMetry (Python client).
