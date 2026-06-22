@@ -6,3 +6,5 @@ results/
 *.safetensors
 .venv/
 .venv-plot/
+.venv-trace/
+traces/
