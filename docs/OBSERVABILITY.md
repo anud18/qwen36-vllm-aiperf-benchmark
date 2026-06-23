@@ -169,6 +169,25 @@ that forward to the other tools (Langfuse, OpenTelemetry, Prometheus, …). `scr
 calls vLLM via the SDK with a `CustomLogger` that records content, tool calls, tokens, latency, and
 **cost** to JSONL — and registers a price for `qwen3.6` (it isn't in LiteLLM's price map).
 
+![LiteLLM trace architecture](litellm_arch.png)
+
+```mermaid
+flowchart LR
+    C["Client<br/>aiperf / app"]
+    L["LiteLLM<br/>gateway/SDK + CustomLogger"]
+    V["vLLM server<br/>:8000"]
+    J[("traces/litellm_trace.jsonl<br/>content·tokens·cost·latency")]
+    B["Langfuse / OTel /<br/>Prometheus (optional)"]
+    C -- "① request" --> L
+    L -- "② forward" --> V
+    V -- "③ response (+usage)" --> L
+    L -- "④ response" --> C
+    L -- "⑤ log_success_event" --> J
+    L -. "⑥ optional callbacks" .-> B
+```
+
+Render the PNG with `python3 scripts/plot_litellm_arch.py`.
+
 ```bash
 python3 -m venv .venv-litellm && .venv-litellm/bin/pip install -q litellm
 .venv-litellm/bin/python scripts/litellm_client.py     # -> traces/litellm_trace.jsonl
