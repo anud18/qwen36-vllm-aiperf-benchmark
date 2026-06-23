@@ -7,6 +7,10 @@ example checked in.
 - **`sample_trace.jsonl`** — 5 real records captured by `scripts/trace_proxy.py` (content trace).
 - **`sample_vllm_spans.jsonl`** — native vLLM **OTLP** spans (server-internal timing), as written by
   the OTel collector; read with `scripts/otel_span_summary.py`.
+- **`sample_openllmetry_spans.jsonl`** — **OpenLLMetry** client spans (content + tokens + tool calls);
+  read with `scripts/openllmetry_summary.py`.
+- **`sample_langfuse_trace.json`** — one **Langfuse** trace exported from its API (content + usage +
+  latency). See [`../../docs/OBSERVABILITY.md`](../../docs/OBSERVABILITY.md) for all four tools.
 - **`record_sample.sh`** — reproduces `sample_trace.jsonl` (starts the proxy, sends the requests,
   prints the summary). Needs vLLM serving on `:8000` (record 5 needs `--enable-auto-tool-choice
   --tool-call-parser hermes`).

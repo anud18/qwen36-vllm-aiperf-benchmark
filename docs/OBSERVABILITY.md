@@ -12,11 +12,58 @@ complementary; pick by what you need (content vs timing, client vs server, file 
 
 All four are documented here; the proxy has its own deep-dive in [`TRACING.md`](TRACING.md).
 
+## What data each tool captures
+
+Verified in this repo against vLLM (Qwen3.6). ✅ = captured, ⚠️ = partial/conditional, ❌ = no.
+
+| data field | Proxy | vLLM OTLP | OpenLLMetry | Langfuse |
+|---|:--:|:--:|:--:|:--:|
+| **input** content (messages/prompt) | ✅ | ❌ | ✅ `gen_ai.input.messages` | ✅ |
+| **output** content | ✅ | ❌ | ✅ `gen_ai.output.messages` | ✅ |
+| **reasoning** / CoT | ✅ separate field | ❌ | ⚠️ inside output | ⚠️ inside output |
+| **tool calls** (name + args) | ✅ | ❌ | ✅ | ✅ |
+| input tokens | ✅ | ✅ | ✅ | ✅ |
+| output tokens | ✅ | ✅ | ⚠️ (❌ on stream) | ✅ |
+| total tokens | ✅ | ⚠️ (derive) | ✅ | ✅ |
+| **TTFT** | ✅ (client) | ✅ (server) | ❌ | ⚠️ stream only (`completionStartTime`) |
+| **e2e latency** | ✅ (client) | ✅ (server) | ✅ (span dur) | ✅ |
+| queue time | ❌ | ✅ | ⚠️ via joined vLLM span | ❌ |
+| **prefill** time | ❌ | ✅ `time_in_model_prefill` | ⚠️ via joined span | ❌ |
+| **decode** time | ❌ | ✅ `time_in_model_decode` | ⚠️ via joined span | ❌ |
+| model name | ✅ | ✅ | ✅ | ✅ |
+| request / response id | ⚠️ / ✅ | ✅ `gen_ai.request.id` | ✅ `gen_ai.response.id` | ✅ |
+| finish reason | ❌ | ❌ | ✅ | ✅ |
+| sampling params (temp/top_p/max_tokens) | ❌ (in input) | ✅ | ✅ | ✅ |
+| timestamp | ✅ | ✅ (span time) | ✅ | ✅ |
+| streamed flag | ✅ | ❌ | ✅ `gen_ai.is_streaming` | ✅ |
+| HTTP status | ✅ | ❌ | ⚠️ span status | ✅ |
+| **cost** ($) | ❌ | ❌ | ❌ | ✅ (token×price) |
+| **UI / search / evals** | ❌ | ❌ | ❌ | ✅ |
+| connects client↔server in one trace | ❌ | ❌ | ✅ (W3C context) | ⚠️ (if OTLP-fed) |
+
+**One-line read:**
+- **Proxy** = everything *content* + client timing, in a flat JSONL; blind to server internals.
+- **vLLM OTLP** = the only source of *server-internal* timing (queue / prefill / decode); no content.
+- **OpenLLMetry** = content + tokens at the client, and it *joins* the vLLM span → content **and**
+  server timing in one trace. Best single lightweight tool.
+- **Langfuse** = content + tokens + latency + **cost** in a real UI; no server-internal split unless
+  you also feed it vLLM's OTLP.
+
+### Example output files (committed)
+
+| tool | sample output | read with |
+|---|---|---|
+| Proxy | [`examples/trace/sample_trace.jsonl`](../examples/trace/sample_trace.jsonl) | `scripts/trace_summary.py` |
+| vLLM OTLP | [`examples/trace/sample_vllm_spans.jsonl`](../examples/trace/sample_vllm_spans.jsonl) | `scripts/otel_span_summary.py` |
+| OpenLLMetry | [`examples/trace/sample_openllmetry_spans.jsonl`](../examples/trace/sample_openllmetry_spans.jsonl) | `scripts/openllmetry_summary.py` |
+| Langfuse | [`examples/trace/sample_langfuse_trace.json`](../examples/trace/sample_langfuse_trace.json) | Langfuse UI / `GET /api/public/traces` |
+
 ## 1. Proxy — content, any client
 
 Transparent logging proxy; records every request to JSONL. Best for capturing real traffic
 (incl. content) with no code changes. See [`TRACING.md`](TRACING.md). Caveat: adds a network hop,
 so don't use it for headline latency numbers.
+**Output** → [`examples/trace/sample_trace.jsonl`](../examples/trace/sample_trace.jsonl).
 
 ## 2. vLLM native OTLP — server-internal timing
 
@@ -25,6 +72,7 @@ vLLM's own OpenTelemetry spans (`gen_ai.*`): token counts + `time_in_queue`,
 `--otlp-traces-endpoint grpc://host.docker.internal:4317` and the OTel collector in `monitoring/`.
 Read with `scripts/otel_span_summary.py`. See the "Native vLLM OTLP tracing" section of
 [`TRACING.md`](TRACING.md).
+**Output** → [`examples/trace/sample_vllm_spans.jsonl`](../examples/trace/sample_vllm_spans.jsonl).
 
 ## 3. OpenLLMetry — client instrumentation (content + timing in one trace)
 
@@ -55,6 +103,8 @@ traceId 6a837b41776b563c..
 
 > Note: this build uses `opentelemetry-instrumentation-openai` ≥ the new gen_ai conventions, so
 > content is in `gen_ai.input.messages` / `output.messages` (not the older `gen_ai.prompt.N.content`).
+
+**Output** → [`examples/trace/sample_openllmetry_spans.jsonl`](../examples/trace/sample_openllmetry_spans.jsonl).
 
 ## 4. Langfuse — self-hosted UI + API
 
@@ -94,6 +144,9 @@ also ingest **OTLP** directly (point an OpenLLMetry/OTel exporter at
 over the SDK wrapper.
 
 > Heaviest option (6 containers) but the only one with a real UI, search, evals, and cost tracking.
+
+**Output** → [`examples/trace/sample_langfuse_trace.json`](../examples/trace/sample_langfuse_trace.json)
+(one trace exported from the API; in normal use you browse them in the UI).
 
 ## When to use which
 
