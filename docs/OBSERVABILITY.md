@@ -3,13 +3,13 @@
 Five ways to capture what the model is doing, from black-box to fully instrumented. They are
 complementary; pick by what you need (content vs timing, client vs server, file vs UI, cost).
 
-| approach | captures content? | captures timing | where | extra hop | backend |
+| approach | runs on | captures content? | captures timing | extra hop | backend |
 |---|---|---|---|---|---|
-| **Proxy** (`scripts/trace_proxy.py`) | ✅ full in/out/reasoning/tool_calls | client-side TTFT/latency | between client & vLLM | yes (+1 hop) | JSONL file |
-| **vLLM OTLP** (`--otlp-traces-endpoint`) | ❌ tokens only | ✅ server-internal (queue/prefill/decode/e2e) | inside vLLM | no | OTel collector → file |
-| **OpenLLMetry** (`scripts/openllmetry_client.py`) | ✅ in/out messages + tool_calls | client span; **joins** vLLM server span | OpenAI client | no | OTLP → collector / Langfuse |
-| **Langfuse** | ✅ (via OpenLLMetry/SDK) | ✅ (spans) | client + ingest | no | self-hosted UI |
-| **LiteLLM** (`scripts/litellm_client.py`) | ✅ in/out + tool_calls | client latency | SDK/gateway | no (SDK) | callbacks + **cost** |
+| **Proxy** (`scripts/trace_proxy.py`) | **proxy** (sits client↔server) | ✅ full in/out/reasoning/tool_calls | client-side TTFT/latency | yes (+1 hop) | JSONL file |
+| **vLLM OTLP** (`--otlp-traces-endpoint`) | **server** (inside vLLM) | ❌ tokens only | ✅ server-internal (queue/prefill/decode/e2e) | no | OTel collector → file |
+| **OpenLLMetry** (`scripts/openllmetry_client.py`) | **client** (OpenAI client) | ✅ in/out messages + tool_calls | client span; **joins** vLLM server span | no | OTLP → collector / Langfuse |
+| **Langfuse** | **client** SDK → **server** backend | ✅ (via OpenLLMetry/SDK) | ✅ (spans) | no | self-hosted UI |
+| **LiteLLM** (`scripts/litellm_client.py`) | **client** SDK (or gateway) | ✅ in/out + tool_calls | client latency | no (SDK) | callbacks + **cost** |
 
 All five are documented here; the proxy has its own deep-dive in [`TRACING.md`](TRACING.md).
 
@@ -19,6 +19,7 @@ Verified in this repo against vLLM (Qwen3.6). ✅ = captured, ⚠️ = partial/c
 
 | data field | Proxy | vLLM OTLP | OpenLLMetry | Langfuse | LiteLLM |
 |---|:--:|:--:|:--:|:--:|:--:|
+| **runs on** | proxy (client↔server) | **server** (in vLLM) | **client** | **client** SDK + server UI | **client** SDK / gateway |
 | **input** content (messages/prompt) | ✅ | ❌ | ✅ `gen_ai.input.messages` | ✅ | ✅ |
 | **output** content | ✅ | ❌ | ✅ `gen_ai.output.messages` | ✅ | ✅ |
 | **reasoning** / CoT | ✅ separate field | ❌ | ⚠️ inside output | ⚠️ inside output | ⚠️ inside output |
