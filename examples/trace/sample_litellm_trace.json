@@ -1,0 +1,41 @@
+[
+  {
+    "ts": "2026-06-23T06:05:03.147785+00:00",
+    "model": "qwen3.6",
+    "input": [
+      {
+        "role": "user",
+        "content": "Name three primary colors."
+      }
+    ],
+    "output": "The three primary colors are **Red**, **Yellow**, and **Blue**.\n\nThese are considered primary in the context of traditional color theory (specifically the RYB model used in art and painting",
+    "tool_calls": null,
+    "prompt_tokens": 17,
+    "completion_tokens": 40,
+    "total_tokens": 57,
+    "cost_usd": 1.77e-05,
+    "latency_ms": 948.5
+  },
+  {
+    "ts": "2026-06-23T06:05:04.097456+00:00",
+    "model": "qwen3.6",
+    "input": [
+      {
+        "role": "user",
+        "content": "Weather in Tokyo? Use the tool."
+      }
+    ],
+    "output": null,
+    "tool_calls": [
+      {
+        "name": "get_weather",
+        "arguments": "{\"location\": \"Tokyo\"}"
+      }
+    ],
+    "prompt_tokens": 265,
+    "completion_tokens": 24,
+    "total_tokens": 289,
+    "cost_usd": 3.6099999999999997e-05,
+    "latency_ms": 628.8
+  }
+]

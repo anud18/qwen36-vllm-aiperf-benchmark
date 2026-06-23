@@ -1,7 +1,7 @@
 # LLM observability options for the vLLM benchmark
 
-Four ways to capture what the model is doing, from black-box to fully instrumented. They are
-complementary; pick by what you need (content vs timing, client vs server, file vs UI).
+Five ways to capture what the model is doing, from black-box to fully instrumented. They are
+complementary; pick by what you need (content vs timing, client vs server, file vs UI, cost).
 
 | approach | captures content? | captures timing | where | extra hop | backend |
 |---|---|---|---|---|---|
@@ -9,37 +9,39 @@ complementary; pick by what you need (content vs timing, client vs server, file 
 | **vLLM OTLP** (`--otlp-traces-endpoint`) | ❌ tokens only | ✅ server-internal (queue/prefill/decode/e2e) | inside vLLM | no | OTel collector → file |
 | **OpenLLMetry** (`scripts/openllmetry_client.py`) | ✅ in/out messages + tool_calls | client span; **joins** vLLM server span | OpenAI client | no | OTLP → collector / Langfuse |
 | **Langfuse** | ✅ (via OpenLLMetry/SDK) | ✅ (spans) | client + ingest | no | self-hosted UI |
+| **LiteLLM** (`scripts/litellm_client.py`) | ✅ in/out + tool_calls | client latency | SDK/gateway | no (SDK) | callbacks + **cost** |
 
-All four are documented here; the proxy has its own deep-dive in [`TRACING.md`](TRACING.md).
+All five are documented here; the proxy has its own deep-dive in [`TRACING.md`](TRACING.md).
 
 ## What data each tool captures
 
 Verified in this repo against vLLM (Qwen3.6). ✅ = captured, ⚠️ = partial/conditional, ❌ = no.
 
-| data field | Proxy | vLLM OTLP | OpenLLMetry | Langfuse |
-|---|:--:|:--:|:--:|:--:|
-| **input** content (messages/prompt) | ✅ | ❌ | ✅ `gen_ai.input.messages` | ✅ |
-| **output** content | ✅ | ❌ | ✅ `gen_ai.output.messages` | ✅ |
-| **reasoning** / CoT | ✅ separate field | ❌ | ⚠️ inside output | ⚠️ inside output |
-| **tool calls** (name + args) | ✅ | ❌ | ✅ | ✅ |
-| input tokens | ✅ | ✅ | ✅ | ✅ |
-| output tokens | ✅ | ✅ | ⚠️ (❌ on stream) | ✅ |
-| total tokens | ✅ | ⚠️ (derive) | ✅ | ✅ |
-| **TTFT** | ✅ (client) | ✅ (server) | ❌ | ⚠️ stream only (`completionStartTime`) |
-| **e2e latency** | ✅ (client) | ✅ (server) | ✅ (span dur) | ✅ |
-| queue time | ❌ | ✅ | ⚠️ via joined vLLM span | ❌ |
-| **prefill** time | ❌ | ✅ `time_in_model_prefill` | ⚠️ via joined span | ❌ |
-| **decode** time | ❌ | ✅ `time_in_model_decode` | ⚠️ via joined span | ❌ |
-| model name | ✅ | ✅ | ✅ | ✅ |
-| request / response id | ⚠️ / ✅ | ✅ `gen_ai.request.id` | ✅ `gen_ai.response.id` | ✅ |
-| finish reason | ❌ | ❌ | ✅ | ✅ |
-| sampling params (temp/top_p/max_tokens) | ❌ (in input) | ✅ | ✅ | ✅ |
-| timestamp | ✅ | ✅ (span time) | ✅ | ✅ |
-| streamed flag | ✅ | ❌ | ✅ `gen_ai.is_streaming` | ✅ |
-| HTTP status | ✅ | ❌ | ⚠️ span status | ✅ |
-| **cost** ($) | ❌ | ❌ | ❌ | ✅ (token×price) |
-| **UI / search / evals** | ❌ | ❌ | ❌ | ✅ |
-| connects client↔server in one trace | ❌ | ❌ | ✅ (W3C context) | ⚠️ (if OTLP-fed) |
+| data field | Proxy | vLLM OTLP | OpenLLMetry | Langfuse | LiteLLM |
+|---|:--:|:--:|:--:|:--:|:--:|
+| **input** content (messages/prompt) | ✅ | ❌ | ✅ `gen_ai.input.messages` | ✅ | ✅ |
+| **output** content | ✅ | ❌ | ✅ `gen_ai.output.messages` | ✅ | ✅ |
+| **reasoning** / CoT | ✅ separate field | ❌ | ⚠️ inside output | ⚠️ inside output | ⚠️ inside output |
+| **tool calls** (name + args) | ✅ | ❌ | ✅ | ✅ | ✅ |
+| input tokens | ✅ | ✅ | ✅ | ✅ | ✅ |
+| output tokens | ✅ | ✅ | ⚠️ (❌ on stream) | ✅ | ✅ |
+| total tokens | ✅ | ⚠️ (derive) | ✅ | ✅ | ✅ |
+| **TTFT** | ✅ (client) | ✅ (server) | ❌ | ⚠️ stream only (`completionStartTime`) | ⚠️ stream only |
+| **e2e latency** | ✅ (client) | ✅ (server) | ✅ (span dur) | ✅ | ✅ (client) |
+| queue time | ❌ | ✅ | ⚠️ via joined vLLM span | ❌ | ❌ |
+| **prefill** time | ❌ | ✅ `time_in_model_prefill` | ⚠️ via joined span | ❌ | ❌ |
+| **decode** time | ❌ | ✅ `time_in_model_decode` | ⚠️ via joined span | ❌ | ❌ |
+| model name | ✅ | ✅ | ✅ | ✅ | ✅ |
+| request / response id | ⚠️ / ✅ | ✅ `gen_ai.request.id` | ✅ `gen_ai.response.id` | ✅ | ✅ |
+| finish reason | ❌ | ❌ | ✅ | ✅ | ✅ |
+| sampling params (temp/top_p/max_tokens) | ❌ (in input) | ✅ | ✅ | ✅ | ✅ |
+| timestamp | ✅ | ✅ (span time) | ✅ | ✅ | ✅ |
+| streamed flag | ✅ | ❌ | ✅ `gen_ai.is_streaming` | ✅ | ✅ |
+| HTTP status | ✅ | ❌ | ⚠️ span status | ✅ | ⚠️ |
+| **cost** ($) | ❌ | ❌ | ❌ | ✅ (token×price) | ✅ **(its headline)** |
+| **UI / search / evals** | ❌ | ❌ | ❌ | ✅ | ⚠️ (proxy spend UI) |
+| connects client↔server in one trace | ❌ | ❌ | ✅ (W3C context) | ⚠️ (if OTLP-fed) | ⚠️ (OTel callback) |
+| multi-provider / routing / fallbacks | ❌ | ❌ | ❌ | ❌ | ✅ **(its headline)** |
 
 **One-line read:**
 - **Proxy** = everything *content* + client timing, in a flat JSONL; blind to server internals.
@@ -48,6 +50,8 @@ Verified in this repo against vLLM (Qwen3.6). ✅ = captured, ⚠️ = partial/c
   server timing in one trace. Best single lightweight tool.
 - **Langfuse** = content + tokens + latency + **cost** in a real UI; no server-internal split unless
   you also feed it vLLM's OTLP.
+- **LiteLLM** = a gateway/SDK: content + tokens + latency + **cost**, and it can *fan out* to the
+  others (Langfuse, OTel, Prometheus) via callbacks. Headline value is routing + cost, not depth.
 
 ### Example output files (committed)
 
@@ -57,6 +61,7 @@ Verified in this repo against vLLM (Qwen3.6). ✅ = captured, ⚠️ = partial/c
 | vLLM OTLP | [`examples/trace/sample_vllm_spans.json`](../examples/trace/sample_vllm_spans.json) | `scripts/otel_span_summary.py` |
 | OpenLLMetry | [`examples/trace/sample_openllmetry_spans.json`](../examples/trace/sample_openllmetry_spans.json) | `scripts/openllmetry_summary.py` |
 | Langfuse | [`examples/trace/sample_langfuse_trace.json`](../examples/trace/sample_langfuse_trace.json) | Langfuse UI / `GET /api/public/traces` |
+| LiteLLM | [`examples/trace/sample_litellm_trace.json`](../examples/trace/sample_litellm_trace.json) | plain JSON (has `cost_usd`) |
 
 ## 1. Proxy — content, any client
 
@@ -148,9 +153,34 @@ over the SDK wrapper.
 **Output** → [`examples/trace/sample_langfuse_trace.json`](../examples/trace/sample_langfuse_trace.json)
 (one trace exported from the API; in normal use you browse them in the UI).
 
+## 5. LiteLLM — gateway/SDK with cost + callback fan-out
+
+[LiteLLM](https://github.com/BerriAI/litellm) is a unified API across 100+ providers (SDK or a
+proxy server). For observability its strengths are **cost computation** and **logging callbacks**
+that forward to the other tools (Langfuse, OpenTelemetry, Prometheus, …). `scripts/litellm_client.py`
+calls vLLM via the SDK with a `CustomLogger` that records content, tool calls, tokens, latency, and
+**cost** to JSONL — and registers a price for `qwen3.6` (it isn't in LiteLLM's price map).
+
+```bash
+python3 -m venv .venv-litellm && .venv-litellm/bin/pip install -q litellm
+.venv-litellm/bin/python scripts/litellm_client.py     # -> traces/litellm_trace.jsonl
+```
+
+Verified — the only tool here that emits a per-request dollar cost:
+
+```
+2026-...T06:05:03  qwen3.6  in=17  out=40  cost=$0.000018  lat=948ms  "The three primary colors…"
+2026-...T06:05:04  qwen3.6  in=265 out=24  cost=$0.000036  lat=629ms  tool:get_weather
+```
+
+> Positioning: LiteLLM is the **router/hub**, not a deep tracer. In production you'd run the LiteLLM
+> *proxy* in front of vLLM and point its callbacks at Langfuse/OTel — so it complements rather than
+> replaces the others. Server-internal timing still only comes from vLLM's OTLP.
+
 ## When to use which
 
 - **Debugging / content capture / dataset capture** → proxy (any client) or OpenLLMetry (Python client).
 - **Authoritative perf timing** → vLLM OTLP (zero hop, server-internal).
 - **Both content + timing, correlated** → OpenLLMetry (it joins to the vLLM span).
-- **A searchable UI, evals, cost tracking** → Langfuse (below).
+- **A searchable UI, evals, cost tracking** → Langfuse.
+- **A gateway across providers + cost + fan-out to the above** → LiteLLM (run its proxy in front of vLLM).

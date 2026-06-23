@@ -11,7 +11,9 @@ either format.
 - **`sample_openllmetry_spans.json`** — **OpenLLMetry** client spans (content + tokens + tool calls);
   read with `scripts/openllmetry_summary.py`.
 - **`sample_langfuse_trace.json`** — one **Langfuse** trace exported from its API (content + usage +
-  latency). See [`../../docs/OBSERVABILITY.md`](../../docs/OBSERVABILITY.md) for all four tools.
+  latency).
+- **`sample_litellm_trace.json`** — **LiteLLM** SDK records (content + tokens + **cost_usd** + latency).
+  See [`../../docs/OBSERVABILITY.md`](../../docs/OBSERVABILITY.md) for all five tools.
 - **`record_sample.sh`** — reproduces `sample_trace.json` (starts the proxy, sends the requests,
   prints the summary). Needs vLLM serving on `:8000` (record 5 needs `--enable-auto-tool-choice
   --tool-call-parser hermes`).

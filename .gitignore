@@ -11,3 +11,4 @@ traces/
 .venv-openllmetry/
 monitoring/langfuse/.env
 .venv-langfuse/
+.venv-litellm/
