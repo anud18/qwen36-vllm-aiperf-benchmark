@@ -3,13 +3,20 @@
 Five ways to capture what the model is doing, from black-box to fully instrumented. They are
 complementary; pick by what you need (content vs timing, client vs server, file vs UI, cost).
 
+Request path: **`client app → gateway → LLM server`**. "runs on" says where each tool sits;
+"server" = the request-*receiving* end (vLLM), "gateway" = an intermediary that receives requests
+and forwards them (the proxy, or LiteLLM in `client → litellm → llm`).
+
 | approach | runs on | captures content? | captures timing | extra hop | backend |
 |---|---|---|---|---|---|
-| **Proxy** (`scripts/trace_proxy.py`) | **proxy** (sits client↔server) | ✅ full in/out/reasoning/tool_calls | client-side TTFT/latency | yes (+1 hop) | JSONL file |
-| **vLLM OTLP** (`--otlp-traces-endpoint`) | **server** (inside vLLM) | ❌ tokens only | ✅ server-internal (queue/prefill/decode/e2e) | no | OTel collector → file |
-| **OpenLLMetry** (`scripts/openllmetry_client.py`) | **client** (OpenAI client) | ✅ in/out messages + tool_calls | client span; **joins** vLLM server span | no | OTLP → collector / Langfuse |
-| **Langfuse** | **client** SDK → **server** backend | ✅ (via OpenLLMetry/SDK) | ✅ (spans) | no | self-hosted UI |
-| **LiteLLM** (`scripts/litellm_client.py`) | **client** SDK (or gateway) | ✅ in/out + tool_calls | client latency | no (SDK) | callbacks + **cost** |
+| **Proxy** (`scripts/trace_proxy.py`) | **gateway** (client → proxy → vLLM) | ✅ full in/out/reasoning/tool_calls | client-side TTFT/latency | yes (+1 hop) | JSONL file |
+| **vLLM OTLP** (`--otlp-traces-endpoint`) | **LLM server** (inside vLLM) | ❌ tokens only | ✅ server-internal (queue/prefill/decode/e2e) | no | OTel collector → file |
+| **OpenLLMetry** (`scripts/openllmetry_client.py`) | **client app** (wraps OpenAI SDK) | ✅ in/out messages + tool_calls | client span; **joins** vLLM server span | no | OTLP → collector / Langfuse |
+| **Langfuse** | **client app** (SDK) → its own server | ✅ (via OpenLLMetry/SDK) | ✅ (spans) | no | self-hosted UI |
+| **LiteLLM** (`scripts/litellm_client.py`) | **gateway** (client → litellm → vLLM)* | ✅ in/out + tool_calls | client latency | proxy: +1 hop | callbacks + **cost** |
+
+\* LiteLLM's normal deployment is a gateway (`client → litellm → llm`); the demo script uses its
+in-process SDK form, but the role is the same request-receiving intermediary.
 
 All five are documented here; the proxy has its own deep-dive in [`TRACING.md`](TRACING.md).
 
@@ -19,7 +26,7 @@ Verified in this repo against vLLM (Qwen3.6). ✅ = captured, ⚠️ = partial/c
 
 | data field | Proxy | vLLM OTLP | OpenLLMetry | Langfuse | LiteLLM |
 |---|:--:|:--:|:--:|:--:|:--:|
-| **runs on** | proxy (client↔server) | **server** (in vLLM) | **client** | **client** SDK + server UI | **client** SDK / gateway |
+| **runs on** | gateway (client→proxy→vLLM) | **LLM server** (in vLLM) | **client** app | **client** app SDK | **gateway** (client→litellm→vLLM) |
 | **input** content (messages/prompt) | ✅ | ❌ | ✅ `gen_ai.input.messages` | ✅ | ✅ |
 | **output** content | ✅ | ❌ | ✅ `gen_ai.output.messages` | ✅ | ✅ |
 | **reasoning** / CoT | ✅ separate field | ❌ | ⚠️ inside output | ⚠️ inside output | ⚠️ inside output |
