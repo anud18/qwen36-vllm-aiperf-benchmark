@@ -27,12 +27,8 @@ def main():
     if "--head" in sys.argv:
         head = int(sys.argv[sys.argv.index("--head") + 1])
 
-    recs = []
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                recs.append(json.loads(line))
+    txt = open(path).read().strip()
+    recs = json.loads(txt) if txt[:1] == "[" else [json.loads(l) for l in txt.splitlines() if l.strip()]
     if not recs:
         print("(no records)")
         return

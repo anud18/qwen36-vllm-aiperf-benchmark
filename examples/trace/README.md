@@ -1,17 +1,18 @@
 # Example — vLLM trace recording
 
 A committed sample of the trace-recording feature (full docs: [`../../docs/TRACING.md`](../../docs/TRACING.md)).
-Live traces normally land in the gitignored `traces/` dir; this folder keeps a small, readable
-example checked in.
+Live traces normally land in the gitignored `traces/` dir as **JSONL** (one object per line); the
+files here are the same data **pretty-printed as JSON** for readability. The summary scripts accept
+either format.
 
-- **`sample_trace.jsonl`** — 5 real records captured by `scripts/trace_proxy.py` (content trace).
-- **`sample_vllm_spans.jsonl`** — native vLLM **OTLP** spans (server-internal timing), as written by
+- **`sample_trace.json`** — 5 real records captured by `scripts/trace_proxy.py` (content trace).
+- **`sample_vllm_spans.json`** — native vLLM **OTLP** spans (server-internal timing), as written by
   the OTel collector; read with `scripts/otel_span_summary.py`.
-- **`sample_openllmetry_spans.jsonl`** — **OpenLLMetry** client spans (content + tokens + tool calls);
+- **`sample_openllmetry_spans.json`** — **OpenLLMetry** client spans (content + tokens + tool calls);
   read with `scripts/openllmetry_summary.py`.
 - **`sample_langfuse_trace.json`** — one **Langfuse** trace exported from its API (content + usage +
   latency). See [`../../docs/OBSERVABILITY.md`](../../docs/OBSERVABILITY.md) for all four tools.
-- **`record_sample.sh`** — reproduces `sample_trace.jsonl` (starts the proxy, sends the requests,
+- **`record_sample.sh`** — reproduces `sample_trace.json` (starts the proxy, sends the requests,
   prints the summary). Needs vLLM serving on `:8000` (record 5 needs `--enable-auto-tool-choice
   --tool-call-parser hermes`).
 
@@ -31,9 +32,9 @@ examples/trace/record_sample.sh        # run from repo root
 
 ## OTLP spans + the join
 
-`sample_vllm_spans.jsonl` is vLLM's own tracing output — token counts plus server-internal
+`sample_vllm_spans.json` is vLLM's own tracing output — token counts plus server-internal
 latencies (`time_in_queue`, `time_in_model_prefill`, `time_in_model_decode`, `e2e`) the proxy can't
-see. `scripts/otel_span_summary.py examples/trace/sample_vllm_spans.jsonl`:
+see. `scripts/otel_span_summary.py examples/trace/sample_vllm_spans.json`:
 
 ```
 request_id                               in    out  queue_ms   ttft_ms    e2e_ms
@@ -45,7 +46,7 @@ The content record's `response_id` equals the span's `gen_ai.request.id`, so the
 content/tokens from the proxy, prefill/decode/queue timing from OTLP. See
 [`../../docs/TRACING.md`](../../docs/TRACING.md).
 
-`scripts/trace_summary.py examples/trace/sample_trace.jsonl`:
+`scripts/trace_summary.py examples/trace/sample_trace.json`:
 
 ```
 ts                              in    out  ttft_ms    lat_ms  input -> output

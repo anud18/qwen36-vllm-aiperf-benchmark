@@ -29,8 +29,10 @@ def first_text(messages_json):
 
 def main():
     path = sys.argv[1] if len(sys.argv) > 1 else "traces/vllm_spans.jsonl"
+    txt = open(path).read().strip()
+    batches = json.loads(txt) if txt[:1] == "[" else [json.loads(l) for l in txt.splitlines() if l.strip()]
     rows = []
-    for b in map(json.loads, filter(str.strip, open(path))):
+    for b in batches:
         for rs in b.get("resourceSpans", []):
             for ss in rs.get("scopeSpans", []):
                 if "openai" not in (ss.get("scope") or {}).get("name", ""):

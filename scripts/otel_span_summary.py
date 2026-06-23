@@ -22,14 +22,15 @@ def attr_val(v):
     return None
 
 
+def load(path):  # accept a JSON array or JSONL (one batch per line)
+    txt = open(path).read().strip()
+    return json.loads(txt) if txt[:1] == "[" else [json.loads(l) for l in txt.splitlines() if l.strip()]
+
+
 def flatten(path):
     spans = []
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            batch = json.loads(line)
+    if True:
+        for batch in load(path):
             for rs in batch.get("resourceSpans", []):
                 for ss in rs.get("scopeSpans", []):
                     for sp in ss.get("spans", []):

@@ -53,9 +53,9 @@ Verified in this repo against vLLM (Qwen3.6). ✅ = captured, ⚠️ = partial/c
 
 | tool | sample output | read with |
 |---|---|---|
-| Proxy | [`examples/trace/sample_trace.jsonl`](../examples/trace/sample_trace.jsonl) | `scripts/trace_summary.py` |
-| vLLM OTLP | [`examples/trace/sample_vllm_spans.jsonl`](../examples/trace/sample_vllm_spans.jsonl) | `scripts/otel_span_summary.py` |
-| OpenLLMetry | [`examples/trace/sample_openllmetry_spans.jsonl`](../examples/trace/sample_openllmetry_spans.jsonl) | `scripts/openllmetry_summary.py` |
+| Proxy | [`examples/trace/sample_trace.json`](../examples/trace/sample_trace.json) | `scripts/trace_summary.py` |
+| vLLM OTLP | [`examples/trace/sample_vllm_spans.json`](../examples/trace/sample_vllm_spans.json) | `scripts/otel_span_summary.py` |
+| OpenLLMetry | [`examples/trace/sample_openllmetry_spans.json`](../examples/trace/sample_openllmetry_spans.json) | `scripts/openllmetry_summary.py` |
 | Langfuse | [`examples/trace/sample_langfuse_trace.json`](../examples/trace/sample_langfuse_trace.json) | Langfuse UI / `GET /api/public/traces` |
 
 ## 1. Proxy — content, any client
@@ -63,7 +63,7 @@ Verified in this repo against vLLM (Qwen3.6). ✅ = captured, ⚠️ = partial/c
 Transparent logging proxy; records every request to JSONL. Best for capturing real traffic
 (incl. content) with no code changes. See [`TRACING.md`](TRACING.md). Caveat: adds a network hop,
 so don't use it for headline latency numbers.
-**Output** → [`examples/trace/sample_trace.jsonl`](../examples/trace/sample_trace.jsonl).
+**Output** → [`examples/trace/sample_trace.json`](../examples/trace/sample_trace.json).
 
 ## 2. vLLM native OTLP — server-internal timing
 
@@ -72,7 +72,7 @@ vLLM's own OpenTelemetry spans (`gen_ai.*`): token counts + `time_in_queue`,
 `--otlp-traces-endpoint grpc://host.docker.internal:4317` and the OTel collector in `monitoring/`.
 Read with `scripts/otel_span_summary.py`. See the "Native vLLM OTLP tracing" section of
 [`TRACING.md`](TRACING.md).
-**Output** → [`examples/trace/sample_vllm_spans.jsonl`](../examples/trace/sample_vllm_spans.jsonl).
+**Output** → [`examples/trace/sample_vllm_spans.json`](../examples/trace/sample_vllm_spans.json).
 
 ## 3. OpenLLMetry — client instrumentation (content + timing in one trace)
 
@@ -104,7 +104,7 @@ traceId 6a837b41776b563c..
 > Note: this build uses `opentelemetry-instrumentation-openai` ≥ the new gen_ai conventions, so
 > content is in `gen_ai.input.messages` / `output.messages` (not the older `gen_ai.prompt.N.content`).
 
-**Output** → [`examples/trace/sample_openllmetry_spans.jsonl`](../examples/trace/sample_openllmetry_spans.jsonl).
+**Output** → [`examples/trace/sample_openllmetry_spans.json`](../examples/trace/sample_openllmetry_spans.json).
 
 ## 4. Langfuse — self-hosted UI + API
 
