@@ -2,12 +2,12 @@
 
 Figures for the **earlier** concurrency sweep (the original "Pass 2" in the repo-root
 [`RESULTS.md`](../RESULTS.md)), rendered with the same `scripts/plot_pareto.py` used for v6 so the
-two are directly comparable. Source data: `results/sweep/` (gitignored). For the authoritative final
-run see [`../report_v6/`](../report_v6/).
+two are directly comparable. Source data: `results/sweep/` (gitignored). For the v6 final-run
+config see [`../RUNBOOK.md`](../RUNBOOK.md).
 
 ## How this differs from v6
 
-| | Pass-2 (this folder) | v6 ([report_v6](../report_v6/)) |
+| | Pass-2 (this folder) | v6 (see RUNBOOK.md) |
 |---|---|---|
 | Server image | `vllm/vllm-openai:latest` | nightly `dgx-vllm-eugr-nightly-tf5:20260614` |
 | `--gpu-memory-utilization` | 0.90 | 0.85 |
