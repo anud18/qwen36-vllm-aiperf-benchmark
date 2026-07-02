@@ -6,9 +6,5 @@ results/
 *.safetensors
 .venv/
 .venv-plot/
-.venv-trace/
-traces/
-.venv-openllmetry/
-monitoring/langfuse/.env
-.venv-langfuse/
 .venv-litellm/
+traces/

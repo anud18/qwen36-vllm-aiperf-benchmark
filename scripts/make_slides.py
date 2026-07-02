@@ -193,7 +193,7 @@ harrow(s, 4.6, 2.9, 3.7, label="HTTP /v1/chat/completions (streaming)")
 harrow(s, 4.6, 3.62, 3.7, label="SSE token stream", above=False, rev=True)
 
 boxtext(s, 4.6, 4.42, 3.7, 0.95, "optional tracing plane (docs/OBSERVABILITY.md)", [
-    "trace proxy :8001 · vLLM OTLP :4317 · Langfuse · LiteLLM — per-request content / timing / cost",
+    "LiteLLM SDK/gateway → traces/litellm_trace.jsonl — per-request content / tokens / cost",
 ], tsize=10, isize=9, dash="dash")
 
 boxtext(s, 4.6, 5.55, 3.7, 1.42, "Prometheus :9090 → Grafana :3000", [
@@ -328,7 +328,7 @@ table(
         ["What bytes are actually sent to the model?", "FORMAT.md / FORMAT.zh-TW.md (real recorded payloads, layer by layer)"],
         ["How do I reproduce the run?", "RUNBOOK.md (server flags, monitoring, one-command reproduce)"],
         ["Full numbers & figures?", "report_v6/ (SUMMARY.md, RESULTS.md, figures/) · earlier passes in RESULTS.md"],
-        ["Per-request tracing / content capture / cost?", "docs/OBSERVABILITY.md · docs/TRACING.md (proxy, OTLP, Langfuse, LiteLLM)"],
+        ["Per-request tracing / content capture / cost?", "docs/OBSERVABILITY.md (LiteLLM trace + cost logging)"],
     ],
     widths=[5.0, 7.45], size=11.5, hsize=12,
 )

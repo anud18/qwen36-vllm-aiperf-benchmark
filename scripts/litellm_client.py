@@ -4,9 +4,11 @@
 LiteLLM is a gateway/SDK with a unified API across providers; its distinguishing
 feature for observability is built-in **cost** computation and pluggable logging
 callbacks. Here a CustomLogger records each call (input/output content, tool
-calls, tokens, cost, latency) to JSONL — the LiteLLM equivalent of the other
-tools' output files. vLLM's qwen3.6 isn't in LiteLLM's price map, so we register
-a price so response_cost is non-zero.
+calls, tokens, cost, latency) as one JSON line per request. vLLM's qwen3.6 isn't
+in LiteLLM's price map, so we register a price so response_cost is non-zero.
+
+Env: TRACE_FILE (default traces/litellm_trace.jsonl), VLLM_BASE (default
+http://localhost:8000/v1). See docs/OBSERVABILITY.md.
 
 Run: .venv-litellm/bin/python scripts/litellm_client.py
 """
