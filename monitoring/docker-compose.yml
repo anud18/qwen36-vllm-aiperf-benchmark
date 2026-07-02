@@ -28,18 +28,3 @@ services:
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
     depends_on: [prometheus]
-
-  # Receives vLLM native OTLP spans (--otlp-traces-endpoint) and writes them to
-  # ../traces/vllm_spans.jsonl (+ debug log). Complements the content-logging proxy.
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.119.0
-    container_name: bench-otel-collector
-    restart: unless-stopped
-    user: "0:0"   # write the span file into the host-mounted ../traces dir
-    command: ["--config=/etc/otelcol/config.yaml"]
-    volumes:
-      - ./otel-collector.yaml:/etc/otelcol/config.yaml:ro
-      - ../traces:/traces
-    ports:
-      - "4317:4317"   # OTLP gRPC
-      - "4318:4318"   # OTLP HTTP

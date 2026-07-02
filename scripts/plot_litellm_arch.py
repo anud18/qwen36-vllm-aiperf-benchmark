@@ -40,7 +40,7 @@ box(10.6, 5.3, 3.0, 1.5, "vLLM server", ":8000 · Docker\nOpenAI API", "#e9f7ec"
 # trace output + optional fan-out
 box(5.3, 2.3, 3.4, 1.5, "traces/litellm_trace.jsonl", "1 line / request\ncontent·tokens·cost·latency",
     "#f3eafe", "#9467bd")
-box(10.6, 2.5, 3.0, 1.3, "Langfuse / OTel /\nPrometheus", "optional callback\nfan-out", "#fdeaea", "#d62728")
+box(10.6, 2.5, 3.0, 1.3, "Prometheus /\nother backends", "optional callback\nfan-out", "#fdeaea", "#d62728")
 
 # forward path (top lane)
 arrow(3.4, 6.25, 5.3, 6.25, "① request", "#1f77b4", lx=4.35, ly=6.5)
