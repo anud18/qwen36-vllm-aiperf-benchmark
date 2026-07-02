@@ -18,7 +18,7 @@ measured input/output/turn characteristics of the converted files in `datasets/a
 | coding | [Inferact/codex_swebenchpro_traces](https://huggingface.co/datasets/Inferact/codex_swebenchpro_traces) | 610 traces, 12–200 turns each | `final_coding.jsonl` — 100 conv × 6 turns | `multi_turn` | coding agent: huge repo-context preamble + tool outputs, history re-sent every turn |
 | rag | [yixuantt/MultiHopRAG](https://huggingface.co/datasets/yixuantt/MultiHopRAG) | 2,556 queries + 609-article news corpus | `final_rag.jsonl` — 500 requests | `single_turn` | retrieval-augmented QA: long stuffed context, few-word answer |
 | agent | [AI45Research/ATBench-Claw](https://huggingface.co/datasets/AI45Research/ATBench-Claw) | 500 trajectories | `final_agent.jsonl` — 200 conv / 887 turns | `multi_turn` | tool-using assistant: short mixed user+tool-result turns |
-| toolagent | [Mooncake FAST'25 toolagent trace](https://github.com/kvcache-ai/Mooncake/blob/main/FAST25-release/traces/toolagent_trace.jsonl) | 23,608 trace lines (lengths + block hashes, no text) | `final_toolagent.jsonl` — 200 requests | `mooncake_trace` | production tool/agent traffic replay with realistic prefix reuse |
+| toolagent | [Mooncake FAST'25 toolagent trace](https://github.com/kvcache-ai/Mooncake/blob/main/FAST25-release/traces/toolagent_trace.jsonl) | 23,608 trace lines (lengths + block hashes, no text) | `final_toolagent.jsonl` — 320 requests | `mooncake_trace` | production tool/agent traffic replay with realistic prefix reuse |
 
 All v6 `final_*` files cap generation at `output_length` 5000 (toolagent keeps the trace's own
 per-request output lengths). Reasoning/thinking flags per workload are listed in
@@ -141,21 +141,21 @@ cache ratio; the workload is "pre-designed, often lengthy, fully repetitive syst
 Each line has only `timestamp`, `input_length`, `output_length`, and `hash_ids` — cumulative
 512-token block hashes where equal ids ⇒ identical prefix content — **no text** (privacy).
 
-**Conversion** (`build_final.py`): first 200 lines, `timestamp` removed (a timestamped trace
+**Conversion** (`build_final.py`): first 320 lines, `timestamp` removed (a timestamped trace
 forces fixed-schedule replay and ignores `--concurrency`); lengths kept verbatim. At run time
 aiperf *synthesizes* prompt text to the exact `input_length`, deterministically per `hash_id`,
 so equal blocks are byte-identical — reproducing the trace's real prefix-reuse pattern.
 
-**Measured** (`final_toolagent.jsonl`, 200 requests, exact token counts from the trace):
+**Measured** (`final_toolagent.jsonl`, 320 requests, exact token counts from the trace):
 
 | property | min | p50 | mean | p90 | max |
 |---|--:|--:|--:|--:|--:|
-| input_length | 898 | 6,608 | 10,156 | 21,094 | 120,633 |
-| output_length | 1 | 35 | 207 | 578 | 929 |
-| hash blocks / request | 2 | 13 | 20 | 42 | 236 |
+| input_length | 893 | 6,520 | 9,283 | 18,720 | 120,633 |
+| output_length | 1 | 34 | 192 | 548 | 929 |
+| hash blocks / request | 2 | 13 | 18 | 37 | 236 |
 
-Prefix sharing in the kept slice: 26.9% of block references are to blocks that occur in 2+
-requests; the `hash_id 0` system-prompt block opens 98/200 requests.
+Prefix sharing in the kept slice: 31.9% of block references are to blocks that occur in 2+
+requests; the `hash_id 0` system-prompt block opens 149/320 requests.
 
 **Traffic shape**: heavy-tailed inputs (median 6.6 K but max 120 K tokens), short-to-medium
 outputs, realistic cross-request prefix reuse ⇒ exercises prefix caching and long-context

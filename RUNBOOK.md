@@ -57,7 +57,7 @@ bash scripts/serve_vllm.sh
 | coding | `Inferact/codex_swebenchpro_traces` | multi_turn | **ON** | 5000 | 100 conv / 600 turns |
 | rag | `yixuantt/MultiHopRAG` (+corpus) | single_turn | off (in data) | 5000 | 500 |
 | agent | `AI45Research/ATBench-Claw` | multi_turn | off (in data) | 5000 | 200 conv / 887 turns |
-| toolagent | `kvcache-ai/Mooncake` FAST25 trace | mooncake_trace | off (`--extra-inputs`) | trace len | 200 (timestamps stripped) |
+| toolagent | `kvcache-ai/Mooncake` FAST25 trace | mooncake_trace | off (`--extra-inputs`) | trace len | 320 (timestamps stripped) |
 
 - reasoning OFF = `extra.chat_template_kwargs.enable_thinking=false` (per-line for file datasets,
   `--extra-inputs '{"chat_template_kwargs":{"enable_thinking":false}}'` for the public/mooncake ones).

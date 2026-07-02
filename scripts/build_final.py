@@ -5,7 +5,7 @@ Spec:
   coding   : multi_turn, reasoning ON (no enable_thinking), output max 5000, 100 conv x 6 turns
   rag      : single_turn, reasoning OFF, output max 5000, 500 prompts
   agent    : multi_turn, reasoning OFF, output max 5000, 200 conv
-  toolagent: mooncake_trace, no timestamp, keep trace output_length, >=160 lines
+  toolagent: mooncake_trace, no timestamp, keep trace output_length, 320 lines
              (reasoning OFF is applied at run time via --extra-inputs)
 """
 import json, os, sys
@@ -52,11 +52,11 @@ for r in agent:
         t["extra"] = THINK_OFF
 write("final_agent.jsonl", agent)
 
-# --- toolagent: mooncake, drop timestamp, keep trace output_length, >=160 lines ---
+# --- toolagent: mooncake, drop timestamp, keep trace output_length, 320 lines ---
 tool = []
 with open(os.path.join(bd.RAW, "toolagent_trace.jsonl")) as f:
     for line in f:
-        if len(tool) >= 200:
+        if len(tool) >= 320:
             break
         d = json.loads(line)
         d.pop("timestamp", None)        # disable fixed-schedule -> concurrency applies
