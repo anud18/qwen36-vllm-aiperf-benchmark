@@ -2,7 +2,8 @@
 """Generate slides/benchmark_overview.pptx — benchmarking system architecture & workloads.
 
 All numbers come from committed docs/data: DATASETS.md (scripts/dataset_stats.py),
-RUNBOOK.md, FORMAT.md, report_v6/SUMMARY.md.  Re-run after changing any of those:
+RUNBOOK.md, FORMAT.md, results/final/ (scripts/summarize_final.py).  Re-run after
+changing any of those:
 
     pip install python-pptx && python3 scripts/make_slides.py
 """
@@ -234,7 +235,7 @@ textbox(s, 0.45, 6.45, 12.45, 0.6, [
 
 # ================================================================ 4. measured characteristics
 s = slide()
-heading(s, "Workload characteristics (measured)", "file stats: scripts/dataset_stats.py (tokens ≈ chars/4) · served ISL/OSL: aiperf, report_v6")
+heading(s, "Workload characteristics (measured)", "file stats: scripts/dataset_stats.py (tokens ≈ chars/4) · served ISL/OSL: aiperf")
 table(
     s, 0.45, 1.5, 12.45, 3.9,
     ["Workload", "Turns / conv", "Input tokens (p50 / max)", "Served ISL avg", "Served OSL avg", "Output profile"],
@@ -300,7 +301,7 @@ boxtext(s, 6.85, 4.25, 6.05, 2.6, "Reliability & outputs", [
 
 # ================================================================ 7. key results
 s = slide()
-heading(s, "What the v6 run shows", "full tables: report_v6/SUMMARY.md · figures: report_v6/figures/")
+heading(s, "What the v6 run shows", "tables + figures: scripts/summarize_final.py · scripts/plot_pareto.py (from results/final/)")
 textbox(s, 0.45, 1.42, 6.5, 5.6, [
     ("TTFT rises with concurrency everywhere — worst where prefill dominates:", {"size": 12.5, "bold": True, "gap": 1}),
     ("rag 3.6 s → 28.6 s (c4→c32, req/s flat ≈ 0.9: pure prefill queueing); chatbot only 0.25 s → 0.51 s", {"size": 11.5, "color": MUT, "gap": 7}),
@@ -311,7 +312,7 @@ textbox(s, 0.45, 1.42, 6.5, 5.6, [
     ("Prefix caching pays: re-sending coding's ~26 K-token history cost ~3 s TTFT instead of ~25 s cold (pass-2 measurement, thinking off)", {"size": 12.5, "bold": True, "gap": 7}),
     ("Big batch budget pays: max-num-batched-tokens 248,320 lets 16 rag prefills batch in one step — TTFT −35 %, req/s +24 % (vs default budget; GPU util 0.5→0.85 changed with it)", {"size": 12.5, "bold": True, "gap": 7}),
 ], leading=1.05)
-pareto = os.path.join(ROOT, "report_v6", "figures", "pareto.png")
+pareto = os.path.join(ROOT, "figures", "pareto.png")
 if os.path.exists(pareto):
     s.shapes.add_picture(pareto, Inches(7.15), Inches(1.55), width=Inches(5.9))
     textbox(s, 7.15, 6.55, 5.9, 0.4, "Throughput vs per-user interactivity (Pareto), per workload & concurrency",
@@ -327,7 +328,7 @@ table(
         ["Where does each dataset come from & what does it look like?", "DATASETS.md (sources, licenses, measured stats — scripts/dataset_stats.py)"],
         ["What bytes are actually sent to the model?", "FORMAT.md / FORMAT.zh-TW.md (real recorded payloads, layer by layer)"],
         ["How do I reproduce the run?", "RUNBOOK.md (server flags, monitoring, one-command reproduce)"],
-        ["Full numbers & figures?", "report_v6/ (SUMMARY.md, RESULTS.md, figures/) · earlier passes in RESULTS.md"],
+        ["Full numbers & figures?", "results/final/ → summarize_final.py + plot_pareto.py · earlier passes in RESULTS.md"],
         ["Per-request tracing / content capture / cost?", "docs/OBSERVABILITY.md (LiteLLM trace + cost logging)"],
     ],
     widths=[5.0, 7.45], size=11.5, hsize=12,

@@ -2,7 +2,7 @@
 """Pareto curves from the v6 concurrency sweep (results/final/<wl>/c<level>/).
 
 Reads the v6 run (IN_DIR) and writes figures into a dedicated OUT_DIR
-(report_v6/figures/), both overridable via SWEEP_DIR / OUT_DIR env vars.
+(figures/ by default), both overridable via SWEEP_DIR / OUT_DIR env vars.
 
 Produces:
   <OUT>/pareto.png            - throughput vs interactivity + req/s vs TTFT (overview)
@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 IN_DIR = os.environ.get("SWEEP_DIR", os.path.join(ROOT, "results", "final"))
-OUT_DIR = os.environ.get("OUT_DIR", os.path.join(ROOT, "report_v6", "figures"))
+OUT_DIR = os.environ.get("OUT_DIR", os.path.join(ROOT, "figures"))
 os.makedirs(OUT_DIR, exist_ok=True)
 WLS = ["chatbot", "coding", "rag", "agent", "toolagent"]
 DECODE = ["chatbot", "coding", "agent", "toolagent"]  # decode-bound (meaningful tok/s)
