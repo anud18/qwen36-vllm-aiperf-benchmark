@@ -192,10 +192,9 @@ def main():
         lambda n, w, p: aiperf_metric(n, w, p, "Time to First Token (ms)"),
         logy=True, logx2=True)
     grid_figure(
-        "nvfp4_rate_ttft.png", RLEVELS, "req/s offered", "TTFT p99 (ms)",
-        "Open-loop TTFT p99 at 0.8 / 1.0 / 1.2 req/s (poisson; log y)",
-        lambda n, w, p: aiperf_metric(n, w, p, "Time to First Token (ms)", "p99"),
-        logy=True)
+        "nvfp4_rate_ttft.png", RLEVELS, "req/s offered", "TTFT avg (ms)",
+        "Open-loop TTFT avg at 0.8 / 1.0 / 1.2 req/s (poisson)",
+        lambda n, w, p: aiperf_metric(n, w, p, "Time to First Token (ms)"))
     grid_figure(
         "nvfp4_kv_recompute.png", CLEVELS, "concurrency", "prefix-cache queries (tokens)",
         "KV pressure: prefix-cache queries per point — recompute amplification on the 24x-smaller 5090 KV (log y)",
