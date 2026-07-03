@@ -1,0 +1,9 @@
+{
+ "window_s": 241,
+ "gen_tok_s": 96.91063829787234,
+ "prompt_tok_s": 163.13191489361702,
+ "running_avg": 4.4375,
+ "waiting_avg": 0.0,
+ "kv_usage_avg": 0.012367141564902756,
+ "kv_usage_max": 0.04681139755766617
+}

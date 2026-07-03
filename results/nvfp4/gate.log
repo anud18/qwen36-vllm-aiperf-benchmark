@@ -1,0 +1,21 @@
+bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+== wait for health ==
+READY after ~20s
+== reset endpoint ==
+== smoke v3 ==
+   [aiperf] chatbot c2 (try 1, warmup=2, reqs=8, tlimit=900s) 11:53:35
+   !!! chatbot c2 FAILED (rc=1, wedged=0, timedout=0, no summary)
+==== [restart vLLM] 11:58:50 ====
+   [aiperf] chatbot c2 (try 2, warmup=2, reqs=8, tlimit=900s) 12:01:26
+   [prefix-hit] chatbot c2: hits=0 queries=2298 rate=0.0%
+   [aiperf] toolagent c2 (try 1, warmup=2, reqs=8, tlimit=900s) 12:04:56
+   [prefix-hit] toolagent c2: hits=2112 queries=73478 rate=2.9%
+================ RUN_NVFP4 node=5090 DONE 2026-07-03 12:05:26 ================
+bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+================ RUN_NVFP4 node=5090 start 2026-07-03 12:05:26 ================
+   [aiperf] agent r1.2 (try 1, warmup=2, reqs=8, tlimit=900s) 12:05:26
+   [prefix-hit] agent r1.2: hits=1056 queries=10796 rate=9.8%
+================ RUN_NVFP4 node=5090 DONE 2026-07-03 12:05:56 ================
+smoke artifacts: 3/3
+== LAUNCH full sweep ==
+LAUNCHED_5090_SWEEP pid=3313124

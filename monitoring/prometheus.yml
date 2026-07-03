@@ -1,9 +1,21 @@
 global:
-  scrape_interval: 2s
-  evaluation_interval: 2s
+  scrape_interval: 5s
+  scrape_timeout: 4s
+  evaluation_interval: 5s
 scrape_configs:
   - job_name: vllm
     metrics_path: /metrics
     static_configs:
       - targets: ['host.docker.internal:8000']
-        labels: {service: vllm-qwen36}
+        labels: {service: vllm-qwen36, node: spark}
+      - targets: ['192.168.100.18:8000']
+        labels: {service: vllm-qwen36, node: '5090'}
+  - job_name: vllm-engine-k8s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['10.244.247.147:8000']
+        labels: {node: 'spark-a362', service: 'vllm-engine'}
+      - targets: ['10.244.215.252:8000']
+        labels: {node: 'spark-1fff', service: 'vllm-engine'}
+      - targets: ['10.244.7.103:8000']
+        labels: {node: 'spark-1697', service: 'vllm-engine'}

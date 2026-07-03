@@ -1,0 +1,95 @@
+bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+================ RUN_NVFP4 node=5090 start 2026-07-03 12:05:56 ================
+==== [restart vLLM] 12:05:56 ====
+   [aiperf] chatbot c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 12:08:32
+   [prefix-hit] chatbot c2: hits=14784 queries=66867 rate=22.1%
+   [aiperf] chatbot c4 (try 1, warmup=16, reqs=96, tlimit=2700s) 12:13:02
+   [prefix-hit] chatbot c4: hits=11616 queries=58805 rate=19.8%
+   [aiperf] chatbot c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 12:16:47
+   [prefix-hit] chatbot c8: hits=5280 queries=50115 rate=10.5%
+   [aiperf] chatbot c16 (try 1, warmup=16, reqs=96, tlimit=2700s) 12:20:18
+   [prefix-hit] chatbot c16: hits=2112 queries=39142 rate=5.4%
+   [aiperf] chatbot c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 12:23:33
+   [prefix-hit] chatbot c32: hits=0 queries=24288 rate=0.0%
+   [aiperf] chatbot r0.8 (try 1, warmup=16, reqs=96, tlimit=3600s) 12:26:48
+   [prefix-hit] chatbot r0.8: hits=14784 queries=67418 rate=21.9%
+   [aiperf] chatbot r1.0 (try 1, warmup=16, reqs=96, tlimit=3600s) 12:32:18
+   [prefix-hit] chatbot r1.0: hits=14784 queries=66747 rate=22.1%
+   [aiperf] chatbot r1.2 (try 1, warmup=16, reqs=96, tlimit=3600s) 12:37:18
+   [prefix-hit] chatbot r1.2: hits=13728 queries=62614 rate=21.9%
+==== [restart vLLM] 12:41:49 ====
+   [aiperf] rag c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 12:44:29
+   [prefix-hit] rag c2: hits=14784 queries=810482 rate=1.8%
+   [aiperf] rag c4 (try 1, warmup=16, reqs=96, tlimit=2700s) 12:45:44
+   [prefix-hit] rag c4: hits=21120 queries=902741 rate=2.3%
+   [aiperf] rag c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 12:46:30
+   [prefix-hit] rag c8: hits=5280 queries=1111887 rate=0.5%
+   [aiperf] rag c16 (try 1, warmup=16, reqs=96, tlimit=2700s) 12:47:15
+   [prefix-hit] rag c16: hits=9504 queries=1416807 rate=0.7%
+   [aiperf] rag c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 12:48:00
+   [prefix-hit] rag c32: hits=8448 queries=1395313 rate=0.6%
+   [aiperf] rag r0.8 (try 1, warmup=16, reqs=96, tlimit=3600s) 12:48:45
+   [prefix-hit] rag r0.8: hits=14784 queries=787777 rate=1.9%
+   [aiperf] rag r1.0 (try 1, warmup=16, reqs=96, tlimit=3600s) 12:51:15
+   [prefix-hit] rag r1.0: hits=13728 queries=783471 rate=1.8%
+   [aiperf] rag r1.2 (try 1, warmup=16, reqs=96, tlimit=3600s) 12:53:30
+   [prefix-hit] rag r1.2: hits=14784 queries=791622 rate=1.9%
+==== [restart vLLM] 12:55:15 ====
+   [aiperf] toolagent c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 12:57:51
+   [prefix-hit] toolagent c2: hits=181632 queries=1067686 rate=17.0%
+   [aiperf] toolagent c4 (try 1, warmup=16, reqs=96, tlimit=2700s) 13:00:21
+   [prefix-hit] toolagent c4: hits=177408 queries=1067770 rate=16.6%
+   [aiperf] toolagent c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 13:01:51
+   [prefix-hit] toolagent c8: hits=192192 queries=1116922 rate=17.2%
+   [aiperf] toolagent c16 (try 1, warmup=16, reqs=96, tlimit=2700s) 13:03:21
+   [prefix-hit] toolagent c16: hits=261888 queries=16548630 rate=1.6%
+   [aiperf] toolagent c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 13:04:36
+   [prefix-hit] toolagent c32: hits=254496 queries=34520407 rate=0.7%
+   [aiperf] toolagent r0.8 (try 1, warmup=16, reqs=96, tlimit=3600s) 13:05:51
+   [prefix-hit] toolagent r0.8: hits=193248 queries=1172707 rate=16.5%
+   [aiperf] toolagent r1.0 (try 1, warmup=16, reqs=96, tlimit=3600s) 13:08:36
+   [prefix-hit] toolagent r1.0: hits=200640 queries=1209537 rate=16.6%
+   [aiperf] toolagent r1.2 (try 1, warmup=16, reqs=96, tlimit=3600s) 13:10:52
+   [prefix-hit] toolagent r1.2: hits=211200 queries=1244443 rate=17.0%
+==== [restart vLLM] 13:12:37 ====
+   [aiperf] agent c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 13:15:17
+   [prefix-hit] agent c2: hits=172128 queries=309789 rate=55.6%
+   [aiperf] agent c4 (try 1, warmup=16, reqs=96, tlimit=2700s) 13:18:17
+   [prefix-hit] agent c4: hits=184800 queries=327522 rate=56.4%
+   [aiperf] agent c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 13:20:03
+   [prefix-hit] agent c8: hits=190080 queries=328503 rate=57.9%
+   [aiperf] agent c16 (try 1, warmup=16, reqs=96, tlimit=2700s) 13:21:18
+   [prefix-hit] agent c16: hits=230208 queries=401484 rate=57.3%
+   [aiperf] agent c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 13:22:33
+   [prefix-hit] agent c32: hits=137280 queries=293409 rate=46.8%
+   [aiperf] agent r0.8 (try 1, warmup=16, reqs=96, tlimit=3600s) 13:23:33
+   [prefix-hit] agent r0.8: hits=172128 queries=311068 rate=55.3%
+   [aiperf] agent r1.0 (try 1, warmup=16, reqs=96, tlimit=3600s) 13:26:18
+   [prefix-hit] agent r1.0: hits=178464 queries=319529 rate=55.9%
+   [aiperf] agent r1.2 (try 1, warmup=16, reqs=96, tlimit=3600s) 13:28:33
+   [prefix-hit] agent r1.2: hits=168960 queries=310344 rate=54.4%
+==== [restart vLLM] 13:30:33 ====
+   [aiperf] coding c2 (try 1, warmup=8, reqs=96, tlimit=2700s) 13:33:09
+   [prefix-hit] coding c2: hits=2190144 queries=3014294 rate=72.7%
+   [aiperf] coding c4 (try 1, warmup=8, reqs=96, tlimit=2700s) 13:38:10
+   [prefix-hit] coding c4: hits=1305216 queries=3244036 rate=40.2%
+   [aiperf] coding c8 (try 1, warmup=8, reqs=96, tlimit=2700s) 13:42:55
+   [prefix-hit] coding c8: hits=415008 queries=306085583 rate=0.1%
+   [aiperf] coding c16 (try 1, warmup=8, reqs=96, tlimit=2700s) 13:47:25
+   [prefix-hit] coding c16: hits=0 queries=135326706 rate=0.0%
+   [aiperf] coding c32 (try 1, warmup=8, reqs=96, tlimit=2700s) 13:50:55
+   [prefix-hit] coding c32: hits=0 queries=136835104 rate=0.0%
+   [aiperf] coding r0.8 (try 1, warmup=8, reqs=96, tlimit=3600s) 13:54:11
+   [prefix-hit] coding r0.8: hits=380160 queries=152351657 rate=0.2%
+   [aiperf] coding r1.0 (try 1, warmup=8, reqs=96, tlimit=3600s) 13:57:41
+   [prefix-hit] coding r1.0: hits=281952 queries=67226283 rate=0.4%
+   [aiperf] coding r1.2 (try 1, warmup=8, reqs=96, tlimit=3600s) 14:00:26
+   [prefix-hit] coding r1.2: hits=196416 queries=101310828 rate=0.2%
+>>> stopping vLLM server
+================ RUN_NVFP4 node=5090 DONE 2026-07-03 14:03:27 ================
+bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+================ RUN_NVFP4 node=5090 start 2026-07-03 17:10:41 ================
+   [aiperf] toolagent_ts fixed (try 1, warmup=16, reqs=320, tlimit=3600s) 17:10:41
+   [prefix-hit] toolagent_ts fixed: hits=908160 queries=96214057 rate=0.9%
+>>> stopping vLLM server
+================ RUN_NVFP4 node=5090 DONE 2026-07-03 17:14:27 ================
