@@ -154,6 +154,32 @@ def flat_vs_orig(fname):
     print("wrote", out)
 
 
+def coding_flat_5090(fname):
+    """Single panel: coding_flat Req/s on the 5090 (closed loop)."""
+    fig, ax = plt.subplots(figsize=(5.2, 3.6), constrained_layout=True)
+    style(ax, "coding_flat — RTX 5090, closed loop (ISL 29,869 fixed)")
+    ys = [aiperf_metric("5090", "coding_flat", f"c{c}",
+                        "Request Throughput (requests/sec)") for c in CLEVELS]
+    xs = [x for x, y in zip(CLEVELS, ys) if y is not None]
+    yv = [y for y in ys if y is not None]
+    color = dict(NODES)["5090"]
+    ax.plot(xs, yv, color=color, linewidth=2, marker="o", markersize=5,
+            markeredgecolor="white", markeredgewidth=1, zorder=3)
+    for x, y in zip(xs, yv):  # 5 points -> label each value directly
+        ax.annotate(f"{y:.2f}", (x, y), textcoords="offset points", xytext=(0, 7),
+                    fontsize=8.5, color=INK, ha="center")
+    ax.set_xscale("log", base=2)
+    ax.set_xticks(CLEVELS)
+    ax.get_xaxis().set_major_formatter(plt.ScalarFormatter())
+    ax.set_xlabel("concurrency", fontsize=9, color=MUTED)
+    ax.set_ylabel("Req/s", fontsize=9, color=MUTED)
+    ax.set_ylim(0, max(yv) * 1.18)
+    out = os.path.join(ROOT, fname)
+    fig.savefig(out, dpi=150, facecolor="white", bbox_inches="tight")
+    plt.close(fig)
+    print("wrote", out)
+
+
 def main():
     grid_figure(
         "nvfp4_throughput.png", CLEVELS, "concurrency", "Req/s",
@@ -188,6 +214,7 @@ def main():
         lambda n, w, p: aiperf_metric(n, w, p, "Time to First Token (ms)"),
         logy=True, logx2=True, wls=FLAT)
     flat_vs_orig("nvfp4_flat_vs_orig.png")
+    coding_flat_5090("nvfp4_coding_flat_5090_reqs.png")
 
 
 if __name__ == "__main__":
