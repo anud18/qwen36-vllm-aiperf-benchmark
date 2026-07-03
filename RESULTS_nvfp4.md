@@ -48,6 +48,30 @@ Same kernel path on both sides ⇒ clean comparison. Weights: 20.4 GiB each.
 Single-user decode (c2): **5090 ≈ 157–178 tok/s/user vs Spark ≈ 30–57** (≈3.2×).
 Output throughput @c32: chatbot 1,414 vs 352 tok/s; agent 1,343 vs 328; coding 396 vs 141.
 
+## Closed loop — ITL avg, ms (c2 → c32)
+
+| workload | spark | 5090 |
+|---|---|---|
+| chatbot | 18 / 23 / 34 / 51 / 73 | 6 / 7 / 9 / 13 / 18 |
+| rag | 107 / 270 / 707 / 1,594 / 3,252 | 18 / 58 / 183 / 241 / 237 |
+| toolagent | 31 / 43 / 93 / 206 / 493 | 9 / 12 / 34 / 68 / 59 |
+| agent | 18 / 24 / 35 / 54 / 83 | 6 / 7 / 9 / 12 / 19 |
+| coding | 23 / 43 / 66 / 202 / 270 | 7 / 11 / 23 / 37 / 29 |
+
+Spark ITL degrades steeply with concurrency (rag c32 hits 3.3 s/token — decode fully
+compute-bound); the 5090 stays under 70 ms everywhere except rag. Note rag/toolagent/coding
+ITL on the 5090 *improves* from c16→c32 — preempted requests re-enter with warm prefixes.
+
+## Closed loop — E2E request latency avg, s (c2 → c32)
+
+| workload | spark | 5090 |
+|---|---|---|
+| chatbot | 3.9 / 5.0 / 7.8 / 10.0 / 15.2 | 1.3 / 1.5 / 2.2 / 2.7 / 3.8 |
+| rag | 1.8 / 3.4 / 6.4 / 12.5 / 24.7 | 0.6 / 1.0 / 1.7 / 3.3 / 6.4 |
+| toolagent | 6.4 / 9.9 / 17.3 / 31.9 / 60.1 | 1.9 / 2.8 / 4.7 / 8.8 / 17.1 |
+| agent | 9.3 / 11.8 / 18.3 / 25.8 / 35.2 | 2.6 / 3.4 / 4.4 / 6.7 / 7.9 |
+| coding | 16.6 / 17.4 / 68.3 / 55.9 / 137.2 | 5.2 / 10.6 / 19.4 / 28.6 / 43.1 |
+
 ## Open loop — delivered req/s (offered 0.8 / 1.0 / 1.2) and TTFT avg
 
 | workload | spark delivered | spark TTFT (ms) | 5090 delivered | 5090 TTFT (ms) |
@@ -62,14 +86,27 @@ The 0.8/1.0/1.2 band brackets Spark's capacity: it holds chatbot/agent, saturate
 toolagent (cap ≈0.5) and coding (≈0.2), and tips over on rag at 1.2 (cap ≈1.1). The 5090
 absorbs every rate except coding.
 
+## Open loop — ITL avg (ms) and E2E latency avg (s)
+
+| workload | spark ITL | spark E2E | 5090 ITL | 5090 E2E |
+|---|---|---|---|---|
+| chatbot | 33 / 39 / 46 | 7.3 / 8.6 / 10.1 | 5 / 5 / 6 | 1.2 / 1.3 / 1.2 |
+| rag | 341 / 1,016 / 2,642 | 3.2 / 6.6 / 15.8 | 11 / 8 / 19 | 0.4 / 0.5 / 0.5 |
+| toolagent | 422 / 416 / 424 | 64.6 / 73.1 / 80.2 | 10 / 13 / 14 | 2.3 / 2.7 / 3.4 |
+| agent | 70 / 74 / 76 | 30.1 / 30.9 / 41.5 | 6 / 7 / 8 | 2.9 / 3.3 / 4.1 |
+| coding | 344 / 262 / 249 | 157.0 / 184.8 / 216.8 | 19 / 29 / 24 | 31.3 / 27.5 / 45.5 |
+
+On the saturated Spark workloads E2E is queue-dominated (coding 157→217 s is mostly TTFT);
+the 5090 keeps interactive-grade ITL (≤29 ms) at every offered rate.
+
 ![rate-ttft](results/nvfp4/nvfp4_rate_ttft.png)
 
 ## Fixed-schedule Mooncake replay (320 reqs, original timestamps, 60 s window ≈ 5.33 req/s)
 
-| | delivered | TTFT avg | ITL avg | out tok/s | prefix-hit | KV max | drain time |
-|---|--:|--:|--:|--:|--:|--:|--:|
-| Spark | 0.5 req/s | 314.8 s | 432 ms | 87 | 24.4% | 55% | ≈11 min |
-| 5090 | 1.5 req/s | 86.5 s | 59 ms | 292 | 0.9% | 100% | ≈3.5 min |
+| | delivered | TTFT avg | ITL avg | E2E avg | out tok/s | prefix-hit | KV max | drain time |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|
+| Spark | 0.5 req/s | 314.8 s | 432 ms | 377.3 s | 87 | 24.4% | 55% | ≈11 min |
+| 5090 | 1.5 req/s | 86.5 s | 59 ms | 94.4 s | 292 | 0.9% | 100% | ≈3.5 min |
 
 Both queue the burst (over both capacities); the 5090 drains 3.6× faster at 7× lower ITL
 even while its KV thrashes (96M prefix-query tokens vs Spark's 3M).

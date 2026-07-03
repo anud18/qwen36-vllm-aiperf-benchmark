@@ -110,6 +110,8 @@ def comparison(md):
             continue
         rows = [("Req/s", "Request Throughput (requests/sec)"),
                 ("TTFT ms", "Time to First Token (ms)"),
+                ("ITL ms", "Inter Token Latency (ms)"),
+                ("E2E ms", "Request Latency (ms)"),
                 ("Out tok/s", "Output Token Throughput (tokens/sec)")]
         if md:
             print(f"### {wl}\n")
