@@ -234,6 +234,16 @@ def main():
         lambda n, w, p: aiperf_metric(n, w, p, "Time to First Token (ms)"),
         logx2=True)
     grid_figure(
+        "nvfp4_itl.png", CLEVELS, "concurrency", "ITL avg (ms)",
+        "Inter-token latency vs concurrency — closed loop",
+        lambda n, w, p: aiperf_metric(n, w, p, "Inter Token Latency (ms)"),
+        logx2=True)
+    grid_figure(
+        "nvfp4_e2e.png", CLEVELS, "concurrency", "E2E request latency avg (ms)",
+        "End-to-end request latency vs concurrency — closed loop",
+        lambda n, w, p: aiperf_metric(n, w, p, "Request Latency (ms)"),
+        logx2=True)
+    grid_figure(
         "nvfp4_rate_ttft.png", RLEVELS, "req/s offered", "TTFT avg (ms)",
         "Open-loop TTFT avg at 0.8 / 1.0 / 1.2 req/s (poisson)",
         lambda n, w, p: aiperf_metric(n, w, p, "Time to First Token (ms)"))

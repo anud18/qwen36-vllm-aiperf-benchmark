@@ -60,6 +60,8 @@ Output throughput @c32: chatbot 1,414 vs 352 tok/s; agent 1,343 vs 328; coding 3
 | agent | 18 / 24 / 35 / 54 / 83 | 6 / 7 / 9 / 12 / 19 |
 | coding | 23 / 43 / 66 / 202 / 270 | 7 / 11 / 23 / 37 / 29 |
 
+![itl](results/nvfp4/nvfp4_itl.png)
+
 Spark ITL degrades steeply with concurrency (rag c32 hits 3.3 s/token — decode fully
 compute-bound); the 5090 stays under 70 ms everywhere except rag. Note rag/toolagent/coding
 ITL on the 5090 *improves* from c16→c32 — preempted requests re-enter with warm prefixes.
@@ -73,6 +75,8 @@ ITL on the 5090 *improves* from c16→c32 — preempted requests re-enter with w
 | toolagent | 6.4 / 9.9 / 17.3 / 31.9 / 60.1 | 1.9 / 2.8 / 4.7 / 8.8 / 17.1 |
 | agent | 9.3 / 11.8 / 18.3 / 25.8 / 35.2 | 2.6 / 3.4 / 4.4 / 6.7 / 7.9 |
 | coding | 16.6 / 17.4 / 68.3 / 55.9 / 137.2 | 5.2 / 10.6 / 19.4 / 28.6 / 43.1 |
+
+![e2e](results/nvfp4/nvfp4_e2e.png)
 
 ## Open loop — delivered req/s (offered 0.8 / 1.0 / 1.2) and TTFT avg
 
