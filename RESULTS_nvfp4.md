@@ -128,14 +128,22 @@ per-session prefix sharing survives.
 
 **Result: ISL is bit-identical at every point on both machines** — chatbot_flat 620.07,
 agent_flat 3,041.42, coding_flat 29,869.05 (all 8 points × both nodes; measured = declared
-to the cent). Throughput stays within a few % of the original multi-turn runs, so the flat
-variants are drop-in comparable:
+to the cent). chatbot/agent throughput stays within a few % of the original multi-turn
+runs (see the overlay plot), so those flat variants are drop-in comparable. coding_flat
+runs ~1.5–2× hotter than real multi-turn coding: trace order keeps each parent turn's
+blocks cache-hot, while real multi-turn interleaving evicts them — treat it as an upper
+bound, not a replacement.
+
+![flat-vs-orig](results/nvfp4/nvfp4_flat_vs_orig.png)
 
 | closed loop c2→c32 | spark req/s | 5090 req/s | spark TTFT ms | 5090 TTFT ms |
 |---|---|---|---|---|
 | chatbot_flat | 0.5 / 0.8 / 1.1 / 1.4 / 1.7 | 1.5 / 2.5 / 3.7 / 4.9 / 6.5 | 170 / 192 / 243 / 468 / 1,291 | 113 / 117 / 144 / 193 / 330 |
 | agent_flat | 0.2 / 0.4 / 0.5 / 0.6 / 0.7 | 0.7 / 1.3 / 1.8 / 2.5 / 3.1 | 359 / 399 / 522 / 954 / 2,813 | 186 / 208 / 237 / 336 / 642 |
 | coding_flat | — (5090 only) | 0.5 / 0.9 / 1.0 / 0.9 / 0.9 | — | 577 / 786 / 911 / 4,950 / 17,184 |
+
+![flat-throughput](results/nvfp4/nvfp4_flat_throughput.png)
+![flat-ttft](results/nvfp4/nvfp4_flat_ttft.png)
 
 Open loop: both machines deliver the offered 0.8/1.0/1.2 on chatbot_flat; agent_flat
 saturates Spark at ≈0.6 (TTFT 1.5→5.9 s) while the 5090 absorbs all rates (TTFT ~190 ms);
