@@ -13,7 +13,8 @@ import os
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "results", "nvfp4")
 NODES = ["spark", "5090"]
-ORDER = ["chatbot", "rag", "toolagent", "agent", "coding", "toolagent_ts"]
+ORDER = ["chatbot", "rag", "toolagent", "agent", "coding", "toolagent_ts",
+         "chatbot_flat", "agent_flat", "coding_flat"]
 STATS = ["avg", "min", "max", "p99", "p90", "p50", "std"]
 # exactly the rows aiperf prints, in its order; value-only metrics have stats=False
 METRICS = [

@@ -1,8 +1,10 @@
 # Results — NVFP4 cross-hardware: GB10 Spark vs RTX 5090
 
-`nvidia/Qwen3.6-35B-A3B-NVFP4` on vLLM **v0.24.0**, 2026-07-03. **82 points**:
+`nvidia/Qwen3.6-35B-A3B-NVFP4` on vLLM **v0.24.0**, 2026-07-03. **122 points**:
 2 machines × 5 workloads × (concurrency 2/4/8/16/32 closed-loop + 0.8/1.0/1.2 req/s
-poisson open-loop) + a fixed-schedule Mooncake replay on both. 96 requests/point,
+poisson open-loop) + a fixed-schedule Mooncake replay on both + flat-trace variants
+(chatbot/agent on both machines, coding on the 5090) with machine-independent ISL —
+see the flat-trace section. 96 requests/point,
 reasoning/thinking OFF, OSL cap 2048, prefix cache reset before every point, server
 restarted between workloads, aiperf 0.10 client co-located on each machine.
 Full methodology + incident log: [`results/nvfp4/SUMMARY_nvfp4.md`](results/nvfp4/SUMMARY_nvfp4.md);
@@ -111,6 +113,46 @@ the 5090 keeps interactive-grade ITL (≤29 ms) at every offered rate.
 Both queue the burst (over both capacities); the 5090 drains 3.6× faster at 7× lower ITL
 even while its KV thrashes (96M prefix-query tokens vs Spark's 3M).
 
+## Flat-trace variants — machine-independent ISL (`*_flat`)
+
+The conversational workloads (chatbot/agent/coding) are multi-turn, so their measured ISL
+is an *emergent* property: which conversations reach which turn depth inside the 96-request
+budget depends on concurrency and machine speed (e.g. coding r1.0 on Spark degenerated to
+84 first-turns, ISL 13.9k vs the 5090's 21.8k — the slow machine gets easier work). To
+remove that confound, `build_flat_traces.py` flattens each turn into an independent
+mooncake_trace entry (the toolagent approach): declared `input_length` = accumulated
+context, `output_length` = per-turn OSL **measured in the real runs** (the datasets declare
+2048 everywhere, but the model EOSes at ~460/~640 — and trace mode does generate ≈ the
+declared length), and `hash_ids` chain a turn to its parent's full 512-token blocks so
+per-session prefix sharing survives.
+
+**Result: ISL is bit-identical at every point on both machines** — chatbot_flat 620.07,
+agent_flat 3,041.42, coding_flat 29,869.05 (all 8 points × both nodes; measured = declared
+to the cent). Throughput stays within a few % of the original multi-turn runs, so the flat
+variants are drop-in comparable:
+
+| closed loop c2→c32 | spark req/s | 5090 req/s | spark TTFT ms | 5090 TTFT ms |
+|---|---|---|---|---|
+| chatbot_flat | 0.5 / 0.8 / 1.1 / 1.4 / 1.7 | 1.5 / 2.5 / 3.7 / 4.9 / 6.5 | 170 / 192 / 243 / 468 / 1,291 | 113 / 117 / 144 / 193 / 330 |
+| agent_flat | 0.2 / 0.4 / 0.5 / 0.6 / 0.7 | 0.7 / 1.3 / 1.8 / 2.5 / 3.1 | 359 / 399 / 522 / 954 / 2,813 | 186 / 208 / 237 / 336 / 642 |
+| coding_flat | — (5090 only) | 0.5 / 0.9 / 1.0 / 0.9 / 0.9 | — | 577 / 786 / 911 / 4,950 / 17,184 |
+
+Open loop: both machines deliver the offered 0.8/1.0/1.2 on chatbot_flat; agent_flat
+saturates Spark at ≈0.6 (TTFT 1.5→5.9 s) while the 5090 absorbs all rates (TTFT ~190 ms);
+coding_flat on the 5090 caps at ≈0.9 req/s.
+
+Prefix-hit also becomes deterministic — agent_flat ≈43% and coding_flat ≈71% at every
+uncontended point, on both machines. Two observations worth keeping:
+
+- **coding_flat reproduces the 5090 KV thrash on schedule** (hit 71% → 40% at c16/c32,
+  TTFT 0.9 s → 17.2 s) but milder than real multi-turn (which fell to 0.1% hit / 27 s):
+  trace order keeps a parent turn's blocks hot when its child arrives.
+- **chatbot_flat's hit-rate is only 1.5%**: short chat turns rarely fill a 512-token
+  block, so there is almost nothing shareable — a structural artifact of block-granular
+  prefix caching, not a regression.
+
+The Spark agent r0.8 EngineCore wedge did **not** reproduce on agent_flat r0.8.
+
 ## KV-capacity story
 
 - **5090 (263K-token KV)** thrashes on long-context workloads: coding prefix-hit collapses
@@ -145,6 +187,10 @@ cd monitoring && docker compose up -d && cd ..
 NODE=spark nohup bash scripts/run_nvfp4.sh &                    # on the Spark
 NODE=5090  nohup bash scripts/run_nvfp4.sh &                    # on the 5090 (~/bench-nvfp4 mirror)
 NODE=spark POINTS=fixed bash scripts/run_nvfp4.sh toolagent_ts  # timestamped replay
+docker run --rm -v ~/.cache/huggingface:/hf -e HF_HOME=/hf -e HF_HUB_OFFLINE=1 \
+  -v "$PWD":/work -w /work --entrypoint python3 aiperf:local \
+  scripts/build_flat_traces.py                                  # flat traces (fixed ISL)
+NODE=spark bash scripts/run_nvfp4.sh chatbot_flat agent_flat coding_flat
 python3 scripts/collect_prom_nvfp4.py && python3 scripts/summarize_nvfp4.py --md
 .venv-plot/bin/python3 scripts/plot_nvfp4.py
 python3 scripts/annotate_grafana_nvfp4.py                       # tag runs in Grafana

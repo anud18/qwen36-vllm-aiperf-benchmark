@@ -88,6 +88,9 @@ run_point() {  # workload point dtype file  extra-args...
     if [ "$wl" = chatbot ]; then args+=(--public-dataset sharegpt --extra-inputs "$THINKOFF")
     elif [ "$wl" = toolagent ]; then args+=(--input-file "$file" --custom-dataset-type "$dtype" --extra-inputs "$THINKOFF")
     elif [ "$wl" = coding ]; then args+=(--input-file "$file" --custom-dataset-type "$dtype" --extra-inputs "$THINKOFF")
+    elif [ "$wl" = chatbot_flat ] || [ "$wl" = agent_flat ] || [ "$wl" = coding_flat ]; then
+      # flattened traces lose the in-data extra field -> thinking off via extra-inputs
+      args+=(--input-file "$file" --custom-dataset-type "$dtype" --extra-inputs "$THINKOFF")
     else args+=(--input-file "$file" --custom-dataset-type "$dtype"); fi
 
     # background aiperf + wedge watchdog (engine deadlock: running>0 but no token movement)
@@ -166,6 +169,10 @@ for wl in $SEL; do
     toolagent_ts) workload toolagent_ts mooncake_trace "$DATA/nvfp4_toolagent_ts.jsonl" ;;
     agent)     workload agent     multi_turn     "$DATA/nvfp4_agent.jsonl" ;;
     coding)    workload coding    multi_turn     "$DATA/nvfp4_coding.jsonl" ;;
+    # flattened multi-turn -> mooncake_trace: machine-independent ISL (see build_flat_traces.py)
+    chatbot_flat) workload chatbot_flat mooncake_trace "$DATA/nvfp4_chatbot_flat.jsonl" ;;
+    agent_flat)   workload agent_flat   mooncake_trace "$DATA/nvfp4_agent_flat.jsonl" ;;
+    coding_flat)  workload coding_flat  mooncake_trace "$DATA/nvfp4_coding_flat.jsonl" ;;
     *) echo "!!! unknown workload $wl" ;;
   esac
 done

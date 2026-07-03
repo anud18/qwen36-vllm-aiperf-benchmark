@@ -1,0 +1,21 @@
+bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+================ RUN_NVFP4 node=5090 start 2026-07-03 20:56:03 ================
+==== [restart vLLM] 20:56:03 ====
+   [aiperf] coding_flat c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 20:58:42
+   [prefix-hit] coding_flat c2: hits=2352768 queries=3299444 rate=71.3%
+   [aiperf] coding_flat c4 (try 1, warmup=16, reqs=96, tlimit=2700s) 21:02:43
+   [prefix-hit] coding_flat c4: hits=2751936 queries=3880660 rate=70.9%
+   [aiperf] coding_flat c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 21:05:13
+   [prefix-hit] coding_flat c8: hits=2743488 queries=3860661 rate=71.1%
+   [aiperf] coding_flat c16 (try 1, warmup=16, reqs=96, tlimit=2700s) 21:07:28
+   [prefix-hit] coding_flat c16: hits=24624864 queries=61364184 rate=40.1%
+   [aiperf] coding_flat c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 21:09:43
+   [prefix-hit] coding_flat c32: hits=35263008 queries=82928446 rate=42.5%
+   [aiperf] coding_flat r0.8 (try 1, warmup=16, reqs=96, tlimit=3600s) 21:11:58
+   [prefix-hit] coding_flat r0.8: hits=2883936 queries=4078550 rate=70.7%
+   [aiperf] coding_flat r1.0 (try 1, warmup=16, reqs=96, tlimit=3600s) 21:14:43
+   [prefix-hit] coding_flat r1.0: hits=9787008 queries=12958429 rate=75.5%
+   [aiperf] coding_flat r1.2 (try 1, warmup=16, reqs=96, tlimit=3600s) 21:17:13
+   [prefix-hit] coding_flat r1.2: hits=10960224 queries=45462773 rate=24.1%
+>>> stopping vLLM server
+================ RUN_NVFP4 node=5090 DONE 2026-07-03 21:19:30 ================

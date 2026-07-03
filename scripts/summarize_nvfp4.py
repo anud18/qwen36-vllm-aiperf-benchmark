@@ -15,7 +15,8 @@ import sys
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "results", "nvfp4")
 NODES = ["spark", "5090"]
-ORDER = ["chatbot", "rag", "toolagent", "agent", "coding", "toolagent_ts"]
+ORDER = ["chatbot", "rag", "toolagent", "agent", "coding", "toolagent_ts",
+         "chatbot_flat", "agent_flat", "coding_flat"]
 ROWS = [
     ("ISL", "Input Sequence Length (tokens)"),
     ("OSL", "Output Sequence Length (tokens)"),
