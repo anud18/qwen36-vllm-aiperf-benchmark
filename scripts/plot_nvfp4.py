@@ -93,6 +93,9 @@ def grid_figure(fname, xlevels, xlabel, ylabel, suptitle, get_y, logy=False, log
             ax.set_xticks(xlevels)
         if logy:
             ax.set_yscale("log")
+        else:  # plain numbers, never scientific/offset notation
+            ax.yaxis.set_major_formatter(
+                plt.FuncFormatter(lambda v, _: f"{v:,.0f}" if v >= 10 else f"{v:g}"))
         ax.set_xlabel(xlabel, fontsize=9, color=MUTED)
     axes[0].set_ylabel(ylabel, fontsize=9, color=MUTED)
     handles = [plt.Line2D([], [], color=c, linewidth=2, marker="o", markersize=5,
@@ -227,9 +230,9 @@ def main():
         logx2=True)
     grid_figure(
         "nvfp4_ttft.png", CLEVELS, "concurrency", "TTFT avg (ms)",
-        "Time-to-first-token vs concurrency — closed loop (log y)",
+        "Time-to-first-token vs concurrency — closed loop",
         lambda n, w, p: aiperf_metric(n, w, p, "Time to First Token (ms)"),
-        logy=True, logx2=True)
+        logx2=True)
     grid_figure(
         "nvfp4_rate_ttft.png", RLEVELS, "req/s offered", "TTFT avg (ms)",
         "Open-loop TTFT avg at 0.8 / 1.0 / 1.2 req/s (poisson)",
@@ -248,9 +251,9 @@ def main():
         logx2=True, wls=FLAT)
     grid_figure(
         "nvfp4_flat_ttft.png", CLEVELS, "concurrency", "TTFT avg (ms)",
-        "Flat-trace time-to-first-token vs concurrency — closed loop (log y)",
+        "Flat-trace time-to-first-token vs concurrency — closed loop",
         lambda n, w, p: aiperf_metric(n, w, p, "Time to First Token (ms)"),
-        logy=True, logx2=True, wls=FLAT)
+        logx2=True, wls=FLAT)
     flat_vs_orig("nvfp4_flat_vs_orig.png")
     coding_flat_5090("nvfp4_coding_flat_5090_reqs.png")
     rate_reqs_figure("nvfp4_rate_reqs.png")
