@@ -180,6 +180,45 @@ def coding_flat_5090(fname):
     print("wrote", out)
 
 
+def rate_reqs_figure(fname):
+    """Open-loop delivered Req/s at r0.8/1.0/1.2 — raw values labeled on every point."""
+    fig, axes = plt.subplots(1, 5, figsize=(16, 3.4), constrained_layout=True)
+    for ax, wl in zip(axes, WLS):
+        style(ax, wl)
+        for node, color in NODES:
+            ys = [aiperf_metric(node, wl, f"r{r}", "Request Throughput (requests/sec)")
+                  for r in RLEVELS]
+            xs = [x for x, y in zip(RLEVELS, ys) if y is not None]
+            yv = [y for y in ys if y is not None]
+            if not xs:
+                continue
+            ax.plot(xs, yv, color=color, linewidth=2, marker="o", markersize=5,
+                    markeredgecolor="white", markeredgewidth=1, zorder=3)
+            # label every point with its raw value; 5090 above, spark below
+            dy = 8 if node == "5090" else -14
+            for x, y in zip(xs, yv):
+                ax.annotate(f"{y:.2f}", (x, y), textcoords="offset points",
+                            xytext=(0, dy), fontsize=8, color=color, ha="center")
+            ax.annotate(node, (xs[-1], yv[-1]), textcoords="offset points",
+                        xytext=(14, -3), fontsize=8.5, color=color, fontweight="bold")
+        ax.set_xticks(RLEVELS)
+        ax.set_xlim(0.72, 1.34)
+        ax.set_ylim(0, 1.45)
+        ax.ticklabel_format(style="plain", axis="y", useOffset=False)
+        ax.set_xlabel("req/s offered", fontsize=9, color=MUTED)
+    axes[0].set_ylabel("Req/s delivered", fontsize=9, color=MUTED)
+    handles = [plt.Line2D([], [], color=c, linewidth=2, marker="o", markersize=5,
+                          markeredgecolor="white", label=n) for n, c in NODES]
+    fig.legend(handles=handles, loc="upper right", frameon=False, fontsize=9,
+               bbox_to_anchor=(0.995, 1.06), ncol=2)
+    fig.suptitle("Open-loop delivered Req/s at 0.8 / 1.0 / 1.2 req/s offered (poisson)",
+                 fontsize=13, color=INK, x=0.01, ha="left")
+    out = os.path.join(ROOT, fname)
+    fig.savefig(out, dpi=150, facecolor="white", bbox_inches="tight")
+    plt.close(fig)
+    print("wrote", out)
+
+
 def main():
     grid_figure(
         "nvfp4_throughput.png", CLEVELS, "concurrency", "Req/s",
@@ -214,6 +253,7 @@ def main():
         logy=True, logx2=True, wls=FLAT)
     flat_vs_orig("nvfp4_flat_vs_orig.png")
     coding_flat_5090("nvfp4_coding_flat_5090_reqs.png")
+    rate_reqs_figure("nvfp4_rate_reqs.png")
 
 
 if __name__ == "__main__":
