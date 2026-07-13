@@ -1,0 +1,50 @@
+######## PASS results/nvfp4/h100 2026-07-14 00:46:26 ########
+================ RUN_NVFP4 node=h100 start 2026-07-14 00:46:26 ================
+==== [restart vLLM] 00:46:26 ====
+   [aiperf] chatbot_flat c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 00:48:20
+   [prefix-hit] chatbot_flat c2: hits=15840 queries=71334 rate=22.2%
+   [aiperf] chatbot_flat c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 00:50:05
+   [prefix-hit] chatbot_flat c8: hits=16896 queries=72682 rate=23.2%
+   [aiperf] chatbot_flat c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 00:50:51
+   [prefix-hit] chatbot_flat c32: hits=19008 queries=76209 rate=24.9%
+==== [restart vLLM] 00:51:21 ====
+   [aiperf] agent_flat c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 00:53:19
+   [prefix-hit] agent_flat c2: hits=178464 queries=317120 rate=56.3%
+   [aiperf] agent_flat c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 00:55:34
+   [prefix-hit] agent_flat c8: hits=182688 queries=323105 rate=56.5%
+   [aiperf] agent_flat c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 00:56:35
+   [prefix-hit] agent_flat c32: hits=187968 queries=345434 rate=54.4%
+==== [restart vLLM] 00:57:20 ====
+   [aiperf] coding_flat c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 00:59:18
+   [prefix-hit] coding_flat c2: hits=2369664 queries=3217092 rate=73.7%
+   [aiperf] coding_flat c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 01:02:19
+   [prefix-hit] coding_flat c8: hits=2459424 queries=3415595 rate=72.0%
+   [aiperf] coding_flat c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 01:04:04
+   [prefix-hit] coding_flat c32: hits=2742432 queries=4035781 rate=68.0%
+================ RUN_NVFP4 node=h100 DONE 2026-07-14 01:05:34 ================
+######## PASS results/nvfp4/h100run2 2026-07-14 01:05:34 ########
+================ RUN_NVFP4 node=h100 start 2026-07-14 01:05:34 ================
+==== [restart vLLM] 01:05:34 ====
+   [aiperf] chatbot_flat c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 01:07:32
+   [prefix-hit] chatbot_flat c2: hits=15840 queries=71334 rate=22.2%
+   [aiperf] chatbot_flat c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 01:09:18
+   [prefix-hit] chatbot_flat c8: hits=17952 queries=73895 rate=24.3%
+   [aiperf] chatbot_flat c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 01:10:03
+   [prefix-hit] chatbot_flat c32: hits=20064 queries=76574 rate=26.2%
+==== [restart vLLM] 01:10:33 ====
+   [aiperf] agent_flat c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 01:12:27
+   [prefix-hit] agent_flat c2: hits=178464 queries=317120 rate=56.3%
+   [aiperf] agent_flat c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 01:14:57
+   [prefix-hit] agent_flat c8: hits=181632 queries=323016 rate=56.2%
+   [aiperf] agent_flat c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 01:16:12
+   [prefix-hit] agent_flat c32: hits=172128 queries=337670 rate=51.0%
+==== [restart vLLM] 01:16:57 ====
+   [aiperf] coding_flat c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 01:19:01
+   [prefix-hit] coding_flat c2: hits=2358048 queries=3217092 rate=73.3%
+   [aiperf] coding_flat c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 01:22:01
+   [prefix-hit] coding_flat c8: hits=2538624 queries=3511619 rate=72.3%
+   [aiperf] coding_flat c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 01:23:47
+   [prefix-hit] coding_flat c32: hits=2785728 queries=3992044 rate=69.8%
+================ RUN_NVFP4 node=h100 DONE 2026-07-14 01:25:32 ================
+an-hao-vllm-nvfp4
+######## DOUBLE RUN DONE 2026-07-14 01:25:33 ########

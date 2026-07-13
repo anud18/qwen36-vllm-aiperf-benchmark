@@ -91,8 +91,10 @@ run_point() {  # workload point dtype file  extra-args...
     elif [ "$wl" = toolagent ]; then args+=(--input-file "$file" --custom-dataset-type "$dtype" --extra-inputs "$THINKOFF")
     elif [ "$wl" = coding ]; then args+=(--input-file "$file" --custom-dataset-type "$dtype" --extra-inputs "$THINKOFF")
     elif [ "$wl" = chatbot_flat ] || [ "$wl" = agent_flat ] || [ "$wl" = coding_flat ]; then
-      # flattened traces lose the in-data extra field -> thinking off via extra-inputs
-      args+=(--input-file "$file" --custom-dataset-type "$dtype" --extra-inputs "$THINKOFF")
+      # text-mode flat traces (`messages` entries): aiperf can't tokenize raw
+      # messages client-side, so ISL comes from server usage (entries carry
+      # stream_options.include_usage; thinking-off is in-data too)
+      args+=(--input-file "$file" --custom-dataset-type "$dtype" --use-server-token-count)
     else args+=(--input-file "$file" --custom-dataset-type "$dtype"); fi
 
     # background aiperf + wedge watchdog (engine deadlock: running>0 but no token movement)
