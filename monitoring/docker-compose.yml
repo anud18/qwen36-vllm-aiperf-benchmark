@@ -11,7 +11,7 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
     command:
       - --config.file=/etc/prometheus/prometheus.yml
-      - --storage.tsdb.retention.time=72h
+      - --storage.tsdb.retention.time=60d
       - --web.enable-admin-api
 
   grafana:
