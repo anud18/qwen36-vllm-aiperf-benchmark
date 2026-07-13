@@ -128,24 +128,27 @@ run of the three; whole 40-point sweep in ~2 h. Single H100 (TP=1), no CPU offlo
 
 | workload | H100 Req/s c2→c32 | H100 TTFT avg ms | H100 ITL avg ms | vs 5090 @c32 |
 |---|---|---|---|--:|
-| chatbot | 1.5 / 2.4 / 3.3 / 5.2 / 6.8 | 82 / 78 / 86 / 91 / 131 | 6 / 7 / 9 / 13 / 17 | ≈ tie |
-| rag | 4.2 / 4.7 / 4.9 / 5.3 / 5.3 | 402 / 717 / 996 / 1,947 / 4,082 | 13 / 32 / 132 / 383 / 634 | **1.2×** |
-| toolagent | 1.1 / 1.6 / 2.0 / 2.4 / 2.6 | 339 / 364 / 582 / 973 / 2,518 | 8 / 11 / 21 / 48 / 119 | **1.5×** |
-| agent | 0.7 / 1.1 / 1.8 / 2.0 / 3.2 | 125 / 130 / 167 / 235 / 578 | 6 / 7 / 9 / 12 / 17 | ≈ tie |
-| coding | 0.4 / 0.5 / 0.8 / 1.0 / 1.2 | 411 / 447 / 624 / 1,230 / 2,991 | 6 / 9 / 14 / 23 / 47 | **2.0×** |
+| chatbot | 1.5 / 2.4 / 3.3 / 5.2 / 7.0 | 77 / 80 / 85 / 93 / 120 | 6 / 7 / 9 / 13 / 17 | ≈ tie |
+| rag | 4.2 / 4.7 / 4.9 / 5.2 / 5.4 | 394 / 684 / 1,102 / 1,929 / 3,937 | 14 / 40 / 137 / 375 / 665 | **1.2×** |
+| toolagent | 1.1 / 1.6 / 2.0 / 2.4 / 2.7 | 345 / 382 / 515 / 1,042 / 2,336 | 8 / 10 / 21 / 50 / 128 | **1.6×** |
+| agent | 0.6 / 1.1 / 1.9 / 2.3 / 3.3 | 123 / 126 / 162 / 226 / 585 | 6 / 7 / 9 / 12 / 17 | ≈ tie |
+| coding | 0.4 / 0.6 / 0.8 / 1.1 / 1.3 | 410 / 449 / 686 / 1,210 / 2,900 | 7 / 9 / 13 / 22 / 41 | **2.2×** |
+
+<sub>Numbers from the monitored re-run (2026-07-13 evening, Prometheus-scraped); within
+run-to-run noise of the first H100 sweep. Per-point CSVs in `results/nvfp4/h100/`.</sub>
 
 **The KV-headroom win (the whole point of the H100 here):** with 2.23M-token KV the prefix
 cache *never collapses*, exactly where the 5090/5080 thrashed —
 
-- **coding**: prefix-hit holds **73% → 67% (c8) → 54% (c32)**; the 5090 and 5080 both fell to
-  **0.1% by c8**. Result: H100 coding throughput is **2× the 5090** at c32 (1.2 vs 0.6 req/s)
-  and TTFT stays 3.0 s where the 5090 blew out to 27 s.
+- **coding**: prefix-hit holds **73% → 69% (c8) → 53% (c32)**; the 5090 and 5080 both fell to
+  **0.1% by c8**. Result: H100 coding throughput is **2.2× the 5090** at c32 (1.3 vs 0.6 req/s)
+  and TTFT stays 2.9 s where the 5090 blew out to 27 s.
 - **toolagent**: hit stays flat at **~18% across c2–c32** (5090 collapsed from c16). H100 leads 1.5×.
 - On **chatbot/agent** (short context, decode-bound) the H100 merely ties the 5090 — no KV
   pressure to relieve, and both are Marlin weight-only so raw decode is comparable.
 
 Fixed-schedule Mooncake replay (same 320-req burst): H100 delivers **2.7 req/s** (Spark 0.5,
-5090 1.5), TTFT avg **28.0 s** (Spark 314.8, 5090 86.5), ITL 77 ms — drains the burst fastest
+5090 1.5), TTFT avg **28.0 s** (Spark 314.8, 5090 86.5), ITL 74 ms — drains the burst fastest
 of the three, its big KV keeping the queue's shared prefixes hot throughout.
 
 **KV usage confirms the headroom** (server-side, scraped via an SSH tunnel Spark→H100 on a
