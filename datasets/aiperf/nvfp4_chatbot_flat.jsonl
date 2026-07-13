@@ -1,0 +1,240 @@
+{"input_length": 34, "output_length": 252, "hash_ids": [0]}
+{"input_length": 322, "output_length": 329, "hash_ids": [1]}
+{"input_length": 669, "output_length": 284, "hash_ids": [2, 3]}
+{"input_length": 986, "output_length": 292, "hash_ids": [2, 4]}
+{"input_length": 1289, "output_length": 313, "hash_ids": [2, 5, 6]}
+{"input_length": 1615, "output_length": 265, "hash_ids": [2, 5, 7, 8]}
+{"input_length": 17, "output_length": 73, "hash_ids": [9]}
+{"input_length": 62, "output_length": 424, "hash_ids": [10]}
+{"input_length": 303, "output_length": 189, "hash_ids": [11]}
+{"input_length": 16, "output_length": 185, "hash_ids": [12]}
+{"input_length": 209, "output_length": 456, "hash_ids": [13]}
+{"input_length": 679, "output_length": 309, "hash_ids": [14, 15]}
+{"input_length": 1000, "output_length": 373, "hash_ids": [14, 16]}
+{"input_length": 5, "output_length": 259, "hash_ids": [17]}
+{"input_length": 269, "output_length": 248, "hash_ids": [18]}
+{"input_length": 526, "output_length": 292, "hash_ids": [19, 20]}
+{"input_length": 825, "output_length": 331, "hash_ids": [19, 21]}
+{"input_length": 1161, "output_length": 220, "hash_ids": [19, 22, 23]}
+{"input_length": 1398, "output_length": 235, "hash_ids": [19, 22, 24]}
+{"input_length": 50, "output_length": 641, "hash_ids": [25]}
+{"input_length": 702, "output_length": 487, "hash_ids": [26, 27]}
+{"input_length": 10, "output_length": 204, "hash_ids": [28]}
+{"input_length": 225, "output_length": 223, "hash_ids": [29]}
+{"input_length": 483, "output_length": 281, "hash_ids": [30]}
+{"input_length": 770, "output_length": 201, "hash_ids": [31, 32]}
+{"input_length": 976, "output_length": 203, "hash_ids": [31, 33]}
+{"input_length": 1184, "output_length": 256, "hash_ids": [31, 34, 35]}
+{"input_length": 1447, "output_length": 351, "hash_ids": [31, 34, 36]}
+{"input_length": 1805, "output_length": 391, "hash_ids": [31, 34, 37, 38]}
+{"input_length": 68, "output_length": 54, "hash_ids": [39]}
+{"input_length": 199, "output_length": 196, "hash_ids": [40]}
+{"input_length": 406, "output_length": 126, "hash_ids": [41]}
+{"input_length": 536, "output_length": 271, "hash_ids": [42, 43]}
+{"input_length": 872, "output_length": 356, "hash_ids": [42, 44]}
+{"input_length": 1243, "output_length": 135, "hash_ids": [42, 45, 46]}
+{"input_length": 1389, "output_length": 158, "hash_ids": [42, 45, 47]}
+{"input_length": 1556, "output_length": 79, "hash_ids": [42, 45, 48, 49]}
+{"input_length": 1639, "output_length": 432, "hash_ids": [42, 45, 48, 50]}
+{"input_length": 8, "output_length": 152, "hash_ids": [51]}
+{"input_length": 269, "output_length": 487, "hash_ids": [52]}
+{"input_length": 880, "output_length": 258, "hash_ids": [53, 54]}
+{"input_length": 1143, "output_length": 179, "hash_ids": [53, 55, 56]}
+{"input_length": 1371, "output_length": 91, "hash_ids": [53, 55, 57]}
+{"input_length": 1532, "output_length": 122, "hash_ids": [53, 55, 58]}
+{"input_length": 1728, "output_length": 130, "hash_ids": [53, 55, 59, 60]}
+{"input_length": 8, "output_length": 135, "hash_ids": [61]}
+{"input_length": 153, "output_length": 18, "hash_ids": [62]}
+{"input_length": 177, "output_length": 89, "hash_ids": [63]}
+{"input_length": 47, "output_length": 474, "hash_ids": [64]}
+{"input_length": 12, "output_length": 40, "hash_ids": [65]}
+{"input_length": 203, "output_length": 436, "hash_ids": [66]}
+{"input_length": 647, "output_length": 51, "hash_ids": [67, 68]}
+{"input_length": 713, "output_length": 399, "hash_ids": [67, 69]}
+{"input_length": 1122, "output_length": 375, "hash_ids": [67, 70, 71]}
+{"input_length": 1517, "output_length": 503, "hash_ids": [67, 70, 72]}
+{"input_length": 47, "output_length": 445, "hash_ids": [73]}
+{"input_length": 503, "output_length": 325, "hash_ids": [74]}
+{"input_length": 19, "output_length": 119, "hash_ids": [75]}
+{"input_length": 150, "output_length": 118, "hash_ids": [76]}
+{"input_length": 273, "output_length": 479, "hash_ids": [77]}
+{"input_length": 775, "output_length": 323, "hash_ids": [78, 79]}
+{"input_length": 1117, "output_length": 341, "hash_ids": [78, 80, 81]}
+{"input_length": 1466, "output_length": 398, "hash_ids": [78, 80, 82]}
+{"input_length": 1875, "output_length": 109, "hash_ids": [78, 80, 83, 84]}
+{"input_length": 353, "output_length": 237, "hash_ids": [85]}
+{"input_length": 598, "output_length": 79, "hash_ids": [86, 87]}
+{"input_length": 689, "output_length": 79, "hash_ids": [86, 88]}
+{"input_length": 772, "output_length": 21, "hash_ids": [86, 89]}
+{"input_length": 38, "output_length": 254, "hash_ids": [90]}
+{"input_length": 330, "output_length": 242, "hash_ids": [91]}
+{"input_length": 811, "output_length": 77, "hash_ids": [92, 93]}
+{"input_length": 1180, "output_length": 51, "hash_ids": [92, 94, 95]}
+{"input_length": 1458, "output_length": 10, "hash_ids": [92, 94, 96]}
+{"input_length": 27, "output_length": 77, "hash_ids": [97]}
+{"input_length": 19, "output_length": 247, "hash_ids": [98]}
+{"input_length": 231, "output_length": 260, "hash_ids": [99]}
+{"input_length": 512, "output_length": 274, "hash_ids": [100]}
+{"input_length": 13, "output_length": 740, "hash_ids": [101]}
+{"input_length": 21, "output_length": 113, "hash_ids": [102]}
+{"input_length": 161, "output_length": 122, "hash_ids": [103]}
+{"input_length": 299, "output_length": 240, "hash_ids": [104]}
+{"input_length": 566, "output_length": 151, "hash_ids": [105, 106]}
+{"input_length": 728, "output_length": 193, "hash_ids": [105, 107]}
+{"input_length": 945, "output_length": 60, "hash_ids": [105, 108]}
+{"input_length": 15, "output_length": 219, "hash_ids": [109]}
+{"input_length": 244, "output_length": 240, "hash_ids": [110]}
+{"input_length": 496, "output_length": 256, "hash_ids": [111]}
+{"input_length": 762, "output_length": 328, "hash_ids": [112, 113]}
+{"input_length": 1104, "output_length": 209, "hash_ids": [112, 114, 115]}
+{"input_length": 36, "output_length": 651, "hash_ids": [116]}
+{"input_length": 733, "output_length": 215, "hash_ids": [117, 118]}
+{"input_length": 8, "output_length": 313, "hash_ids": [119]}
+{"input_length": 16, "output_length": 139, "hash_ids": [120]}
+{"input_length": 174, "output_length": 155, "hash_ids": [121]}
+{"input_length": 337, "output_length": 182, "hash_ids": [122]}
+{"input_length": 24, "output_length": 583, "hash_ids": [123]}
+{"input_length": 411, "output_length": 322, "hash_ids": [124]}
+{"input_length": 770, "output_length": 59, "hash_ids": [125, 126]}
+{"input_length": 1020, "output_length": 164, "hash_ids": [125, 127]}
+{"input_length": 1410, "output_length": 191, "hash_ids": [125, 128, 129]}
+{"input_length": 1704, "output_length": 177, "hash_ids": [125, 128, 130, 131]}
+{"input_length": 142, "output_length": 172, "hash_ids": [132]}
+{"input_length": 405, "output_length": 87, "hash_ids": [133]}
+{"input_length": 545, "output_length": 61, "hash_ids": [134, 135]}
+{"input_length": 653, "output_length": 76, "hash_ids": [134, 136]}
+{"input_length": 9, "output_length": 423, "hash_ids": [137]}
+{"input_length": 447, "output_length": 391, "hash_ids": [138]}
+{"input_length": 8, "output_length": 70, "hash_ids": [139]}
+{"input_length": 85, "output_length": 91, "hash_ids": [140]}
+{"input_length": 184, "output_length": 319, "hash_ids": [141]}
+{"input_length": 512, "output_length": 302, "hash_ids": [142]}
+{"input_length": 823, "output_length": 118, "hash_ids": [142, 143]}
+{"input_length": 950, "output_length": 113, "hash_ids": [142, 144]}
+{"input_length": 1071, "output_length": 152, "hash_ids": [142, 145, 146]}
+{"input_length": 1231, "output_length": 154, "hash_ids": [142, 145, 147]}
+{"input_length": 1392, "output_length": 179, "hash_ids": [142, 145, 148]}
+{"input_length": 43, "output_length": 113, "hash_ids": [149]}
+{"input_length": 24, "output_length": 24, "hash_ids": [150]}
+{"input_length": 77, "output_length": 25, "hash_ids": [151]}
+{"input_length": 121, "output_length": 33, "hash_ids": [152]}
+{"input_length": 181, "output_length": 170, "hash_ids": [153]}
+{"input_length": 29, "output_length": 44, "hash_ids": [154]}
+{"input_length": 90, "output_length": 38, "hash_ids": [155]}
+{"input_length": 14, "output_length": 105, "hash_ids": [156]}
+{"input_length": 166, "output_length": 129, "hash_ids": [157]}
+{"input_length": 311, "output_length": 109, "hash_ids": [158]}
+{"input_length": 462, "output_length": 133, "hash_ids": [159]}
+{"input_length": 620, "output_length": 138, "hash_ids": [160, 161]}
+{"input_length": 779, "output_length": 352, "hash_ids": [160, 162]}
+{"input_length": 1156, "output_length": 269, "hash_ids": [160, 163, 164]}
+{"input_length": 1524, "output_length": 143, "hash_ids": [160, 163, 165]}
+{"input_length": 35, "output_length": 179, "hash_ids": [166]}
+{"input_length": 285, "output_length": 277, "hash_ids": [167]}
+{"input_length": 595, "output_length": 142, "hash_ids": [168, 169]}
+{"input_length": 861, "output_length": 179, "hash_ids": [168, 170]}
+{"input_length": 1056, "output_length": 145, "hash_ids": [168, 171, 172]}
+{"input_length": 1210, "output_length": 607, "hash_ids": [168, 171, 173]}
+{"input_length": 11, "output_length": 91, "hash_ids": [174]}
+{"input_length": 124, "output_length": 47, "hash_ids": [175]}
+{"input_length": 209, "output_length": 492, "hash_ids": [176]}
+{"input_length": 828, "output_length": 387, "hash_ids": [177, 178]}
+{"input_length": 1224, "output_length": 80, "hash_ids": [177, 179, 180]}
+{"input_length": 31, "output_length": 364, "hash_ids": [181]}
+{"input_length": 420, "output_length": 329, "hash_ids": [182]}
+{"input_length": 773, "output_length": 265, "hash_ids": [183, 184]}
+{"input_length": 1067, "output_length": 68, "hash_ids": [183, 185, 186]}
+{"input_length": 1153, "output_length": 145, "hash_ids": [183, 185, 187]}
+{"input_length": 1335, "output_length": 374, "hash_ids": [183, 185, 188]}
+{"input_length": 318, "output_length": 196, "hash_ids": [189]}
+{"input_length": 556, "output_length": 654, "hash_ids": [190, 191]}
+{"input_length": 14, "output_length": 658, "hash_ids": [192]}
+{"input_length": 423, "output_length": 366, "hash_ids": [193]}
+{"input_length": 847, "output_length": 730, "hash_ids": [194, 195]}
+{"input_length": 134, "output_length": 71, "hash_ids": [196]}
+{"input_length": 224, "output_length": 73, "hash_ids": [197]}
+{"input_length": 317, "output_length": 57, "hash_ids": [198]}
+{"input_length": 380, "output_length": 54, "hash_ids": [199]}
+{"input_length": 445, "output_length": 246, "hash_ids": [200]}
+{"input_length": 4, "output_length": 290, "hash_ids": [201]}
+{"input_length": 42, "output_length": 255, "hash_ids": [202]}
+{"input_length": 325, "output_length": 218, "hash_ids": [203]}
+{"input_length": 584, "output_length": 260, "hash_ids": [204, 205]}
+{"input_length": 864, "output_length": 254, "hash_ids": [204, 206]}
+{"input_length": 26, "output_length": 425, "hash_ids": [207]}
+{"input_length": 464, "output_length": 196, "hash_ids": [208]}
+{"input_length": 667, "output_length": 305, "hash_ids": [209, 210]}
+{"input_length": 1005, "output_length": 179, "hash_ids": [209, 211]}
+{"input_length": 1267, "output_length": 262, "hash_ids": [209, 212, 213]}
+{"input_length": 23, "output_length": 14, "hash_ids": [214]}
+{"input_length": 737, "output_length": 10, "hash_ids": [215, 216]}
+{"input_length": 351, "output_length": 368, "hash_ids": [217]}
+{"input_length": 49, "output_length": 390, "hash_ids": [218]}
+{"input_length": 7, "output_length": 36, "hash_ids": [219]}
+{"input_length": 340, "output_length": 282, "hash_ids": [220]}
+{"input_length": 661, "output_length": 446, "hash_ids": [221, 222]}
+{"input_length": 1174, "output_length": 333, "hash_ids": [221, 223, 224]}
+{"input_length": 1618, "output_length": 279, "hash_ids": [221, 223, 225, 226]}
+{"input_length": 1944, "output_length": 64, "hash_ids": [221, 223, 225, 227]}
+{"input_length": 2029, "output_length": 89, "hash_ids": [221, 223, 225, 228]}
+{"input_length": 19, "output_length": 96, "hash_ids": [229]}
+{"input_length": 131, "output_length": 111, "hash_ids": [230]}
+{"input_length": 271, "output_length": 31, "hash_ids": [231]}
+{"input_length": 410, "output_length": 192, "hash_ids": [232]}
+{"input_length": 655, "output_length": 103, "hash_ids": [233, 234]}
+{"input_length": 768, "output_length": 95, "hash_ids": [233, 235]}
+{"input_length": 872, "output_length": 31, "hash_ids": [233, 236]}
+{"input_length": 934, "output_length": 162, "hash_ids": [233, 237]}
+{"input_length": 432, "output_length": 130, "hash_ids": [238]}
+{"input_length": 576, "output_length": 572, "hash_ids": [239, 240]}
+{"input_length": 1156, "output_length": 551, "hash_ids": [239, 241, 242]}
+{"input_length": 1712, "output_length": 387, "hash_ids": [239, 241, 243, 244]}
+{"input_length": 68, "output_length": 411, "hash_ids": [245]}
+{"input_length": 18, "output_length": 404, "hash_ids": [246]}
+{"input_length": 455, "output_length": 329, "hash_ids": [247]}
+{"input_length": 801, "output_length": 174, "hash_ids": [248, 249]}
+{"input_length": 992, "output_length": 251, "hash_ids": [248, 250]}
+{"input_length": 1262, "output_length": 134, "hash_ids": [248, 251, 252]}
+{"input_length": 7, "output_length": 215, "hash_ids": [253]}
+{"input_length": 7, "output_length": 438, "hash_ids": [254]}
+{"input_length": 453, "output_length": 486, "hash_ids": [255]}
+{"input_length": 946, "output_length": 814, "hash_ids": [256, 257]}
+{"input_length": 21, "output_length": 281, "hash_ids": [258]}
+{"input_length": 309, "output_length": 318, "hash_ids": [259]}
+{"input_length": 12, "output_length": 226, "hash_ids": [260]}
+{"input_length": 249, "output_length": 214, "hash_ids": [261]}
+{"input_length": 475, "output_length": 250, "hash_ids": [262]}
+{"input_length": 732, "output_length": 209, "hash_ids": [263, 264]}
+{"input_length": 951, "output_length": 240, "hash_ids": [263, 265]}
+{"input_length": 31, "output_length": 37, "hash_ids": [266]}
+{"input_length": 73, "output_length": 51, "hash_ids": [267]}
+{"input_length": 8, "output_length": 215, "hash_ids": [268]}
+{"input_length": 7, "output_length": 238, "hash_ids": [269]}
+{"input_length": 254, "output_length": 293, "hash_ids": [270]}
+{"input_length": 21, "output_length": 335, "hash_ids": [271]}
+{"input_length": 40, "output_length": 165, "hash_ids": [272]}
+{"input_length": 238, "output_length": 156, "hash_ids": [273]}
+{"input_length": 404, "output_length": 175, "hash_ids": [274]}
+{"input_length": 598, "output_length": 107, "hash_ids": [275, 276]}
+{"input_length": 752, "output_length": 160, "hash_ids": [275, 277]}
+{"input_length": 930, "output_length": 92, "hash_ids": [275, 278]}
+{"input_length": 1037, "output_length": 96, "hash_ids": [275, 279, 280]}
+{"input_length": 1223, "output_length": 173, "hash_ids": [275, 279, 281]}
+{"input_length": 1417, "output_length": 156, "hash_ids": [275, 279, 282]}
+{"input_length": 1621, "output_length": 337, "hash_ids": [275, 279, 283, 284]}
+{"input_length": 1969, "output_length": 223, "hash_ids": [275, 279, 283, 285]}
+{"input_length": 18, "output_length": 158, "hash_ids": [286]}
+{"input_length": 14, "output_length": 130, "hash_ids": [287]}
+{"input_length": 150, "output_length": 147, "hash_ids": [288]}
+{"input_length": 305, "output_length": 85, "hash_ids": [289]}
+{"input_length": 405, "output_length": 187, "hash_ids": [290]}
+{"input_length": 618, "output_length": 357, "hash_ids": [291, 292]}
+{"input_length": 981, "output_length": 126, "hash_ids": [291, 293]}
+{"input_length": 1125, "output_length": 194, "hash_ids": [291, 294, 295]}
+{"input_length": 1383, "output_length": 614, "hash_ids": [291, 294, 296]}
+{"input_length": 5, "output_length": 298, "hash_ids": [297]}
+{"input_length": 119, "output_length": 157, "hash_ids": [298]}
+{"input_length": 11, "output_length": 259, "hash_ids": [299]}
+{"input_length": 285, "output_length": 271, "hash_ids": [300]}
+{"input_length": 569, "output_length": 238, "hash_ids": [301, 302]}
+{"input_length": 819, "output_length": 281, "hash_ids": [301, 303]}

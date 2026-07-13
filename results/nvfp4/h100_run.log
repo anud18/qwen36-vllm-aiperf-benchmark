@@ -1,0 +1,88 @@
+================ RUN_NVFP4 node=h100 start 2026-07-13 15:53:40 ================
+==== [restart vLLM] 15:53:40 ====
+   [aiperf] chatbot c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 15:55:45
+   [prefix-hit] chatbot c2: hits=14784 queries=66951 rate=22.1%
+   [aiperf] chatbot c4 (try 1, warmup=16, reqs=96, tlimit=2700s) 16:04:30
+   [prefix-hit] chatbot c4: hits=11616 queries=58237 rate=19.9%
+   [aiperf] chatbot c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 16:09:16
+   [prefix-hit] chatbot c8: hits=5280 queries=50234 rate=10.5%
+   [aiperf] chatbot c16 (try 1, warmup=16, reqs=96, tlimit=2700s) 16:13:46
+   [prefix-hit] chatbot c16: hits=2112 queries=39820 rate=5.3%
+   [aiperf] chatbot c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 16:18:02
+   [prefix-hit] chatbot c32: hits=0 queries=26185 rate=0.0%
+   [aiperf] chatbot r0.8 (try 1, warmup=16, reqs=96, tlimit=3600s) 16:22:02
+   [prefix-hit] chatbot r0.8: hits=14784 queries=67546 rate=21.9%
+   [aiperf] chatbot r1.0 (try 1, warmup=16, reqs=96, tlimit=3600s) 16:28:17
+   [prefix-hit] chatbot r1.0: hits=14784 queries=67542 rate=21.9%
+   [aiperf] chatbot r1.2 (try 1, warmup=16, reqs=96, tlimit=3600s) 16:34:03
+   [prefix-hit] chatbot r1.2: hits=11616 queries=60572 rate=19.2%
+==== [restart vLLM] 16:39:33 ====
+   [aiperf] rag c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 16:41:32
+   [prefix-hit] rag c2: hits=11616 queries=769197 rate=1.5%
+   [aiperf] rag c4 (try 1, warmup=16, reqs=96, tlimit=2700s) 16:42:17
+   [prefix-hit] rag c4: hits=11616 queries=769197 rate=1.5%
+   [aiperf] rag c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 16:43:03
+   [prefix-hit] rag c8: hits=11616 queries=769197 rate=1.5%
+   [aiperf] rag c16 (try 1, warmup=16, reqs=96, tlimit=2700s) 16:43:48
+   [prefix-hit] rag c16: hits=20064 queries=784358 rate=2.6%
+   [aiperf] rag c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 16:44:33
+   [prefix-hit] rag c32: hits=15840 queries=910611 rate=1.7%
+   [aiperf] rag r0.8 (try 1, warmup=16, reqs=96, tlimit=3600s) 16:45:18
+   [prefix-hit] rag r0.8: hits=11616 queries=769197 rate=1.5%
+   [aiperf] rag r1.0 (try 1, warmup=16, reqs=96, tlimit=3600s) 16:48:03
+   [prefix-hit] rag r1.0: hits=11616 queries=769197 rate=1.5%
+   [aiperf] rag r1.2 (try 1, warmup=16, reqs=96, tlimit=3600s) 16:50:19
+   [prefix-hit] rag r1.2: hits=11616 queries=769197 rate=1.5%
+==== [restart vLLM] 16:52:04 ====
+   [aiperf] toolagent c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 16:54:03
+   [prefix-hit] toolagent c2: hits=195360 queries=1061112 rate=18.4%
+   [aiperf] toolagent c4 (try 1, warmup=16, reqs=96, tlimit=2700s) 16:56:03
+   [prefix-hit] toolagent c4: hits=195360 queries=1061112 rate=18.4%
+   [aiperf] toolagent c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 16:57:33
+   [prefix-hit] toolagent c8: hits=200640 queries=1067944 rate=18.8%
+   [aiperf] toolagent c16 (try 1, warmup=16, reqs=96, tlimit=2700s) 16:58:48
+   [prefix-hit] toolagent c16: hits=199584 queries=1184578 rate=16.8%
+   [aiperf] toolagent c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 16:59:48
+   [prefix-hit] toolagent c32: hits=216480 queries=1196887 rate=18.1%
+   [aiperf] toolagent r0.8 (try 1, warmup=16, reqs=96, tlimit=3600s) 17:00:49
+   [prefix-hit] toolagent r0.8: hits=195360 queries=1069314 rate=18.3%
+   [aiperf] toolagent r1.0 (try 1, warmup=16, reqs=96, tlimit=3600s) 17:03:34
+   [prefix-hit] toolagent r1.0: hits=195360 queries=1069314 rate=18.3%
+   [aiperf] toolagent r1.2 (try 1, warmup=16, reqs=96, tlimit=3600s) 17:05:49
+   [prefix-hit] toolagent r1.2: hits=195360 queries=1069314 rate=18.3%
+==== [restart vLLM] 17:07:34 ====
+   [aiperf] agent c2 (try 1, warmup=16, reqs=96, tlimit=2700s) 17:09:33
+   [prefix-hit] agent c2: hits=189024 queries=330495 rate=57.2%
+   [aiperf] agent c4 (try 1, warmup=16, reqs=96, tlimit=2700s) 17:12:33
+   [prefix-hit] agent c4: hits=170016 queries=304703 rate=55.8%
+   [aiperf] agent c8 (try 1, warmup=16, reqs=96, tlimit=2700s) 17:14:18
+   [prefix-hit] agent c8: hits=189024 queries=320178 rate=59.0%
+   [aiperf] agent c16 (try 1, warmup=16, reqs=96, tlimit=2700s) 17:15:33
+   [prefix-hit] agent c16: hits=218592 queries=378760 rate=57.7%
+   [aiperf] agent c32 (try 1, warmup=16, reqs=96, tlimit=2700s) 17:16:49
+   [prefix-hit] agent c32: hits=167904 queries=319263 rate=52.6%
+   [aiperf] agent r0.8 (try 1, warmup=16, reqs=96, tlimit=3600s) 17:17:49
+   [prefix-hit] agent r0.8: hits=180576 queries=318552 rate=56.7%
+   [aiperf] agent r1.0 (try 1, warmup=16, reqs=96, tlimit=3600s) 17:20:34
+   [prefix-hit] agent r1.0: hits=187968 queries=325534 rate=57.7%
+   [aiperf] agent r1.2 (try 1, warmup=16, reqs=96, tlimit=3600s) 17:22:49
+   [prefix-hit] agent r1.2: hits=174240 queries=310594 rate=56.1%
+==== [restart vLLM] 17:24:50 ====
+   [aiperf] coding c2 (try 1, warmup=8, reqs=96, tlimit=2700s) 17:26:48
+   [prefix-hit] coding c2: hits=2209152 queries=3016292 rate=73.2%
+   [aiperf] coding c4 (try 1, warmup=8, reqs=96, tlimit=2700s) 17:31:34
+   [prefix-hit] coding c4: hits=2105664 queries=2926214 rate=72.0%
+   [aiperf] coding c8 (try 1, warmup=8, reqs=96, tlimit=2700s) 17:35:04
+   [prefix-hit] coding c8: hits=1901856 queries=2842944 rate=66.9%
+   [aiperf] coding c16 (try 1, warmup=8, reqs=96, tlimit=2700s) 17:37:49
+   [prefix-hit] coding c16: hits=1718112 queries=2712944 rate=63.3%
+   [aiperf] coding c32 (try 1, warmup=8, reqs=96, tlimit=2700s) 17:40:04
+   [prefix-hit] coding c32: hits=1457280 queries=2680558 rate=54.4%
+   [aiperf] coding r0.8 (try 1, warmup=8, reqs=96, tlimit=3600s) 17:41:50
+   [prefix-hit] coding r0.8: hits=1788864 queries=2648231 rate=67.5%
+   [aiperf] coding r1.0 (try 1, warmup=8, reqs=96, tlimit=3600s) 17:44:35
+   [prefix-hit] coding r1.0: hits=1707552 queries=2656572 rate=64.3%
+   [aiperf] coding r1.2 (try 1, warmup=8, reqs=96, tlimit=3600s) 17:47:05
+   [prefix-hit] coding r1.2: hits=1505856 queries=2517177 rate=59.8%
+>>> stopping vLLM server
+================ RUN_NVFP4 node=h100 DONE 2026-07-13 17:49:21 ================

@@ -118,11 +118,11 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(vllm:e2e_request_latency_seconds_bucket{model_name=\"$model_name\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by(le, node) (rate(vllm:e2e_request_latency_seconds_bucket{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "includeNullMetadata": false,
           "instant": false,
-          "legendFormat": "P99",
+          "legendFormat": "P99 {{node}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -134,12 +134,12 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum by(le) (rate(vllm:e2e_request_latency_seconds_bucket{model_name=\"$model_name\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.95, sum by(le, node) (rate(vllm:e2e_request_latency_seconds_bucket{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
           "instant": false,
-          "legendFormat": "P95",
+          "legendFormat": "P95 {{node}}",
           "range": true,
           "refId": "B",
           "useBackend": false
@@ -151,12 +151,12 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.9, sum by(le) (rate(vllm:e2e_request_latency_seconds_bucket{model_name=\"$model_name\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.9, sum by(le, node) (rate(vllm:e2e_request_latency_seconds_bucket{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
           "instant": false,
-          "legendFormat": "P90",
+          "legendFormat": "P90 {{node}}",
           "range": true,
           "refId": "C",
           "useBackend": false
@@ -168,12 +168,12 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.5, sum by(le) (rate(vllm:e2e_request_latency_seconds_bucket{model_name=\"$model_name\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.5, sum by(le, node) (rate(vllm:e2e_request_latency_seconds_bucket{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
           "instant": false,
-          "legendFormat": "P50",
+          "legendFormat": "P50 {{node}}",
           "range": true,
           "refId": "D",
           "useBackend": false
@@ -184,10 +184,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(vllm:e2e_request_latency_seconds_sum{model_name=\"$model_name\"}[$__rate_interval])\n/\nrate(vllm:e2e_request_latency_seconds_count{model_name=\"$model_name\"}[$__rate_interval])",
+          "expr": "rate(vllm:e2e_request_latency_seconds_sum{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])\n/\nrate(vllm:e2e_request_latency_seconds_count{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])",
           "hide": false,
           "instant": false,
-          "legendFormat": "Average",
+          "legendFormat": "Average {{node}}",
           "range": true,
           "refId": "E"
         }
@@ -283,11 +283,11 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(vllm:prompt_tokens_total{model_name=\"$model_name\"}[$__rate_interval])",
+          "expr": "rate(vllm:prompt_tokens_total{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "includeNullMetadata": false,
           "instant": false,
-          "legendFormat": "Prompt Tokens/Sec",
+          "legendFormat": "Prompt Tokens/Sec {{node}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -299,12 +299,12 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(vllm:generation_tokens_total{model_name=\"$model_name\"}[$__rate_interval])",
+          "expr": "rate(vllm:generation_tokens_total{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
           "instant": false,
-          "legendFormat": "Generation Tokens/Sec",
+          "legendFormat": "Generation Tokens/Sec {{node}}",
           "range": true,
           "refId": "B",
           "useBackend": false
@@ -402,11 +402,11 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(vllm:inter_token_latency_seconds_bucket{model_name=\"$model_name\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by(le, node) (rate(vllm:inter_token_latency_seconds_bucket{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "includeNullMetadata": false,
           "instant": false,
-          "legendFormat": "P99",
+          "legendFormat": "P99 {{node}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -418,12 +418,12 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum by(le) (rate(vllm:inter_token_latency_seconds_bucket{model_name=\"$model_name\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.95, sum by(le, node) (rate(vllm:inter_token_latency_seconds_bucket{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
           "instant": false,
-          "legendFormat": "P95",
+          "legendFormat": "P95 {{node}}",
           "range": true,
           "refId": "B",
           "useBackend": false
@@ -435,12 +435,12 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.9, sum by(le) (rate(vllm:inter_token_latency_seconds_bucket{model_name=\"$model_name\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.9, sum by(le, node) (rate(vllm:inter_token_latency_seconds_bucket{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
           "instant": false,
-          "legendFormat": "P90",
+          "legendFormat": "P90 {{node}}",
           "range": true,
           "refId": "C",
           "useBackend": false
@@ -452,12 +452,12 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.5, sum by(le) (rate(vllm:inter_token_latency_seconds_bucket{model_name=\"$model_name\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.5, sum by(le, node) (rate(vllm:inter_token_latency_seconds_bucket{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
           "instant": false,
-          "legendFormat": "P50",
+          "legendFormat": "P50 {{node}}",
           "range": true,
           "refId": "D",
           "useBackend": false
@@ -468,10 +468,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(vllm:inter_token_latency_seconds_sum{model_name=\"$model_name\"}[$__rate_interval])\n/\nrate(vllm:inter_token_latency_seconds_count{model_name=\"$model_name\"}[$__rate_interval])",
+          "expr": "rate(vllm:inter_token_latency_seconds_sum{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])\n/\nrate(vllm:inter_token_latency_seconds_count{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])",
           "hide": false,
           "instant": false,
-          "legendFormat": "Mean",
+          "legendFormat": "Mean {{node}}",
           "range": true,
           "refId": "E"
         }
@@ -568,11 +568,11 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "vllm:num_requests_running{model_name=\"$model_name\"}",
+          "expr": "vllm:num_requests_running{model_name=\"$model_name\", node=~\"$node\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "Num Running",
+          "legendFormat": "Num Running {{node}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -584,12 +584,12 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "vllm:num_requests_waiting{model_name=\"$model_name\"}",
+          "expr": "vllm:num_requests_waiting{model_name=\"$model_name\", node=~\"$node\"}",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "Num Waiting",
+          "legendFormat": "Num Waiting {{node}}",
           "range": true,
           "refId": "C",
           "useBackend": false
@@ -687,12 +687,12 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(vllm:time_to_first_token_seconds_bucket{model_name=\"$model_name\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by(le, node) (rate(vllm:time_to_first_token_seconds_bucket{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
           "instant": false,
-          "legendFormat": "P99",
+          "legendFormat": "P99 {{node}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -704,11 +704,11 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum by(le) (rate(vllm:time_to_first_token_seconds_bucket{model_name=\"$model_name\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.95, sum by(le, node) (rate(vllm:time_to_first_token_seconds_bucket{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "includeNullMetadata": false,
           "instant": false,
-          "legendFormat": "P95",
+          "legendFormat": "P95 {{node}}",
           "range": true,
           "refId": "B",
           "useBackend": false
@@ -720,12 +720,12 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.9, sum by(le) (rate(vllm:time_to_first_token_seconds_bucket{model_name=\"$model_name\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.9, sum by(le, node) (rate(vllm:time_to_first_token_seconds_bucket{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
           "instant": false,
-          "legendFormat": "P90",
+          "legendFormat": "P90 {{node}}",
           "range": true,
           "refId": "C",
           "useBackend": false
@@ -737,12 +737,12 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.5, sum by(le) (rate(vllm:time_to_first_token_seconds_bucket{model_name=\"$model_name\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.5, sum by(le, node) (rate(vllm:time_to_first_token_seconds_bucket{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
           "instant": false,
-          "legendFormat": "P50",
+          "legendFormat": "P50 {{node}}",
           "range": true,
           "refId": "D",
           "useBackend": false
@@ -753,10 +753,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(vllm:time_to_first_token_seconds_sum{model_name=\"$model_name\"}[$__rate_interval])\n/\nrate(vllm:time_to_first_token_seconds_count{model_name=\"$model_name\"}[$__rate_interval])",
+          "expr": "rate(vllm:time_to_first_token_seconds_sum{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])\n/\nrate(vllm:time_to_first_token_seconds_count{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])",
           "hide": false,
           "instant": false,
-          "legendFormat": "Average",
+          "legendFormat": "Average {{node}}",
           "range": true,
           "refId": "E"
         }
@@ -852,9 +852,9 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "vllm:kv_cache_usage_perc{model_name=\"$model_name\"}",
+          "expr": "vllm:kv_cache_usage_perc{model_name=\"$model_name\", node=~\"$node\"}",
           "instant": false,
-          "legendFormat": "GPU Cache Usage",
+          "legendFormat": "GPU Cache Usage {{node}}",
           "range": true,
           "refId": "A"
         }
@@ -910,7 +910,7 @@
           "color": "rgba(255,0,255,0.7)"
         },
         "filterValues": {
-          "le": 1e-9
+          "le": 1e-09
         },
         "legend": {
           "show": true
@@ -940,7 +940,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(le) (increase(vllm:request_prompt_tokens_bucket{model_name=\"$model_name\"}[$__rate_interval]))",
+          "expr": "sum by(le) (increase(vllm:request_prompt_tokens_bucket{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval]))",
           "format": "heatmap",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -1002,7 +1002,7 @@
           "color": "rgba(255,0,255,0.7)"
         },
         "filterValues": {
-          "le": 1e-9
+          "le": 1e-09
         },
         "legend": {
           "show": true
@@ -1032,7 +1032,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(le) (increase(vllm:request_generation_tokens_bucket{model_name=\"$model_name\"}[$__rate_interval]))",
+          "expr": "sum by(le) (increase(vllm:request_generation_tokens_bucket{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval]))",
           "format": "heatmap",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -1133,7 +1133,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(finished_reason) (increase(vllm:request_success_total{model_name=\"$model_name\"}[$__rate_interval]))",
+          "expr": "sum by(finished_reason, node) (increase(vllm:request_success_total{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1234,7 +1234,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "rate(vllm:request_queue_time_seconds_sum{model_name=\"$model_name\"}[$__rate_interval])",
+          "expr": "rate(vllm:request_queue_time_seconds_sum{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1334,11 +1334,11 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "rate(vllm:request_prefill_time_seconds_sum{model_name=\"$model_name\"}[$__rate_interval])",
+          "expr": "rate(vllm:request_prefill_time_seconds_sum{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "Prefill",
+          "legendFormat": "Prefill {{node}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -1349,10 +1349,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(vllm:request_decode_time_seconds_sum{model_name=\"$model_name\"}[$__rate_interval])",
+          "expr": "rate(vllm:request_decode_time_seconds_sum{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])",
           "hide": false,
           "instant": false,
-          "legendFormat": "Decode",
+          "legendFormat": "Decode {{node}}",
           "range": true,
           "refId": "B"
         }
@@ -1447,11 +1447,11 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "rate(vllm:request_max_num_generation_tokens_sum{model_name=\"$model_name\"}[$__rate_interval])",
+          "expr": "rate(vllm:request_max_num_generation_tokens_sum{model_name=\"$model_name\", node=~\"$node\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "Tokens",
+          "legendFormat": "Tokens {{node}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -1510,6 +1510,33 @@
         "regex": "",
         "skipUrlSync": false,
         "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(vllm:num_requests_running{model_name=\"$model_name\"}, node)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "node",
+        "multi": true,
+        "name": "node",
+        "options": [],
+        "query": {
+          "query": "label_values(vllm:num_requests_running{model_name=\"$model_name\"}, node)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
         "type": "query"
       }
     ]

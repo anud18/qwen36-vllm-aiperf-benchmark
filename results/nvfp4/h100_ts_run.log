@@ -1,0 +1,6 @@
+================ RUN_NVFP4 node=h100 start 2026-07-13 17:49:50 ================
+==== [restart vLLM] 17:49:50 ====
+   [aiperf] toolagent_ts fixed (try 1, warmup=16, reqs=96, tlimit=3600s) 17:51:48
+   [prefix-hit] toolagent_ts fixed: hits=744480 queries=3032585 rate=24.5%
+>>> stopping vLLM server
+================ RUN_NVFP4 node=h100 DONE 2026-07-13 17:54:04 ================
