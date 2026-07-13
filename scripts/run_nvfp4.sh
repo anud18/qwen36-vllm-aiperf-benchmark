@@ -30,6 +30,8 @@ WEDGE_S="${WEDGE_S:-120}"
 THINKOFF='{"chat_template_kwargs":{"enable_thinking":false}}'
 OUTBASE="${OUTBASE:-results/nvfp4/$NODE}"
 RESTART_PER_WL="${RESTART_PER_WL:-1}"   # 0 = reuse running server (smoke)
+VLLM_CNAME="${VLLM_CNAME:-vllm-nvfp4}"  # server container name (prefix on shared boxes)
+CPREFIX="${CPREFIX:-aiperf}"            # aiperf client container-name prefix
 
 prefix_metrics() {  # echo "hits queries"
   curl -s "${URL}/metrics" 2>/dev/null | awk '
@@ -47,7 +49,7 @@ restart_server() {
   echo "==== [restart vLLM] $(date +%T) ===="
   NODE="$NODE" bash scripts/serve_nvfp4.sh >"$log" 2>&1
   grep -q "READY" "$log" || { echo "   !!! server not ready"; tail -8 "$log"; return 1; }
-  docker inspect vllm-nvfp4 --format '{{json .Config.Cmd}}' > "$OUTBASE/server_cmd.json" 2>/dev/null || true
+  docker inspect "$VLLM_CNAME" --format '{{json .Config.Cmd}}' > "$OUTBASE/server_cmd.json" 2>/dev/null || true
 }
 
 run_point() {  # workload point dtype file  extra-args...
@@ -66,7 +68,7 @@ run_point() {  # workload point dtype file  extra-args...
   esac
   local wu="$WARMUP"; [ "$wl" = coding ] && wu="$WARMUP_CODING"
 
-  local cname="aiperf-$wl-$pt" attempt rc
+  local cname="${CPREFIX}-$wl-$pt" attempt rc
   for attempt in $(seq 1 "$tries"); do
     docker rm -f "$cname" >/dev/null 2>&1 || true
     rm -f "$adir/profile_export_aiperf.json"
@@ -96,6 +98,8 @@ run_point() {  # workload point dtype file  extra-args...
     # background aiperf + wedge watchdog (engine deadlock: running>0 but no token movement)
     docker run --rm --name "$cname" --network host \
       -v "${HF_DIR}:/hf" -e HF_HOME=/hf \
+      -e AIPERF_DATASET_CONFIGURATION_TIMEOUT="${AIPERF_DS_TIMEOUT:-900}" \
+      -e AIPERF_SERVICE_PROFILE_CONFIGURE_TIMEOUT="${AIPERF_DS_TIMEOUT:-900}" \
       -v "${ROOT}:/work" -w /work "$IMG" profile "${args[@]}" >"$adir/run.log" 2>&1 &
     local dpid=$! start=$SECONDS frozen=0 lastg="" lastp="" wedged=0 timedout=0 g p r
     while kill -0 "$dpid" 2>/dev/null; do
@@ -177,6 +181,6 @@ for wl in $SEL; do
   esac
 done
 if [ "${STOP_AFTER:-1}" = 1 ]; then
-  echo ">>> stopping vLLM server"; docker rm -f vllm-nvfp4 >/dev/null 2>&1 || true
+  echo ">>> stopping vLLM server"; docker rm -f "$VLLM_CNAME" >/dev/null 2>&1 || true
 fi
 echo "================ RUN_NVFP4 node=$NODE DONE $(date '+%F %T') ================"

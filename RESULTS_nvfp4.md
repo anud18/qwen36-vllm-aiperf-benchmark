@@ -1,27 +1,30 @@
-# Results — NVFP4 cross-hardware: GB10 Spark vs RTX 5090
+# Results — NVFP4 cross-hardware: GB10 Spark vs RTX 5090 vs H100 PCIe
 
-`nvidia/Qwen3.6-35B-A3B-NVFP4` on vLLM **v0.24.0**, 2026-07-03. **122 points**:
-2 machines × 5 workloads × (concurrency 2/4/8/16/32 closed-loop + 0.8/1.0/1.2 req/s
-poisson open-loop) + a fixed-schedule Mooncake replay on both + flat-trace variants
-(chatbot/agent on both machines, coding on the 5090) with machine-independent ISL —
-see the flat-trace section. 96 requests/point,
+`nvidia/Qwen3.6-35B-A3B-NVFP4` on vLLM **v0.24.0**, 2026-07-03 (Spark/5090), 2026-07-13 (H100).
+**163 points**: 3 machines × 5 workloads × (concurrency 2/4/8/16/32 closed-loop + 0.8/1.0/1.2
+req/s poisson open-loop) + a fixed-schedule Mooncake replay on each + flat-trace variants
+(chatbot/agent on Spark+5090, coding on the 5090) with machine-independent ISL — see the
+flat-trace section. 96 requests/point,
 reasoning/thinking OFF, OSL cap 2048, prefix cache reset before every point, server
 restarted between workloads, aiperf 0.10 client co-located on each machine.
 Full methodology + incident log: [`results/nvfp4/SUMMARY_nvfp4.md`](results/nvfp4/SUMMARY_nvfp4.md);
-raw per-point tables: [`results/nvfp4/SUMMARY_tables.md`](results/nvfp4/SUMMARY_tables.md);
+raw per-point tables (all 3 machines): [`results/nvfp4/SUMMARY_tables.md`](results/nvfp4/SUMMARY_tables.md);
 per-run Grafana windows: [`results/nvfp4/GRAFANA_LINKS.md`](results/nvfp4/GRAFANA_LINKS.md).
 
 ## Configuration
 
-| | Spark (GB10, 128 GB unified) | RTX 5090 (32 GB) |
-|---|---|---|
-| image | `vllm/vllm-openai:v0.24.0` (cu130) | `v0.24.0-x86_64-cu129` (driver 575) |
-| gpu-mem-util / batched-tokens | 0.5 / 32768 | 0.9 / 8192 |
-| max-model-len / max-num-seqs | 131072 / 32 | 131072 / 32 |
-| **KV cache** | **1,216,668 tokens** | **263,144 tokens (4.6× smaller)** |
-| FP4 kernel | Marlin weight-only (sm_121 — no native FP4) | Marlin weight-only (sm_120 — same) |
+| | Spark (GB10, 128 GB unified) | RTX 5090 (32 GB) | H100 PCIe (80 GB) |
+|---|---|---|---|
+| image | `vllm/vllm-openai:v0.24.0` (cu130) | `v0.24.0-x86_64-cu129` (driver 575) | `vllm/vllm-openai:v0.24.0` (cu130, driver 610) |
+| gpu-mem-util / batched-tokens | 0.5 / 32768 | 0.9 / 8192 | 0.9 / 32768 |
+| max-model-len / max-num-seqs | 131072 / 32 | 131072 / 32 | 131072 / 32 |
+| **KV cache** | **1,216,668 tokens** | **263,144 tokens (4.6× smaller)** | **2,233,226 tokens (largest)** |
+| CPU offload | none | none | none (weights fit in 80 GB) |
+| FP4 kernel | Marlin weight-only (sm_121 — no native FP4) | Marlin weight-only (sm_120 — same) | Marlin weight-only (sm_90 — same) |
 
-Same kernel path on both sides ⇒ clean comparison. Weights: 20.4 GiB each.
+Same kernel path on all three ⇒ clean comparison. Weights: 20.4 GiB each; single-GPU (TP=1)
+everywhere. The H100 has **8.5× the 5090's KV cache** and never thrashes — its story is
+KV-headroom, not raw FLOPs (on the compute-light chatbot/agent it merely ties the 5090).
 
 ## Closed loop — Req/s (c2 → c32)
 
@@ -116,6 +119,39 @@ the 5090 keeps interactive-grade ITL (≤29 ms) at every offered rate.
 
 Both queue the burst (over both capacities); the 5090 drains 3.6× faster at 7× lower ITL
 even while its KV thrashes (96M prefix-query tokens vs Spark's 3M).
+
+## Third machine — H100 PCIe 80 GB (KV-headroom, no thrash)
+
+Added 2026-07-13 on a shared H100 box (repo + model + caches under `~/900g/an-hao`,
+containers `an-hao-*` prefixed). 41 points, **zero failures, zero wedges** — the cleanest
+run of the three; whole 40-point sweep in ~2 h. Single H100 (TP=1), no CPU offload.
+
+| workload | H100 Req/s c2→c32 | H100 TTFT avg ms | H100 ITL avg ms | vs 5090 @c32 |
+|---|---|---|---|--:|
+| chatbot | 1.5 / 2.4 / 3.3 / 5.2 / 6.8 | 82 / 78 / 86 / 91 / 131 | 6 / 7 / 9 / 13 / 17 | ≈ tie |
+| rag | 4.2 / 4.7 / 4.9 / 5.3 / 5.3 | 402 / 717 / 996 / 1,947 / 4,082 | 13 / 32 / 132 / 383 / 634 | **1.2×** |
+| toolagent | 1.1 / 1.6 / 2.0 / 2.4 / 2.6 | 339 / 364 / 582 / 973 / 2,518 | 8 / 11 / 21 / 48 / 119 | **1.5×** |
+| agent | 0.7 / 1.1 / 1.8 / 2.0 / 3.2 | 125 / 130 / 167 / 235 / 578 | 6 / 7 / 9 / 12 / 17 | ≈ tie |
+| coding | 0.4 / 0.5 / 0.8 / 1.0 / 1.2 | 411 / 447 / 624 / 1,230 / 2,991 | 6 / 9 / 14 / 23 / 47 | **2.0×** |
+
+**The KV-headroom win (the whole point of the H100 here):** with 2.23M-token KV the prefix
+cache *never collapses*, exactly where the 5090/5080 thrashed —
+
+- **coding**: prefix-hit holds **73% → 67% (c8) → 54% (c32)**; the 5090 and 5080 both fell to
+  **0.1% by c8**. Result: H100 coding throughput is **2× the 5090** at c32 (1.2 vs 0.6 req/s)
+  and TTFT stays 3.0 s where the 5090 blew out to 27 s.
+- **toolagent**: hit stays flat at **~18% across c2–c32** (5090 collapsed from c16). H100 leads 1.5×.
+- On **chatbot/agent** (short context, decode-bound) the H100 merely ties the 5090 — no KV
+  pressure to relieve, and both are Marlin weight-only so raw decode is comparable.
+
+Fixed-schedule Mooncake replay (same 320-req burst): H100 delivers **2.7 req/s** (Spark 0.5,
+5090 1.5), TTFT avg **28.0 s** (Spark 314.8, 5090 86.5), ITL 77 ms — drains the burst fastest
+of the three, its big KV keeping the queue's shared prefixes hot throughout.
+
+> Note: the monitoring stack never scraped the H100 (its Prometheus target was never wired
+> up), so H100 rows have no server-side `KV max %` / `wait avg` in SUMMARY_tables.md. All
+> client-side latency/throughput and the per-point prefix hit/query counts (from the run's
+> own `/metrics` deltas) are complete.
 
 ## Flat-trace variants — machine-independent ISL (`*_flat`)
 

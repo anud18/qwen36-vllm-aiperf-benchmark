@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "results", "nvfp4")
 WLS = ["chatbot", "rag", "toolagent", "agent", "coding"]
-NODES = [("spark", "#2a78d6"), ("5090", "#1baf7a")]  # dataviz reference palette slots 1-2
+NODES = [("spark", "#2a78d6"), ("5090", "#1baf7a"), ("h100", "#e0803a")]  # dataviz palette slots 1-3 (blue/green/orange, CVD-safe)
 INK, MUTED, GRID = "#1a1a2e", "#6b6b7b", "#e8e8ee"
 CLEVELS = [2, 4, 8, 16, 32]
 RLEVELS = [0.8, 1.0, 1.2]
