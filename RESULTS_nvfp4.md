@@ -148,10 +148,14 @@ Fixed-schedule Mooncake replay (same 320-req burst): H100 delivers **2.7 req/s**
 5090 1.5), TTFT avg **28.0 s** (Spark 314.8, 5090 86.5), ITL 77 ms — drains the burst fastest
 of the three, its big KV keeping the queue's shared prefixes hot throughout.
 
-> Note: the monitoring stack never scraped the H100 (its Prometheus target was never wired
-> up), so H100 rows have no server-side `KV max %` / `wait avg` in SUMMARY_tables.md. All
-> client-side latency/throughput and the per-point prefix hit/query counts (from the run's
-> own `/metrics` deltas) are complete.
+**KV usage confirms the headroom** (server-side, scraped via an SSH tunnel Spark→H100 on a
+monitored re-run): the H100 never exceeds **~33% KV even at c32** — coding rises only
+5.3% → 14.6% (c8) → 32.5% (c32), toolagent tops out at 21%. The 5090/5080 sat pinned at
+98–100% on the same points. That gap *is* the no-thrash result: the H100 has cache to spare
+exactly where the smaller cards evict-and-recompute. Full server-side KV / running / waiting
+time-series for all three machines are in Grafana (dashboard `b281712d…`, `node` variable);
+the 2026-07-03 Spark/5090 curves were restored from TSDB snapshots (72h retention had
+evicted them) and retention raised to 60 d.
 
 ## Flat-trace variants — machine-independent ISL (`*_flat`)
 
