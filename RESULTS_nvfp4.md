@@ -1,9 +1,10 @@
 # Results — NVFP4 cross-hardware: GB10 Spark vs RTX 5090 vs H100 PCIe
 
 `nvidia/Qwen3.6-35B-A3B-NVFP4` on vLLM **v0.24.0**, 2026-07-03 (Spark/5090), 2026-07-13 (H100).
-**163 points**: 3 machines × 5 workloads × (concurrency 2/4/8/16/32 closed-loop + 0.8/1.0/1.2
+**181 points**: 3 machines × 5 workloads × (concurrency 2/4/8/16/32 closed-loop + 0.8/1.0/1.2
 req/s poisson open-loop) + a fixed-schedule Mooncake replay on each + flat-trace variants
-(chatbot/agent on Spark+5090, coding on the 5090) with machine-independent ISL — see the
+(v1 synthetic: chatbot/agent on Spark+5090, coding on the 5090; v2 original-text: all three
+run twice on the H100 for a bit-identical-ISL proof) — see the
 flat-trace section. 96 requests/point,
 reasoning/thinking OFF, OSL cap 2048, prefix cache reset before every point, server
 restarted between workloads, aiperf 0.10 client co-located on each machine.
@@ -207,6 +208,43 @@ uncontended point, on both machines. Two observations worth keeping:
   prefix caching, not a regression.
 
 The Spark agent r0.8 EngineCore wedge did **not** reproduce on agent_flat r0.8.
+
+### Flat-trace v2 — original text (`messages` mode), H100 double-run verification
+
+*Build/run/preview guide: [FLAT_TRACES.md](FLAT_TRACES.md).*
+
+The v1 flat traces above declared token *lengths* and let aiperf synthesize prompt text.
+Per methodology decision, everything except toolagent must send **the original text**, so
+`build_flat_text_traces.py` rebuilt all three `nvfp4_*_flat.jsonl` as mooncake_trace
+**`messages` entries**: each flattened turn carries its full real conversation history
+(`[user_1, assistant_1, …, user_k]`) verbatim in the file. Assistant-reply sources:
+
+- **chatbot** — the ShareGPT dataset's own gpt replies (true original text); sessions are
+  matched back to their ShareGPT entries by exact user-text sequence, `output_length`
+  keeps the payload's `max_completion_tokens` (aiperf derives it from the same reply).
+- **agent / coding** — the datasets carry no assistant text, so replies were generated
+  once (greedy: temperature 0, seed 42, thinking off) and frozen into the file; raw
+  generations live in `datasets/aiperf/canonical/`.
+
+Two harness fixes this mode needs: aiperf cannot client-side-tokenize raw messages, so
+each entry carries `stream_options.include_usage` and the runner passes
+`--use-server-token-count` — ISL is now the **server-reported prompt token count**
+(includes chat-template tokens, hence slightly above v1's text-only counts).
+
+**Verification: the full sweep (chatbot/agent/coding_flat × c2/c8/c32) was run twice on
+the H100 (`results/nvfp4/h100/*_flat`, `results/nvfp4/h100run2/`). All 9 points × 96
+requests have bit-identical per-request ISL across the two passes** — chatbot_flat
+avg 654.05 (min 20 / max 1,947), agent_flat 2,977.44 (405 / 10,106), coding_flat
+29,645.64 (12,632 / 76,884) — and c2 prefix-cache hits/queries reproduce exactly
+(chatbot 15,840/71,334; agent 178,464/317,120; coding 2,369,664±11k/3,217,092 —
+queries identical, hits within 0.5%). Since the text is fixed in the file, any machine
+serving the same model/template gets these same input tokens. OSL is *not* pinned
+(generation stays live: chatbot 286/288 turns identical, agent/coding ~half differ) —
+that is ordinary sampling/batching nondeterminism on the output side.
+
+Real text also restores realistic prefix sharing that v1's 512-token hash blocks
+understated for chat: chatbot_flat hit-rate is now ~22–26% (v1: 1.5%), agent_flat
+~51–56% (v1: 43%), coding_flat ~68–74% (v1: 71%).
 
 ## KV-capacity story
 
