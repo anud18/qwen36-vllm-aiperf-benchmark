@@ -112,6 +112,14 @@ def chatbot_sessions():
 
 
 def main():
+    # v1 SYNTHETIC generator — superseded by build_flat_text_traces.py (original
+    # text, messages mode). Running this would overwrite the text-mode
+    # nvfp4_*_flat.jsonl files with synthetic ones, so it now requires opt-in.
+    if os.environ.get("FORCE_V1") != "1":
+        raise SystemExit(
+            "build_flat_traces.py is the SUPERSEDED v1 synthetic generator; the "
+            "current nvfp4_*_flat.jsonl are original-text (see FLAT_TRACES.md, "
+            "scripts/build_flat_text_traces.py). Set FORCE_V1=1 to overwrite anyway.")
     from transformers import AutoTokenizer
     tok = AutoTokenizer.from_pretrained(TOKENIZER)
     for name, sessions in [("agent_flat", multiturn_sessions("agent")),
