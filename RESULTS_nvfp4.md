@@ -211,6 +211,8 @@ The Spark agent r0.8 EngineCore wedge did **not** reproduce on agent_flat r0.8.
 
 ### Flat-trace v2 — original text (`messages` mode), H100 double-run verification
 
+*Build/run/preview guide: [FLAT_TRACES.md](FLAT_TRACES.md).*
+
 The v1 flat traces above declared token *lengths* and let aiperf synthesize prompt text.
 Per methodology decision, everything except toolagent must send **the original text**, so
 `build_flat_text_traces.py` rebuilt all three `nvfp4_*_flat.jsonl` as mooncake_trace

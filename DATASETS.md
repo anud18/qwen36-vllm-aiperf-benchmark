@@ -24,6 +24,9 @@ All v6 `final_*` files cap generation at `output_length` 5000 (toolagent keeps t
 per-request output lengths). Reasoning/thinking flags per workload are listed in
 [RUNBOOK.md §5](RUNBOOK.md); this file is about the data itself.
 
+The NVFP4 cross-hardware sweep additionally uses flattened multi-turn variants with
+machine-independent input tokens — build/run/preview guide in [FLAT_TRACES.md](FLAT_TRACES.md).
+
 ---
 
 ## 1) chatbot — ShareGPT
