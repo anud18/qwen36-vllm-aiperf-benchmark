@@ -23,7 +23,12 @@ import matplotlib.pyplot as plt
 ROOT = os.path.join(os.path.dirname(__file__), "..", "results", "nvfp4")
 WLS = ["chatbot", "rag", "toolagent", "agent", "coding"]
 NODES = [("spark", "#2a78d6"), ("5090", "#1baf7a"), ("h100", "#e0803a")]  # dataviz palette slots 1-3 (blue/green/orange, CVD-safe)
+DISP = {"spark": "Spark", "h100": "H100"}  # on-plot labels; the raw keys stay lowercase (they are directory names)
 INK, MUTED, GRID = "#1a1a2e", "#6b6b7b", "#e8e8ee"
+
+
+def disp(n):
+    return DISP.get(n, n)
 CLEVELS = [2, 4, 8, 16, 32]
 RLEVELS = [0.8, 1.0, 1.2]
 
@@ -82,7 +87,7 @@ def grid_figure(fname, xlevels, xlabel, ylabel, suptitle, get_y, logy=False, log
                 lo, hi = sorted((prev_end, yv[-1]))
                 if lo > 0 and hi / max(lo, 1e-12) < 1.35:
                     dy = -11
-            ax.annotate(node, (xs[-1], yv[-1]), textcoords="offset points",
+            ax.annotate(disp(node), (xs[-1], yv[-1]), textcoords="offset points",
                         xytext=(5, dy), fontsize=8.5, color=color, fontweight="bold")
             prev_end = yv[-1]
         if logx2:
@@ -99,7 +104,7 @@ def grid_figure(fname, xlevels, xlabel, ylabel, suptitle, get_y, logy=False, log
         ax.set_xlabel(xlabel, fontsize=9, color=MUTED)
     axes[0].set_ylabel(ylabel, fontsize=9, color=MUTED)
     handles = [plt.Line2D([], [], color=c, linewidth=2, marker="o", markersize=5,
-                          markeredgecolor="white", label=n) for n, c in NODES]
+                          markeredgecolor="white", label=disp(n)) for n, c in NODES]
     fig.legend(handles=handles, loc="upper right", frameon=False, fontsize=9,
                bbox_to_anchor=(0.995, 1.06), ncol=2)
     fig.suptitle(suptitle, fontsize=13, color=INK, x=0.01, ha="left")
@@ -134,7 +139,7 @@ def flat_vs_orig(fname):
                         lo, hi = sorted((prev_end, yv[-1]))
                         if lo > 0 and hi / max(lo, 1e-12) < 1.35:
                             dy = -11
-                    ax.annotate(node, (xs[-1], yv[-1]), textcoords="offset points",
+                    ax.annotate(disp(node), (xs[-1], yv[-1]), textcoords="offset points",
                                 xytext=(5, dy), fontsize=8.5, color=color,
                                 fontweight="bold")
                     prev_end = yv[-1]
@@ -145,7 +150,7 @@ def flat_vs_orig(fname):
     axes[0].set_ylabel("Req/s", fontsize=9, color=MUTED)
     handles = [plt.Line2D([], [], color=c, linewidth=2, linestyle=ls, alpha=a,
                           marker="o" if ls == "-" else None, markersize=5,
-                          markeredgecolor="white", label=f"{n} {v}")
+                          markeredgecolor="white", label=f"{disp(n)} {v}")
                for n, c in NODES for v, ls, a in (("flat", "-", 1.0), ("multi-turn", "--", 0.5))]
     fig.legend(handles=handles, loc="upper right", frameon=False, fontsize=8,
                bbox_to_anchor=(0.995, 1.10), ncol=4)
@@ -202,7 +207,7 @@ def rate_reqs_figure(fname):
             for x, y in zip(xs, yv):
                 ax.annotate(f"{y:.2f}", (x, y), textcoords="offset points",
                             xytext=(0, dy), fontsize=8, color=color, ha="center")
-            ax.annotate(node, (xs[-1], yv[-1]), textcoords="offset points",
+            ax.annotate(disp(node), (xs[-1], yv[-1]), textcoords="offset points",
                         xytext=(14, -3), fontsize=8.5, color=color, fontweight="bold")
         ax.set_xticks(RLEVELS)
         ax.set_xlim(0.72, 1.34)
@@ -211,7 +216,7 @@ def rate_reqs_figure(fname):
         ax.set_xlabel("req/s offered", fontsize=9, color=MUTED)
     axes[0].set_ylabel("Req/s delivered", fontsize=9, color=MUTED)
     handles = [plt.Line2D([], [], color=c, linewidth=2, marker="o", markersize=5,
-                          markeredgecolor="white", label=n) for n, c in NODES]
+                          markeredgecolor="white", label=disp(n)) for n, c in NODES]
     fig.legend(handles=handles, loc="upper right", frameon=False, fontsize=9,
                bbox_to_anchor=(0.995, 1.06), ncol=2)
     fig.suptitle("Open-loop delivered Req/s at 0.8 / 1.0 / 1.2 req/s offered (poisson)",
