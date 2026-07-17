@@ -202,13 +202,16 @@ def rate_reqs_figure(fname):
                 continue
             ax.plot(xs, yv, color=color, linewidth=2, marker="o", markersize=5,
                     markeredgecolor="white", markeredgewidth=1, zorder=3)
-            # label every point with its raw value; 5090 above, spark below
-            dy = 8 if node == "5090" else -14
+            # label every point with its raw value; one vertical tier per node so
+            # coincident curves (e.g. 5090 & H100 both delivering the offered rate)
+            # don't stack their labels on top of each other
+            val_dy = {"spark": -15, "5090": 9, "h100": -28}.get(node, -15)
             for x, y in zip(xs, yv):
                 ax.annotate(f"{y:.2f}", (x, y), textcoords="offset points",
-                            xytext=(0, dy), fontsize=8, color=color, ha="center")
+                            xytext=(0, val_dy), fontsize=8, color=color, ha="center")
+            name_dy = {"spark": -3, "5090": 11, "h100": -17}.get(node, -3)
             ax.annotate(disp(node), (xs[-1], yv[-1]), textcoords="offset points",
-                        xytext=(14, -3), fontsize=8.5, color=color, fontweight="bold")
+                        xytext=(14, name_dy), fontsize=8.5, color=color, fontweight="bold")
         ax.set_xticks(RLEVELS)
         ax.set_xlim(0.72, 1.34)
         ax.set_ylim(0, 1.45)
@@ -220,6 +223,50 @@ def rate_reqs_figure(fname):
     fig.legend(handles=handles, loc="upper right", frameon=False, fontsize=9,
                bbox_to_anchor=(0.995, 1.06), ncol=2)
     fig.suptitle("Open-loop delivered Req/s at 0.8 / 1.0 / 1.2 req/s offered (poisson)",
+                 fontsize=13, color=INK, x=0.01, ha="left")
+    out = os.path.join(ROOT, fname)
+    fig.savefig(out, dpi=150, facecolor="white", bbox_inches="tight")
+    plt.close(fig)
+    print("wrote", out)
+
+
+def interactivity_figure(fname, wls=WLS):
+    """Interactivity (per-user output tok/s) vs system output throughput (tok/s),
+    closed-loop concurrency sweep c2->c32. One panel per workload; each marker is a
+    concurrency level — c2 sits top-left (few users, fast each), c32 bottom-right
+    (many users, more total tok/s, slower each)."""
+    fig, axes = plt.subplots(1, len(wls), figsize=(3.2 * len(wls) + 0.4, 3.4),
+                             constrained_layout=True)
+    for ax, wl in zip(axes, wls):
+        style(ax, wl)
+        for node, color in NODES:
+            xs, ys = [], []
+            for c in CLEVELS:
+                x = aiperf_metric(node, wl, f"c{c}", "Output Token Throughput (tokens/sec)")
+                y = aiperf_metric(node, wl, f"c{c}", "Output Token Throughput Per User (tokens/sec/user)")
+                if x is None or y is None:
+                    continue
+                xs.append(x); ys.append(y)
+            if not xs:
+                continue
+            ax.plot(xs, ys, color=color, linewidth=2, marker="o", markersize=5,
+                    markeredgecolor="white", markeredgewidth=1, zorder=3)
+            # direct-label the node at its highest-throughput (c32) end; one
+            # vertical tier per node so the 5090 & H100 ties don't collide
+            imax = xs.index(max(xs))
+            name_dy = {"spark": 4, "5090": 10, "h100": -12}.get(node, 4)
+            ax.annotate(disp(node), (xs[imax], ys[imax]), textcoords="offset points",
+                        xytext=(6, name_dy), fontsize=8.5, color=color, fontweight="bold")
+        ax.set_ylim(bottom=0)
+        ax.set_xlim(left=0)
+        ax.set_xlabel("system output tok/s", fontsize=9, color=MUTED)
+    axes[0].set_ylabel("per-user tok/s (interactivity)", fontsize=9, color=MUTED)
+    handles = [plt.Line2D([], [], color=c, linewidth=2, marker="o", markersize=5,
+                          markeredgecolor="white", label=disp(n)) for n, c in NODES]
+    fig.legend(handles=handles, loc="upper right", frameon=False, fontsize=9,
+               bbox_to_anchor=(0.995, 1.06), ncol=3)
+    fig.suptitle("Interactivity vs system throughput — closed loop, concurrency 2→"
+                 "32 (marker = c2 top-left → c32 bottom-right)",
                  fontsize=13, color=INK, x=0.01, ha="left")
     out = os.path.join(ROOT, fname)
     fig.savefig(out, dpi=150, facecolor="white", bbox_inches="tight")
@@ -272,6 +319,7 @@ def main():
     flat_vs_orig("nvfp4_flat_vs_orig.png")
     coding_flat_5090("nvfp4_coding_flat_5090_reqs.png")
     rate_reqs_figure("nvfp4_rate_reqs.png")
+    interactivity_figure("nvfp4_interactivity.png")
 
 
 if __name__ == "__main__":
