@@ -99,7 +99,8 @@ def table(node, wl, md):
 
 
 def comparison(md):
-    """spark vs 5090: Req/s, TTFT avg, Out tok/s per (workload, point)."""
+    """Per-workload hardware comparison (spark/5090/h100): ISL, OSL, Req/s,
+    TTFT, ITL, E2E, Out tok/s per (workload, point)."""
     hdr = "## spark vs 5090\n" if md else "\n=== spark vs 5090 ==="
     print(hdr)
     for wl in ORDER:
@@ -109,7 +110,9 @@ def comparison(md):
         pts = sorted(set(pts), key=lambda b: point_key(b))
         if not pts:
             continue
-        rows = [("Req/s", "Request Throughput (requests/sec)"),
+        rows = [("ISL", "Input Sequence Length (tokens)"),
+                ("OSL", "Output Sequence Length (tokens)"),
+                ("Req/s", "Request Throughput (requests/sec)"),
                 ("TTFT ms", "Time to First Token (ms)"),
                 ("ITL ms", "Inter Token Latency (ms)"),
                 ("E2E ms", "Request Latency (ms)"),
