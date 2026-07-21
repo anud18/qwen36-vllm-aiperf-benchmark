@@ -11,8 +11,9 @@ import csv
 import glob
 import os
 
-ROOT = os.path.join(os.path.dirname(__file__), "..", "results", "nvfp4")
-NODES = ["spark", "5090", "h100"]
+ROOT = os.environ.get("NVFP4_RESULTS_DIR",
+                       os.path.join(os.path.dirname(__file__), "..", "results", "nvfp4"))
+NODES = os.environ.get("NVFP4_NODES", "spark,5090,h100").split(",")
 ORDER = ["chatbot", "rag", "toolagent", "agent", "coding", "toolagent_ts",
          "chatbot_flat", "agent_flat", "coding_flat"]
 STATS = ["avg", "min", "max", "p99", "p90", "p50", "std"]

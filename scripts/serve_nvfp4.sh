@@ -17,7 +17,9 @@ case "$NODE" in
 esac
 
 IMAGE="${VLLM_IMAGE:-$DEF_IMAGE}"
-MODEL="${MODEL:-nvidia/Qwen3.6-35B-A3B-NVFP4}"
+# SERVE_MODEL wins over MODEL: run_nvfp4.sh reassigns MODEL to the *served* name
+# (the id aiperf sends), and it stays exported, so it can't carry the HF repo id here.
+MODEL="${SERVE_MODEL:-${MODEL:-nvidia/Qwen3.6-35B-A3B-NVFP4}}"
 SERVED="${SERVED_NAME:-qwen3.6-nvfp4}"
 PORT="${PORT:-8000}"
 MAXLEN="${MAX_MODEL_LEN:-131072}"
@@ -48,6 +50,7 @@ docker run -d --name "$NAME" \
   -v "${VLLM_CACHE}:/root/.cache/vllm" \
   -e HF_HUB_OFFLINE=1 \
   -e VLLM_SERVER_DEV_MODE=1 \
+  ${DOCKER_ENV_ARGS:-} \
   "$IMAGE" \
   serve "$MODEL" \
   --served-model-name "$SERVED" \

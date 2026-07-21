@@ -20,10 +20,14 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-ROOT = os.path.join(os.path.dirname(__file__), "..", "results", "nvfp4")
-WLS = ["chatbot", "rag", "toolagent", "agent", "coding"]
-NODES = [("spark", "#2a78d6"), ("5090", "#1baf7a"), ("h100", "#e0803a")]  # dataviz palette slots 1-3 (blue/green/orange, CVD-safe)
+ROOT = os.environ.get("NVFP4_RESULTS_DIR",
+                       os.path.join(os.path.dirname(__file__), "..", "results", "nvfp4"))
+WLS = os.environ.get("NVFP4_WLS", "chatbot,rag,toolagent,agent,coding").split(",")
+_PALETTE = ["#2a78d6", "#1baf7a", "#e0803a"]  # dataviz palette slots 1-3 (blue/green/orange, CVD-safe)
+NODES = [(n, _PALETTE[i % len(_PALETTE)])
+         for i, n in enumerate(os.environ.get("NVFP4_NODES", "spark,5090,h100").split(","))]
 DISP = {"spark": "Spark", "h100": "H100"}  # on-plot labels; the raw keys stay lowercase (they are directory names)
+MODEL_LABEL = os.environ.get("NVFP4_MODEL_LABEL", "Qwen3.6-35B-A3B-NVFP4")
 INK, MUTED, GRID = "#1a1a2e", "#6b6b7b", "#e8e8ee"
 
 
@@ -164,6 +168,9 @@ def flat_vs_orig(fname):
 
 def coding_flat_5090(fname):
     """Single panel: coding_flat Req/s on the 5090 (closed loop)."""
+    if "5090" not in dict(NODES):
+        print("skip", fname, "(no 5090 node in this run)")
+        return
     fig, ax = plt.subplots(figsize=(5.2, 3.6), constrained_layout=True)
     style(ax, "coding_flat — RTX 5090, closed loop (ISL 29,869 fixed)")
     ys = [aiperf_metric("5090", "coding_flat", f"c{c}",
@@ -277,7 +284,7 @@ def interactivity_figure(fname, wls=WLS):
 def main():
     grid_figure(
         "nvfp4_throughput.png", CLEVELS, "concurrency", "Req/s",
-        "Request throughput vs concurrency — Qwen3.6-35B-A3B-NVFP4, closed loop, 96 req/point",
+        f"Request throughput vs concurrency — {MODEL_LABEL}, closed loop, 96 req/point",
         lambda n, w, p: aiperf_metric(n, w, p, "Request Throughput (requests/sec)"),
         logx2=True)
     grid_figure(
@@ -307,8 +314,7 @@ def main():
     FLAT = ["chatbot_flat", "agent_flat", "coding_flat"]
     grid_figure(
         "nvfp4_flat_throughput.png", CLEVELS, "concurrency", "Req/s",
-        "Flat-trace request throughput vs concurrency — machine-independent ISL "
-        "(620 / 3,041 / 29,869 tokens at every point)",
+        f"Flat-trace request throughput vs concurrency — {MODEL_LABEL}, machine-independent ISL",
         lambda n, w, p: aiperf_metric(n, w, p, "Request Throughput (requests/sec)"),
         logx2=True, wls=FLAT)
     grid_figure(

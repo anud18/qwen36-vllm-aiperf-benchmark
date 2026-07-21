@@ -16,7 +16,8 @@ import os
 import urllib.parse
 import urllib.request
 
-ROOT = os.path.join(os.path.dirname(__file__), "..", "results", "nvfp4")
+ROOT = os.environ.get("NVFP4_RESULTS_DIR",
+                       os.path.join(os.path.dirname(__file__), "..", "results", "nvfp4"))
 
 
 def q(prom, expr, ts):
