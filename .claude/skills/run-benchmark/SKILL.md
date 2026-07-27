@@ -51,8 +51,8 @@ bash scripts/run_final.sh rag coding     # default: chatbot rag toolagent agent 
 ```
 
 Sweep shape: chatbot, rag → `4 8 16 32`; toolagent, agent, coding → `4 8 16`.
-Termination: chatbot/rag/toolagent `--request-count 160`; agent/coding `--benchmark-duration 300
---benchmark-grace-period 300`.
+Termination: chatbot/rag/toolagent `--request-count $REQ_COUNT` (default 160); agent/coding
+`--benchmark-duration 300 --benchmark-grace-period 300`.
 
 ## 3. Expectations while it runs
 
@@ -90,6 +90,7 @@ python3 scripts/plot_pareto.py          # Pareto curves
 | `MAX_NUM_BATCHED_TOKENS` | unset | the main v6 lever: 248320 batches all prefills in one step (rag c16: TTFT −35%, req/s +24%) |
 | `WARMUP` / `WARMUP_CODING` | 32 / 8 | coding is reasoning-ON and long; 32 warmups there eat the time budget |
 | `DURATION` / `GRACE` | 300 / 300 | duration-based points (agent, coding) |
+| `REQ_COUNT` | 160 | requests per point for chatbot/rag/toolagent; at 320 raise `RC_TLIM` to ≥1800 (toolagent c4 needs ~1200 s) and note toolagent's dataset is exactly 320 lines |
 | `RC_TLIM` | 1200 | hard wall-clock cap per request-count point |
 | `WEDGE_S` / `MAX_TRIES` | 120 / 3 | wedge watchdog |
 | `VLLM_IMAGE` | `ghcr.io/spark-arena/dgx-vllm-eugr-nightly-tf5:20260614` | arm64 nightly, vLLM 0.22.1 |
