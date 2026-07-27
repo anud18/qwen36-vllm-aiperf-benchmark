@@ -9,5 +9,6 @@ Docs:
 - **DATASETS.md** — original dataset sources + measured input/output/turn characteristics per workload
 - **FORMAT.md** (中文版: **FORMAT.zh-TW.md**) — exactly how each dataset is converted and sent to the LLM
 - **RUNBOOK.md** — v6 server/client config and run methodology
+  (operational version as a Claude Code skill: `.claude/skills/run-benchmark/`, invoke `/run-benchmark`)
 - **RESULTS.md** — benchmark numbers
 - `slides/` — architecture & workloads slide deck

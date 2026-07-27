@@ -8,3 +8,4 @@ results/
 .venv-plot/
 .venv-litellm/
 traces/
+.claude/settings.local.json
