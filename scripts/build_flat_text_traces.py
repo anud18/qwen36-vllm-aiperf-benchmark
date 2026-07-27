@@ -47,6 +47,19 @@ OSL_CAP = 2048
 THINKOFF = {"chat_template_kwargs": {"enable_thinking": False}}
 # raw-messages mode skips aiperf's client-side input tokenization, so ISL must
 # come from the server: force usage reporting on the streaming response.
+#
+# PIN_DECODE: aiperf sends output_length as max_completion_tokens, i.e. a CAP —
+# the model still stops at its own EOS. On the NCHC GLM-5.2 gateway the OSL
+# CANNOT be pinned to the trace: `ignore_eos`, `min_tokens` and
+# `min_completion_tokens` are all silently dropped (verified — a cap-200 request
+# still stops at 12 tokens). temperature 0 + seed 42 is reproducible for short
+# prompts but NOT for the multi-turn contexts: replaying agent entries against
+# the canonical lengths gave 332->214, 180->168, 188->171 (batch composition on
+# a shared server moves the EOS point). So treat output_length as "declared cap,
+# measured OSL <= it, usually close". Pinning the sampler still removes
+# sampling-noise as a second source of drift; --no-pin-decode leaves the
+# server's default sampler.
+PIN_DECODE = {"temperature": 0, "seed": 42}
 ENTRY_EXTRA = {**THINKOFF, "stream_options": {"include_usage": True}}
 
 
@@ -127,16 +140,18 @@ def chatbot_sessions():
 
 # ---------- agent/coding: one-time greedy canonical generation ----------
 
-def chat(url, model, messages, max_tokens, retries=5):
+def chat(url, model, messages, max_tokens, retries=5, api_key=""):
     body = json.dumps({
         "model": model, "messages": messages, "stream": False,
         "temperature": 0, "seed": 42, "max_tokens": max_tokens, **THINKOFF,
     }).encode()
+    headers = {"Content-Type": "application/json"}
+    if api_key:
+        headers["Authorization"] = "Bearer " + api_key
     for attempt in range(retries):
         try:
             req = urllib.request.Request(
-                url + "/v1/chat/completions", data=body,
-                headers={"Content-Type": "application/json"})
+                url + "/v1/chat/completions", data=body, headers=headers)
             with urllib.request.urlopen(req, timeout=1800) as r:
                 d = json.load(r)
             return (d["choices"][0]["message"]["content"] or "",
@@ -148,17 +163,17 @@ def chat(url, model, messages, max_tokens, retries=5):
             time.sleep(10 * (attempt + 1))
 
 
-def gen_session(sess, url, model):
+def gen_session(sess, url, model, api_key=""):
     msgs, out = [], []
     for t in sess["turns"]:
         msgs.append({"role": "user", "content": t["text"]})
-        reply, ct = chat(url, model, msgs, OSL_CAP)
+        reply, ct = chat(url, model, msgs, OSL_CAP, api_key=api_key)
         msgs.append({"role": "assistant", "content": reply})
         out.append({"user": t["text"], "reply": reply, "completion_tokens": ct})
     return {"session_id": sess["session_id"], "turns": out}
 
 
-def canonical_generate(wl, url, model, workers):
+def canonical_generate(wl, url, model, workers, api_key=""):
     """Generate (or load cached) greedy replies for enough sessions of `wl`."""
     os.makedirs(CANON, exist_ok=True)
     cache = os.path.join(CANON, f"{wl}_replies.jsonl")
@@ -179,7 +194,7 @@ def canonical_generate(wl, url, model, workers):
           f"{len(done)} cached, {len(todo)} to generate", file=sys.stderr)
     if todo:
         with concurrent.futures.ThreadPoolExecutor(workers) as ex, open(cache, "a") as f:
-            futs = {ex.submit(gen_session, s, url, model): s for s in todo}
+            futs = {ex.submit(gen_session, s, url, model, api_key): s for s in todo}
             for i, fut in enumerate(concurrent.futures.as_completed(futs), 1):
                 rec = fut.result()
                 f.write(json.dumps(rec, ensure_ascii=False) + "\n")
@@ -193,17 +208,40 @@ def canonical_generate(wl, url, model, workers):
 
 
 def main():
+    global N_ENTRIES, ENTRY_EXTRA, OSL_CAP
     ap = argparse.ArgumentParser()
     ap.add_argument("workloads", nargs="+", choices=["chatbot", "agent", "coding"])
     ap.add_argument("--url", default="http://localhost:8000")
     ap.add_argument("--model", default="qwen3.6-nvfp4")
     ap.add_argument("--workers", type=int, default=8)
+    ap.add_argument("--force-osl", action="store_true",
+                    help="write ignore_eos into every entry so the measured OSL equals "
+                         "output_length exactly. Works against a vLLM you control; the "
+                         "NCHC gateway drops the parameter (see FLAT_TRACES.md)")
+    ap.add_argument("--osl-cap", type=int, default=OSL_CAP,
+                    help="max_tokens for canonical generation and the ceiling "
+                         "written into output_length (default %(default)s)")
+    ap.add_argument("--no-pin-decode", action="store_true",
+                    help="do not write temperature 0 / seed 42 into each entry; "
+                         "output_length then acts as a cap only")
+    ap.add_argument("--api-key", default="",
+                    help="bearer token for a gated endpoint (or env API_KEY)")
+    ap.add_argument("--n-entries", type=int, default=N_ENTRIES,
+                    help="entries per file; must be >= warmup + request-count of "
+                         "the largest sweep point (default %(default)s)")
     args = ap.parse_args()
+    N_ENTRIES = args.n_entries
+    OSL_CAP = args.osl_cap
+    if not args.no_pin_decode:
+        ENTRY_EXTRA = {**ENTRY_EXTRA, **PIN_DECODE}
+    if args.force_osl:
+        ENTRY_EXTRA = {**ENTRY_EXTRA, "ignore_eos": True}
     for wl in args.workloads:
         if wl == "chatbot":
             sessions = chatbot_sessions()
         else:
-            sessions = canonical_generate(wl, args.url, args.model, args.workers)
+            sessions = canonical_generate(wl, args.url, args.model, args.workers,
+                                          args.api_key or os.environ.get("API_KEY", ""))
         path = os.path.join(OUT, f"nvfp4_{wl}_flat.jsonl")
         n = emit(sessions, path)
         osl = [json.loads(l)["output_length"] for l in open(path)]

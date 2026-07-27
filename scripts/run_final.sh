@@ -112,14 +112,15 @@ workload() {  # name "levels" dtype file tlimit term-args...
   for c in $levels; do run_point "$wl" "$c" "$dtype" "$file" "$tlim" "$@"; done
 }
 
+REQ_COUNT="${REQ_COUNT:-160}"              # requests per --request-count point
 RC_TLIM="${RC_TLIM:-1200}"                 # hard cap for --request-count points
 DUR_TLIM=$((DURATION + GRACE + 600))       # hard cap for --benchmark-duration points
 SEL="${*:-chatbot rag toolagent agent coding}"
 for wl in $SEL; do
   case $wl in
-    chatbot)   workload chatbot   "4 8 16 32" public         ""                          "$RC_TLIM"  --request-count 160 ;;
-    rag)       workload rag       "4 8 16 32" single_turn    "$DATA/final_rag.jsonl"      "$RC_TLIM"  --request-count 160 ;;
-    toolagent) workload toolagent "4 8 16"    mooncake_trace "$DATA/final_toolagent.jsonl" "$RC_TLIM" --request-count 160 ;;
+    chatbot)   workload chatbot   "4 8 16 32" public         ""                          "$RC_TLIM"  --request-count "$REQ_COUNT" ;;
+    rag)       workload rag       "4 8 16 32" single_turn    "$DATA/final_rag.jsonl"      "$RC_TLIM"  --request-count "$REQ_COUNT" ;;
+    toolagent) workload toolagent "4 8 16"    mooncake_trace "$DATA/final_toolagent.jsonl" "$RC_TLIM" --request-count "$REQ_COUNT" ;;
     agent)     workload agent     "4 8 16"    multi_turn     "$DATA/final_agent.jsonl"    "$DUR_TLIM" --benchmark-duration "$DURATION" --benchmark-grace-period "$GRACE" ;;
     coding)    workload coding    "4 8 16"    multi_turn     "$DATA/final_coding.jsonl"   "$((DURATION + GRACE + 900))" --benchmark-duration "$DURATION" --benchmark-grace-period "$GRACE" ;;
   esac

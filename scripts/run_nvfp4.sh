@@ -14,6 +14,12 @@ cd "$(dirname "$0")/.."
 ROOT="$(pwd)"
 
 NODE="${NODE:?set NODE=spark|5090}"
+# REMOTE=1: the endpoint is a managed/gateway vLLM we do not own (e.g. the NCHC
+# GLM-5.2 gateway). No server restart, no /reset_prefix_cache, no /metrics — the
+# gateway only exposes /v1/*, everything else 403s. Prefix-hit and the engine-wedge
+# watchdog are therefore unavailable; only the hard tlimit backstop remains.
+REMOTE="${REMOTE:-0}"
+API_KEY="${API_KEY:-}"          # sent to aiperf as --api-key (Authorization: Bearer)
 MODEL="${SERVED_NAME:-qwen3.6-nvfp4}"
 URL="${URL:-http://localhost:8000}"
 TOKENIZER="${TOKENIZER:-nvidia/Qwen3.6-35B-A3B-NVFP4}"
@@ -29,7 +35,7 @@ RATE_TLIM="${RATE_TLIM:-3600}"   # hard cap, rate points (saturation drain can b
 WEDGE_S="${WEDGE_S:-120}"
 THINKOFF='{"chat_template_kwargs":{"enable_thinking":false}}'
 OUTBASE="${OUTBASE:-results/nvfp4/$NODE}"
-RESTART_PER_WL="${RESTART_PER_WL:-1}"   # 0 = reuse running server (smoke)
+RESTART_PER_WL="${RESTART_PER_WL:-$([ "$REMOTE" = 1 ] && echo 0 || echo 1)}"   # 0 = reuse running server (smoke/remote)
 VLLM_CNAME="${VLLM_CNAME:-vllm-nvfp4}"  # server container name (prefix on shared boxes)
 CPREFIX="${CPREFIX:-aiperf}"            # aiperf client container-name prefix
 
@@ -41,10 +47,12 @@ prefix_metrics() {  # echo "hits queries"
 }
 
 reset_kv() {  # returns http code of POST /reset_prefix_cache
+  [ "$REMOTE" = 1 ] && { echo skipped; return 0; }
   curl -s -m 30 -X POST -o /dev/null -w '%{http_code}' "${URL}/reset_prefix_cache" 2>/dev/null
 }
 
 restart_server() {
+  [ "$REMOTE" = 1 ] && { echo "==== [remote endpoint — no restart] ===="; return 0; }
   local log=$1
   echo "==== [restart vLLM] $(date +%T) ===="
   NODE="$NODE" bash scripts/serve_nvfp4.sh >"$log" 2>&1
@@ -75,12 +83,13 @@ run_point() {  # workload point dtype file  extra-args...
 
     # cold prefix cache for every point
     local rkc; rkc=$(reset_kv)
-    [ "$rkc" = 200 ] || echo "   !!! reset_prefix_cache HTTP $rkc (continuing)"
+    [ "$rkc" = 200 ] || [ "$rkc" = skipped ] || echo "   !!! reset_prefix_cache HTTP $rkc (continuing)"
 
     local b a t0 t1; b=$(prefix_metrics); t0=$(date +%s)
     echo "   [aiperf] $wl $pt (try $attempt, warmup=$wu, reqs=$REQS, tlimit=${tlim}s) $(date +%T)"
     local args=(--model "$MODEL" --url "$URL" --endpoint-type chat --streaming
                 --tokenizer "$TOKENIZER" --artifact-dir "$adir" --random-seed 42)
+    [ -n "$API_KEY" ] && args+=(--api-key "$API_KEY")
     if [ "$pt" = fixed ]; then
       # fixed-schedule: replay ALL entries at trace timing; no request-count/warmup
       args+=("${loadargs[@]}")
@@ -106,6 +115,12 @@ run_point() {  # workload point dtype file  extra-args...
     local dpid=$! start=$SECONDS frozen=0 lastg="" lastp="" wedged=0 timedout=0 g p r
     while kill -0 "$dpid" 2>/dev/null; do
       sleep 15
+      if [ "$REMOTE" = 1 ]; then
+        # no /metrics on a gateway — tlimit is the only backstop
+        [ $((SECONDS-start)) -ge "$tlim" ] && {
+          echo "   !!! hard tlimit ${tlim}s exceeded — killing $(date +%T)"; timedout=1; break; }
+        continue
+      fi
       read g p r < <(curl -s -m3 "${URL}/metrics" 2>/dev/null | awk '
         /^vllm:generation_tokens_total/{g=$2} /^vllm:prompt_tokens_total/{p=$2} /^vllm:num_requests_running/{r=$2}
         END{printf "%s %s %s", g+0, p+0, r+0}')
@@ -127,6 +142,12 @@ run_point() {  # workload point dtype file  extra-args...
     t1=$(date +%s)
 
     if [ -s "$adir/profile_export_aiperf.json" ]; then
+      if [ "$REMOTE" = 1 ]; then
+        echo '{"unavailable":true,"reason":"remote endpoint: no /metrics"}' > "$adir/prefix.json"
+        printf '{"node":"%s","wl":"%s","point":"%s","start":%d,"end":%d,"reqs":%s,"warmup":%s,"try":%d,"remote":true}\n' \
+          "$NODE" "$wl" "$pt" "$t0" "$t1" "$REQS" "$wu" "$attempt" > "$adir/meta.json"
+        return 0
+      fi
       a=$(prefix_metrics)
       awk -v b="$b" -v a="$a" -v wl="$wl" -v pt="$pt" -v out="$adir/prefix.json" 'BEGIN{
         split(b,B," "); split(a,A," "); dh=A[1]-B[1]; dq=A[2]-B[2];
@@ -182,7 +203,7 @@ for wl in $SEL; do
     *) echo "!!! unknown workload $wl" ;;
   esac
 done
-if [ "${STOP_AFTER:-1}" = 1 ]; then
+if [ "${STOP_AFTER:-$([ "$REMOTE" = 1 ] && echo 0 || echo 1)}" = 1 ]; then
   echo ">>> stopping vLLM server"; docker rm -f "$VLLM_CNAME" >/dev/null 2>&1 || true
 fi
 echo "================ RUN_NVFP4 node=$NODE DONE $(date '+%F %T') ================"
