@@ -1,6 +1,6 @@
 ---
 name: run-benchmark
-description: Use when the user wants to run / re-run / resume the Qwen3.6-35B-A3B-FP8 vLLM benchmark in this repo (跑 benchmark) — bring up the vLLM server + Prometheus/Grafana, build the aiperf datasets, run the concurrency sweep over the 5 workloads, and summarize/plot the results.
+description: Use when the user wants to run / re-run / resume a vLLM benchmark in this repo (跑 benchmark) — the v6 Qwen3.6-35B-A3B-FP8 sweep or the flat-trace sweep, against a local server or a managed cloud endpoint. Brings up vLLM + Prometheus/Grafana, builds the aiperf datasets, runs the concurrency sweep, and summarizes/plots the results.
 ---
 
 # Run the Qwen3.6 vLLM benchmark (GB10 / aarch64)
@@ -8,7 +8,38 @@ description: Use when the user wants to run / re-run / resume the Qwen3.6-35B-A3
 Full config rationale lives in `RUNBOOK.md`; dataset conversion in `FORMAT.md` / `DATASETS.md`.
 This skill is the operational path: what to run, in what order, and what to check.
 
-## 0. Preconditions
+## 0. Ask the user before running anything
+
+These four choices change the run and cannot be inferred. Ask them together (AskUserQuestion),
+then state the resolved config back before launching. Skip a question only if the user already
+answered it in their request.
+
+| choice | options | consequence |
+|---|---|---|
+| **track** | v6 Qwen3.6 local (§2) / flat traces (§6) | different scripts, datasets and result dirs — never mix |
+| **endpoint** | local self-hosted vLLM / managed cloud gateway | cloud needs `REMOTE=1` + `API_KEY`, and loses `/metrics`, prefix-hit and the wedge watchdog |
+| **requests per point** | v6: `REQ_COUNT` (default 160) · flat: `REQS` (default 96, dataset allows ≤ 320) | more requests = longer per point; the dataset must hold `warmup + requests` entries |
+| **OSL** (flat track only) | follow the trace exactly / let the model stop naturally | the shipped flat files already pin it (`ignore_eos` in-data); "natural" means rebuilding without `--force-osl`. Exact OSL also needs a vLLM you control — a gateway drops the parameter |
+
+Defaults if the user says "just run it": v6 track, local, `REQ_COUNT=160`. On the flat track the
+shipped datasets pin OSL to the trace — only rebuild if the user asks for natural stopping.
+
+**Request count vs dataset size.** aiperf consumes entries in file order — a point uses
+`entries[warmup : warmup + requests]`, verified. So any request count ≤ dataset size is
+deterministic and reproducible, but a smaller count is a *prefix subset*, weighted toward the
+first turns of few sessions: coding's first 16 entries average OSL 40 against 584 for the whole
+file. Runs with different request counts are different workloads, not coarse/fine versions of
+one. If `warmup + requests` exceeds the file, aiperf wraps around and replays early entries,
+inflating prefix-cache hits — rebuild the dataset larger instead (§6).
+
+| dataset | entries | max requests (warmup 16) |
+|---|--:|--:|
+| `nvfp4_{chatbot,agent,coding}_flat.jsonl` | 384 | 320 |
+| `final_rag.jsonl` | 500 | 484 |
+| `final_toolagent.jsonl` | 320 | 304 |
+| chatbot (`--public-dataset sharegpt`) | — | unbounded |
+
+## 0b. Preconditions
 
 ```bash
 nvidia-smi                              # GB10 visible, no stray EngineCore holding memory
@@ -98,9 +129,59 @@ python3 scripts/plot_pareto.py          # Pareto curves
 Reasoning is OFF everywhere except **coding** (`enable_thinking=false`, per-line for file datasets,
 `--extra-inputs` for chatbot/toolagent). Changing that changes the workload definition — flag it.
 
+## 6. Flat-trace track (`run_nvfp4.sh`) — the other benchmark
+
+Separate scripts, datasets and result dirs from §2. Use it when the point is comparing
+*machines or endpoints* on identical input tokens. Full guide: `FLAT_TRACES.md`.
+
+`nvfp4_{chatbot,agent,coding}_flat.jsonl` are 384-entry `mooncake_trace` **`messages` mode**
+files: every conversation turn is one independent request carrying its real history, so ISL is
+fixed by the file. `rag` (`single_turn`) and `toolagent` (lengths-declared trace) are already
+flat and need no variant.
+
+```bash
+# local self-hosted vLLM
+NODE=spark REQS=320 POINTS="c2 c8 c32" bash scripts/run_nvfp4.sh chatbot_flat agent_flat coding_flat
+
+# managed cloud gateway (NCHC GLM-5.2)
+API_KEY=... REMOTE=1 NODE=glm52 REQS=320 SERVED_NAME=GLM-5.2 \
+  URL=https://inner-medusa.genai.nchc.org.tw TOKENIZER=zai-org/GLM-5.2-FP8 \
+  OUTBASE=results/nvfp4/glm52 POINTS="c2 c8 c32" \
+  bash scripts/run_nvfp4.sh chatbot_flat agent_flat coding_flat rag toolagent
+```
+
+| env | default | effect |
+|---|---|---|
+| `REQS` | 96 | requests per point; ≤ 320 with the 384-entry files |
+| `REMOTE` | 0 | 1 = endpoint we don't own: no server restart, no `/reset_prefix_cache`, no `/metrics` watchdog (tlimit only), `prefix.json` marked unavailable |
+| `API_KEY` | unset | passed to aiperf as `--api-key` |
+| `POINTS` | `c2 c4 c8 c16 c32 r0.8 r1.0 r1.2` | `c<N>` closed-loop, `r<R>` poisson open-loop, `fixed` replays trace timestamps |
+| `RC_TLIM` / `RATE_TLIM` | 2700 / 3600 | hard caps; raise for `REQS` 320 (Spark coding_flat c2 was 577 s at 96) |
+| `WARMUP` | 16 | also consumed from the front of the file — changing it shifts which entries are profiled |
+
+**OSL mode.** The shipped files carry `ignore_eos` (built with `--force-osl`), so on a vLLM you
+control the measured OSL equals `output_length` exactly — verified through aiperf: chatbot
+279.5/54/641, agent 195.6/80/452, coding 39.9/13/156, identical to declared. `temperature 0` /
+`seed 42` are pinned in-data too. Two catches: a managed gateway may silently drop `ignore_eos`
+(the NCHC one does, along with `min_tokens`), leaving `output_length` as a cap only — those
+numbers are not comparable with self-hosted ones; and with OSL forced, the cap becomes real
+decode work (93/384 coding turns generate a full 2,048 tokens each, so coding runs heavier).
+To rebuild without it, drop `--force-osl`:
+
+```bash
+python3 scripts/build_flat_text_traces.py chatbot --n-entries 384 --osl-cap 2048 --force-osl
+API_KEY=... python3 scripts/build_flat_text_traces.py agent coding \
+  --n-entries 384 --osl-cap 2048 --force-osl --model GLM-5.2 \
+  --url https://inner-medusa.genai.nchc.org.tw
+```
+
+`--osl-cap` sets both the canonical-generation `max_tokens` and the `output_length` ceiling;
+changing it means **deleting `datasets/aiperf/canonical/*_replies.jsonl` first**, or previously
+clipped replies survive from the cache. Rebuilding changes the dataset — say so, and don't mix
+the new numbers with results measured against an older build (`datasets/aiperf/archive_*`).
+
 ## Not this benchmark
 
-`scripts/serve_nvfp4.sh` / `run_nvfp4.sh` / `summarize_nvfp4.py` are the separate **NVFP4
-cross-hardware** track (Spark / 5090 / H100, see `RESULTS_nvfp4.md`), and
-`scripts/build_flat_traces.py` / `double_flat_run.sh` the flat-trace track (`FLAT_TRACES.md`).
-Don't mix their scripts or result dirs into a v6 run.
+`scripts/build_flat_traces.py` (v1 synthetic, lengths + hash_ids) is superseded by
+`build_flat_text_traces.py`; `double_flat_run.sh` is the H100 reproducibility double-run.
+Don't mix §2 and §6 scripts or result dirs in one run.
