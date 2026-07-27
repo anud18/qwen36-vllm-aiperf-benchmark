@@ -30,8 +30,12 @@ REQS="${REQS:-96}"
 WARMUP="${WARMUP:-16}"
 WARMUP_CODING="${WARMUP_CODING:-8}"
 POINTS="${POINTS:-c2 c4 c8 c16 c32 r0.8 r1.0 r1.2}"
-RC_TLIM="${RC_TLIM:-2700}"       # hard cap, concurrency points
-RATE_TLIM="${RATE_TLIM:-3600}"   # hard cap, rate points (saturation drain can be long)
+# Hard caps sized for REQS=320 with OSL pinned to the trace (ignore_eos). The 320
+# window decodes 3.2-5.0x the tokens of the old 96 window (coding: 167,382 forced
+# output tokens vs 33,794), and low-concurrency points are the slow ones — Spark
+# coding_flat c2 took 577 s at 96 requests. 2700/3600 were the REQS=96 values.
+RC_TLIM="${RC_TLIM:-5400}"       # hard cap, concurrency points
+RATE_TLIM="${RATE_TLIM:-7200}"   # hard cap, rate points (saturation drain can be long)
 WEDGE_S="${WEDGE_S:-120}"
 THINKOFF='{"chat_template_kwargs":{"enable_thinking":false}}'
 OUTBASE="${OUTBASE:-results/nvfp4/$NODE}"

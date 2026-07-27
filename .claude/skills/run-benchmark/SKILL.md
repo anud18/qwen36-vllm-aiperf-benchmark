@@ -156,7 +156,7 @@ API_KEY=... REMOTE=1 NODE=glm52 REQS=320 SERVED_NAME=GLM-5.2 \
 | `REMOTE` | 0 | 1 = endpoint we don't own: no server restart, no `/reset_prefix_cache`, no `/metrics` watchdog (tlimit only), `prefix.json` marked unavailable |
 | `API_KEY` | unset | passed to aiperf as `--api-key` |
 | `POINTS` | `c2 c4 c8 c16 c32 r0.8 r1.0 r1.2` | `c<N>` closed-loop, `r<R>` poisson open-loop, `fixed` replays trace timestamps |
-| `RC_TLIM` / `RATE_TLIM` | 2700 / 3600 | hard caps; raise for `REQS` 320 (Spark coding_flat c2 was 577 s at 96) |
+| `RC_TLIM` / `RATE_TLIM` | 5400 / 7200 | hard caps, sized for `REQS=320` with OSL pinned (that window decodes 3.2-5.0x the tokens of the old 96 window; Spark coding_flat c2 took 577 s at 96). Lower them for small `REQS` |
 | `WARMUP` | 16 | also consumed from the front of the file — changing it shifts which entries are profiled |
 
 **OSL mode.** The shipped files carry `ignore_eos` (built with `--force-osl`), so on a vLLM you
