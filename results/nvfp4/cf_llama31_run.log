@@ -1,0 +1,12 @@
+### metrics before: 73387 127547
+### [1/2] chatbot_flat  18:46:37
+================ RUN_NVFP4 node=llama31_cf start 2026-07-29 18:46:37 ================
+   [aiperf] chatbot_flat c1 (try 1, warmup=0, reqs=20, tlimit=2700s) 18:46:38
+================ RUN_NVFP4 node=llama31_cf DONE 2026-07-29 18:57:23 ================
+### metrics after chatbot: 73387 127547
+### [2/2] agent_flat  18:57:23
+================ RUN_NVFP4 node=llama31_cf start 2026-07-29 18:57:23 ================
+   [aiperf] agent_flat c1 (try 1, warmup=0, reqs=20, tlimit=2700s) 18:57:23
+================ RUN_NVFP4 node=llama31_cf DONE 2026-07-29 19:12:08 ================
+### metrics after agent: 73387 127547
+### ALL DONE 19:12:08

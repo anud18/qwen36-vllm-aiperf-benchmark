@@ -1,0 +1,8 @@
+=== 端點恢復 2026-07-29 13:54:26 — 開始跑 ===
+================ RUN_NVFP4 node=qwen3vl_ngrok start 2026-07-29 13:54:26 ================
+   [aiperf] chatbot_flat c1 (try 1, warmup=2, reqs=10, tlimit=900s) 13:54:27
+================ RUN_NVFP4 node=qwen3vl_ngrok DONE 2026-07-29 13:59:12 ================
+================ RUN_NVFP4 node=qwen3vl_ngrok start 2026-07-29 13:59:12 ================
+   [aiperf] chatbot_flat c2 (try 1, warmup=2, reqs=20, tlimit=900s) 13:59:12
+================ RUN_NVFP4 node=qwen3vl_ngrok DONE 2026-07-29 14:10:28 ================
+=== ALL DONE 2026-07-29 14:10:28 ===

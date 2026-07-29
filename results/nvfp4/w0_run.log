@@ -1,0 +1,17 @@
+### metrics before all: 25794 49277
+### [1/3] chatbot_flat  17:03:47
+================ RUN_NVFP4 node=qwen3vl_ngrok start 2026-07-29 17:03:47 ================
+   [aiperf] chatbot_flat c1 (try 1, warmup=0, reqs=20, tlimit=2700s) 17:03:47
+================ RUN_NVFP4 node=qwen3vl_ngrok DONE 2026-07-29 17:11:47 ================
+### metrics after chatbot: 33018 60975
+### [2/3] agent_flat  17:11:48
+================ RUN_NVFP4 node=qwen3vl_ngrok start 2026-07-29 17:11:48 ================
+   [aiperf] agent_flat c1 (try 1, warmup=0, reqs=20, tlimit=2700s) 17:11:48
+================ RUN_NVFP4 node=qwen3vl_ngrok DONE 2026-07-29 17:23:34 ================
+### metrics after agent: 56028 94135
+### [3/3] chatbot_flat REPEAT (cache-carryover probe)  17:23:34
+================ RUN_NVFP4 node=qwen3vl_ngrok start 2026-07-29 17:23:34 ================
+   [aiperf] chatbot_flat c1 (try 1, warmup=0, reqs=20, tlimit=2700s) 17:23:35
+================ RUN_NVFP4 node=qwen3vl_ngrok DONE 2026-07-29 17:31:50 ================
+### metrics after repeat: 63252 105833
+### ALL DONE 17:31:50
