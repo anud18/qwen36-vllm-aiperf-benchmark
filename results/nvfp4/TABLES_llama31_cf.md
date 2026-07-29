@@ -20,7 +20,11 @@ Settings are identical to the `w0` series in `TABLES_w0.md`.
 **TPOT = ITL** — aiperf's `inter_token_latency` is `(request_latency − TTFT) / (OSL − 1)`, the
 standard time-per-output-token. Shown as one row. **p50 is the median.**
 
-Validity: both points completed **20 / 20** requests, **0 errors**, `osl_mismatch_count = 0`.
+Validity: all points completed **20 / 20** requests, **0 errors**, `osl_mismatch_count = 0`.
+
+`chatbot_flat` c1 was run a second time on 2026-07-30 02:26 through a fresh tunnel
+(`arena-iii-chains-rings.trycloudflare.com`) **after the worker was restarted** — the Dynamo
+instance moved from port 38103 to 42471, so its KV cache started empty. See *Repeatability*.
 
 ## Distribution metrics
 
@@ -55,6 +59,37 @@ Validity: both points completed **20 / 20** requests, **0 errors**, `osl_mismatc
 | Requests completed | 20 / 20 | 20 / 20 |
 | Errors | 0 | 0 |
 | OSL mismatches | 0 | 0 |
+
+## Repeatability — `chatbot_flat` c1 twice, worker restarted in between
+
+Identical invocation. Run 1 at 18:46 on the original tunnel; run 2 at 02:26 the next day on a new
+tunnel, after the Dynamo worker had been restarted (port 38103 → 42471, new instance id), so run 2
+provably began with a **cold KV cache**.
+
+| metric | run 1 (18:46) | run 2 (02:26, cold cache) | Δ |
+|---|--:|--:|--:|
+| benchmark duration (s) | 637.56 | 625.51 | −1.9 % |
+| TTFT avg / p50 / p90 (ms) | 11,444.39 / 13,706.37 / 17,135.06 | 11,196.31 / 13,396.80 / 16,808.69 | −2.2 / −2.3 / −1.9 % |
+| ITL = TPOT avg / p50 (ms) | 68.72 / 68.45 | 67.39 / 67.23 | −1.9 / −1.8 % |
+| E2E latency avg / p50 (ms) | 31,875.21 / 34,582.14 | 31,272.78 / 34,015.90 | −1.9 / −1.6 % |
+| request throughput (req/s) | 0.0314 | 0.0320 | +1.9 % |
+| output token throughput (tok/s) | 9.36 | 9.54 | +1.9 % |
+| output tok/s per user avg | 14.56 | 14.86 | +2.0 % |
+| **total ISL / OSL (tokens)** | 12,176 / 5,970 | **12,176 / 5,970** | **0.0 %** |
+| **cache-read tokens** | 7,772 | **7,772** | **0.0 %** |
+| **cache hit rate** | 63.83 % | **63.83 %** | **0.0 %** |
+
+ISL and OSL match on every percentile; latency metrics are uniformly ~2 % faster, within noise.
+
+**This is the decisive evidence on cross-round cache carryover.** Run 2 started on a restarted
+worker whose KV cache was necessarily empty, and still reported *exactly* the same 7,772
+cache-read tokens. The 63.83 % hit rate is therefore entirely intra-run — later turns of a session
+hitting earlier turns of the same session — with zero contribution from anything cached earlier.
+The equivalent Qwen observation (`c1` twice, 7,224 both times) was consistent with this but could
+also be explained by eviction during the 90-minute gap; a cold start cannot.
+
+Practical consequence: **rounds on this deployment are independent and need no cache flush between
+them.**
 
 ## Cross-model comparison, same settings
 

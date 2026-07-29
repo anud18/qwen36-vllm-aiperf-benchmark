@@ -9,7 +9,8 @@ Two models were measured on the same physical box through two different tunnels:
 | # | model | tunnel | status |
 |---|---|---|---|
 | A | `Qwen3-VL-30B-A3B-Instruct-optimumxt` | ngrok — `poppy-zero-ritzy.ngrok-free.dev` | **dead**, monthly bandwidth quota exhausted (`ERR_NGROK_725`) |
-| B | `Llama-3.1-8B-Instruct-optimumxt` | Cloudflare — `athens-move-ted-convertible.trycloudflare.com` | live as of 19:12 |
+| B | `Llama-3.1-8B-Instruct-optimumxt` | Cloudflare — `athens-move-ted-convertible.trycloudflare.com` | **dead** — trycloudflare quick tunnels are ephemeral, DNS record gone |
+| B′ | `Llama-3.1-8B-Instruct-optimumxt` | Cloudflare — `arena-iii-chains-rings.trycloudflare.com` | same model and box, worker restarted (port 38103 → 42471) |
 
 ## Reports (start here)
 
@@ -44,6 +45,7 @@ Every point directory contains the same ten files — see *Artifact layout* belo
 |---|---|--:|--:|--:|---|--:|---|
 | `cf_llama31_chatbot/chatbot_flat/c1/` | chatbot_flat | 1 | 20 | **0** | `[0:20]` | 637.6 s | ✅ |
 | `cf_llama31_agent/agent_flat/c1/` | agent_flat | 1 | 20 | **0** | `[0:20]` | 876.5 s | ✅ |
+| `cf_llama31_chatbot_rep/chatbot_flat/c1/` | chatbot_flat | 1 | 20 | **0** | `[0:20]` | 625.5 s | ✅ repeat, cold cache after worker restart |
 
 ## Driver logs
 
@@ -56,6 +58,7 @@ Every point directory contains the same ten files — see *Artifact layout* belo
 | `w0_run.log` | the three `WARMUP=0` points, with Dynamo `cached_tokens` sampled around each |
 | `w0_agent_c2.log` | `agent_flat` `c2` — the point killed by the ngrok quota |
 | `cf_llama31_run.log` | both Cloudflare / Llama points |
+| `cf_llama31_chatbot_rep.log` | `chatbot_flat` c1 repeat on the second tunnel, cold cache |
 
 ## Artifact layout
 

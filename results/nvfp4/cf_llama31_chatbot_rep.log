@@ -1,0 +1,3 @@
+================ RUN_NVFP4 node=llama31_cf start 2026-07-30 02:26:39 ================
+   [aiperf] chatbot_flat c1 (try 1, warmup=0, reqs=20, tlimit=2700s) 02:26:40
+================ RUN_NVFP4 node=llama31_cf DONE 2026-07-30 02:37:25 ================
