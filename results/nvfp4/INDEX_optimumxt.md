@@ -19,6 +19,7 @@ Two models were measured on the same physical box through two different tunnels:
 | `qwen3vl_ngrok/RESULTS.md` | Full narrative report for model A — config, methodology caveats, all points, repeatability, prefix-cache analysis, prefill diagnosis, workload feasibility at 4096 context |
 | `TABLES_w0.md` | Result tables for the `WARMUP=0 / REQS=20 / c1` series on model A (TTFT, ITL=TPOT, E2E, ISL, OSL, req/s, token throughput; avg / p50 / p90 / p95 / p99 / min / max / std) |
 | `TABLES_llama31_cf.md` | Same tables for model B, plus the cross-model comparison at identical settings |
+| `TABLES_r100.md` | 100-request series on model B — chatbot and agent at c1 and c2, run alternating, on context-filtered datasets |
 | `INDEX_optimumxt.md` | This file |
 
 ## Benchmark points
@@ -47,6 +48,22 @@ Every point directory contains the same ten files — see *Artifact layout* belo
 | `cf_llama31_agent/agent_flat/c1/` | agent_flat | 1 | 20 | **0** | `[0:20]` | 876.5 s | ✅ |
 | `cf_llama31_chatbot_rep/chatbot_flat/c1/` | chatbot_flat | 1 | 20 | **0** | `[0:20]` | 625.5 s | ✅ repeat, cold cache after worker restart |
 
+### Model B′ — Llama-3.1-8B, 100 requests, filtered datasets
+
+Run alternating (chatbot c1 → agent c1 → chatbot c2 → agent c2) on 2026-07-30 03:23–07:45,
+against `datasets/aiperf/le4096/` — entries over the 4096 cap removed.
+
+| point directory | workload | conc. | reqs | warmup | slice | duration | valid |
+|---|---|--:|--:|--:|---|--:|---|
+| `r100_chatbot_flat_c1/` | chatbot_flat | 1 | 100 | **0** | `[0:100]` | 2,757.6 s | ✅ 100/100 |
+| `r100_agent_flat_c1/` | agent_flat | 1 | 100 | **0** | `[0:100]` | 4,105.1 s | ⚠️ 97/100 — 3 × Cloudflare 524 |
+| `r100_chatbot_flat_c2/` | chatbot_flat | 2 | 100 | **0** | `[0:100]` | 3,132.2 s | ✅ 100/100 |
+| `r100_agent_flat_c2/` | agent_flat | 2 | 100 | **0** | `[0:100]` | 5,683.7 s | ⚠️ 90/100 — 10 × Cloudflare 524 |
+
+The 524s are the tunnel's ~100 s origin timeout. They drop the *slowest* requests, so the agent
+latency distributions are truncated on the right and read optimistically — the true avg and upper
+percentiles are higher than reported. Both chatbot points are clean.
+
 ## Driver logs
 
 | file | what it covers |
@@ -59,6 +76,7 @@ Every point directory contains the same ten files — see *Artifact layout* belo
 | `w0_agent_c2.log` | `agent_flat` `c2` — the point killed by the ngrok quota |
 | `cf_llama31_run.log` | both Cloudflare / Llama points |
 | `cf_llama31_chatbot_rep.log` | `chatbot_flat` c1 repeat on the second tunnel, cold cache |
+| `r100_run.log` | the four alternating 100-request points, with per-point start/end timestamps |
 
 ## Artifact layout
 
@@ -96,7 +114,16 @@ Both are `mooncake_trace` **`messages` mode** files carrying in-data `ignore_eos
 `coding_flat`, `rag` and `toolagent` were **never run**: their prompts exceed the 4096 context
 cap (see the feasibility table in `qwen3vl_ngrok/RESULTS.md`).
 
-## Code change
+For the 100-request series, `scripts/filter_le4096.py` produced context-filtered copies in
+`datasets/aiperf/le4096/`: `agent_flat` kept 279/384 entries (105 dropped), `chatbot_flat` kept
+all 384. Only the agent file is committed — the chatbot copy is byte-identical to the original.
+Filtering is tokenizer-dependent, so it must be regenerated for a different model.
+
+## Code changes
+
+`scripts/filter_le4096.py` — new. Drops flat-trace entries whose `ISL + OSL` exceeds a context
+limit, so a small-context endpoint stops returning HTTP 400 mid-run. Output feeds the runner via
+`DATA_DIR`.
 
 `scripts/run_nvfp4.sh` line ~101 — `WARMUP=0` now omits `--warmup-request-count` entirely
 instead of passing `0`, which aiperf rejects (`greater_than 0` validation). Without this fix
@@ -113,6 +140,10 @@ unchanged.
    coarse and fine versions of one.
 3. **Model A vs model B is not a tunnel A/B.** The tunnel and the model changed together.
    Isolating the tunnel's latency contribution still requires a `localhost` run on the box.
-4. **`total_token_throughput` ranks workloads misleadingly** when prefix-cache hit rates differ —
+4. **Filtered `agent_flat` is a different workload from unfiltered `agent_flat`.** Removing the
+   105 over-cap entries shifts the length distribution; the 100-request agent numbers are not
+   comparable with the 10- and 20-request ones. `chatbot_flat` lost no entries and stays
+   comparable across all request counts.
+5. **`total_token_throughput` ranks workloads misleadingly** when prefix-cache hit rates differ —
    `agent_flat` tops it while having the worst request throughput, because ~70 % of its prompt
    tokens are cache hits.
