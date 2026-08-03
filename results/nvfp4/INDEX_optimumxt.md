@@ -116,8 +116,9 @@ cap (see the feasibility table in `qwen3vl_ngrok/RESULTS.md`).
 
 For the 100-request series, `scripts/filter_le4096.py` produced context-filtered copies in
 `datasets/aiperf/le4096/`: `agent_flat` kept 279/384 entries (105 dropped), `chatbot_flat` kept
-all 384. Only the agent file is committed — the chatbot copy is byte-identical to the original.
-Filtering is tokenizer-dependent, so it must be regenerated for a different model.
+all 384. Both files are committed — the chatbot copy is byte-identical to the original, but must
+be present for `DATA_DIR=datasets/aiperf/le4096` to resolve. Filtering is tokenizer-dependent, so
+it must be regenerated for a different model.
 
 ## Code changes
 

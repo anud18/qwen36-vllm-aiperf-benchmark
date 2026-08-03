@@ -20,8 +20,11 @@ Entries whose `ISL + OSL` exceeds the 4096 context cap were removed, tokenising 
 tokenizer. Written to `datasets/aiperf/le4096/` by `scripts/filter_le4096.py`; the originals are
 untouched, and the run picked them up via `DATA_DIR`.
 
-Only the agent file is committed — `chatbot_flat` lost nothing, so its filtered copy is
-byte-identical to `datasets/aiperf/nvfp4_chatbot_flat.jsonl`. Regenerate it with:
+Both files are committed so `DATA_DIR=datasets/aiperf/le4096` works as-is. The chatbot copy is
+byte-identical to `datasets/aiperf/nvfp4_chatbot_flat.jsonl` — nothing was dropped — but it has to
+be present or the runner cannot resolve `nvfp4_chatbot_flat.jsonl` under that `DATA_DIR`.
+
+Regenerate with:
 
 ```bash
 python3 scripts/filter_le4096.py --tokenizer NousResearch/Meta-Llama-3.1-8B-Instruct
