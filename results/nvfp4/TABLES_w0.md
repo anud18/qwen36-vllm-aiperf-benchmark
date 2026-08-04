@@ -12,6 +12,9 @@ reported value exactly. They are shown as one row rather than duplicated.
 **p50 is the median** — one column, both labels.
 
 
+> **Metric formulas** — every aiperf field used here, verified against the raw per-request
+> records: [`SPARK_REPRO.md` § Metric definitions](SPARK_REPRO.md#metric-definitions).
+
 > **Reproduced locally.** Every point here was re-run on spark against a local vLLM at the same
 > 4096 context, with ISL matched exactly. See [`SPARK_REPRO.md`](SPARK_REPRO.md) — the endpoint's
 > prefill turns out to be 30–237× slower than the same model on the same box.

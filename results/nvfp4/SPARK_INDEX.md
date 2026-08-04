@@ -12,6 +12,9 @@ itself** (NVIDIA GB10, aarch64, 119 GB unified memory) against `vllm/vllm-openai
 | [`INDEX_optimumxt.md`](INDEX_optimumxt.md) | Index of the **endpoint-side** artifacts being reproduced, and which of those are invalid |
 | `SPARK_INDEX.md` | This file |
 
+Metric formulas for every aiperf field, verified against the raw per-request records:
+[`SPARK_REPRO.md` § Metric definitions](SPARK_REPRO.md#metric-definitions).
+
 ## Benchmark points
 
 ### Llama-3.1-8B-Instruct — `spark_repro_llama31/`

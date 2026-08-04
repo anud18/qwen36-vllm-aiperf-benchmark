@@ -89,20 +89,63 @@ ISL anyway — these datasets run with `--use-server-token-count`.
 
 **Result: ISL matches exactly on every model-matched pair below.**
 
+## Metric definitions
+
+Every number in this document is an aiperf field, not a derived quantity. The formulas below were
+verified against the raw per-request records in `profile_export.jsonl` — each matched to full
+float precision. Worked examples use **record 0 of
+[`spark_repro_llama31/w0_chatbot_c1/chatbot_flat/c1/`](spark_repro_llama31/w0_chatbot_c1/chatbot_flat/c1/)**:
+`ISL = 69`, `OSL = 252`, `TTFT = 79.13132 ms`, `request_latency = 18,200.474004 ms`.
+
+### Per-request metrics
+
+These come with `avg / p50 / p90 / p95 / p99 / min / max / std` in the tables.
+
+| field | formula | check |
+|---|---|---|
+| `request_latency` | `request_end_ns − request_start_ns`, in ms | 18,200.4740 = 18,200.4740 |
+| `time_to_first_token` | first streamed token − `request_start_ns`, in ms | — |
+| `inter_token_latency` (**ITL = TPOT**) | `(request_latency − TTFT) ÷ (OSL − 1)` | `(18,200.474 − 79.131) ÷ 251` = 72.196584 ✓ |
+| `time_to_second_token` | gap between the 1st and 2nd streamed token | — |
+| `prefill_throughput_per_user` | `ISL ÷ (TTFT ÷ 1000)` — tokens/sec/user | `69 ÷ 0.07913` = 871.9683 ✓ |
+| `output_token_throughput_per_user` (**decode**) | `1000 ÷ ITL`, identically `(OSL − 1) ÷ ((latency − TTFT) ÷ 1000)` | `1000 ÷ 72.196584` = 13.851071 ✓ |
+| `e2e_output_token_throughput` | `OSL ÷ (request_latency ÷ 1000)` — includes TTFT, so always ≤ decode | `252 ÷ 18.200474` = 13.845793 ✓ |
+| `input_sequence_length` (**ISL**) | server-reported `usage.prompt_tokens` (`--use-server-token-count`) | — |
+| `output_sequence_length` (**OSL**) | server-reported `usage.completion_tokens` | — |
+
+### Run-level metrics
+
+Single values per point — aiperf produces no percentiles for these.
+
+| field | formula | check |
+|---|---|---|
+| `benchmark_duration` | last `request_end_ns` − first `request_start_ns`, in s | 433.1123 = 433.1123 |
+| `request_throughput` | `request_count ÷ benchmark_duration` | `20 ÷ 433.1123` = 0.046177 ✓ |
+| `output_token_throughput` (**system**) | `total_osl ÷ benchmark_duration` | `5,970 ÷ 433.1123` = 13.783954 ✓ |
+| `total_token_throughput` | `(total_isl + total_osl) ÷ benchmark_duration` | `18,146 ÷ 433.1123` = 41.896754 ✓ |
+| `total_isl` / `total_osl` | sums of the per-request ISL / OSL | — |
+| `overall_usage_prompt_cache_read_pct` | `total_usage_prompt_cache_read_tokens ÷ total_usage_prompt_tokens` | — |
+| `osl_mismatch_count` | requests whose measured OSL ≠ the trace's `output_length` | — |
+
+### Two consequences worth stating
+
+**The `avg` of a per-request field is a mean of per-request values, not a ratio of totals.** For
+`prefill_throughput_per_user` the two differ noticeably — this point reports 7,475.84 tok/s/user as
+the mean of 20 per-request ratios, where `Σ ISL ÷ Σ TTFT` gives 7,673. The tables use aiperf's
+mean throughout; the distinction matters when a run mixes very short and very long prompts, which
+these traces do.
+
+**Per-user and system throughput move independently.** `prefill_throughput_per_user`,
+`output_token_throughput_per_user` and `e2e_output_token_throughput` describe one client's
+experience; only `output_token_throughput` is server-wide. Going c1 → c2 on Llama `r100 chatbot`,
+per-user decode rises slightly (13.76 → 14.57) while system output roughly doubles (13.74 →
+28.75) — batching working. On the endpoint the same step sends per-user decode from 14.86 to 6.62.
+
 ## Prefill and decode throughput
 
-Taken straight from aiperf's own metrics — no derived quantities:
-
-| reported as | aiperf field | unit |
-|---|---|---|
-| **Prefill throughput** | `prefill_throughput_per_user` | tokens/sec/user — ISL ÷ TTFT per request |
-| **Decode throughput** | `output_token_throughput_per_user` | tokens/sec/user — the reciprocal of ITL |
-| **E2E output throughput** | `e2e_output_token_throughput` | tokens/sec/user — OSL ÷ full request latency |
-| **System output throughput** | `output_token_throughput` | tokens/sec — total OSL ÷ wall clock |
-
-The first three are **per-user** rates: what one client experiences. Only
-`output_token_throughput` is system-wide, which is why at c2 a per-user figure can fall while the
-system figure rises. All four come with percentiles in the per-pair tables below.
+Prefill is `prefill_throughput_per_user`, decode is `output_token_throughput_per_user` — both
+per-user, both defined in *Metric definitions* above. `output_token_throughput` is the system-wide
+figure and is listed alongside.
 
 > **Prefill throughput is inflated by prefix-cache hits on the endpoint side.** Cached prefix
 > tokens count toward ISL but are never computed, so the endpoint's true prefill rate is *lower*

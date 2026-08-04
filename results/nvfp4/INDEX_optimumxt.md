@@ -29,6 +29,9 @@ Two models were measured on the same physical box through two different tunnels:
 | `INDEX_optimumxt.md` | This file |
 | [`SPARK_INDEX.md`](SPARK_INDEX.md) | Index of the spark reproduction artifacts — all 26 local points, scripts and datasets |
 
+Metric formulas for every aiperf field, verified against the raw per-request records:
+[`SPARK_REPRO.md` § Metric definitions](SPARK_REPRO.md#metric-definitions).
+
 ## Benchmark points
 
 Every point directory contains the same ten files — see *Artifact layout* below.
