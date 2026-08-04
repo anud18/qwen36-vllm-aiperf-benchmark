@@ -31,6 +31,9 @@ def rows_for(L,E,req):
      ("TTFT  avg (ms)",           n(g(L,'time_to_first_token'),1),      n(g(E,'time_to_first_token'),1),      ratio(g(L,'time_to_first_token'),g(E,'time_to_first_token'))),
      ("ITL = TPOT  avg (ms)",     n(g(L,'inter_token_latency')),        n(g(E,'inter_token_latency')),        ratio(g(L,'inter_token_latency'),g(E,'inter_token_latency'))),
      ("E2E latency  avg (ms)",    n(g(L,'request_latency'),1),          n(g(E,'request_latency'),1),          ratio(g(L,'request_latency'),g(E,'request_latency'))),
+     ("Prefill throughput (tok/s/user)", n(g(L,'prefill_throughput_per_user'),1), n(g(E,'prefill_throughput_per_user'),1), ratio(g(L,'prefill_throughput_per_user'),g(E,'prefill_throughput_per_user'),inv=True)),
+     ("Decode throughput (tok/s/user)",  n(g(L,'output_token_throughput_per_user')), n(g(E,'output_token_throughput_per_user')), ratio(g(L,'output_token_throughput_per_user'),g(E,'output_token_throughput_per_user'),inv=True)),
+     ("Output throughput, system (tok/s)", n(g(L,'output_token_throughput')), n(g(E,'output_token_throughput')), ratio(g(L,'output_token_throughput'),g(E,'output_token_throughput'),inv=True)),
      ("Request throughput (req/s)",n(g(L,'request_throughput'),4),      n(g(E,'request_throughput'),4),       ratio(g(L,'request_throughput'),g(E,'request_throughput'),inv=True)),
      ("ISL  avg / total (tokens)", f"{g(L,'input_sequence_length'):,.1f} / {g(L,'total_isl'):,.0f}",
                                    f"{g(E,'input_sequence_length'):,.1f} / {g(E,'total_isl'):,.0f}",
@@ -49,7 +52,7 @@ def add_table_slides(prs, blank, head, tb, rule):
         s=blank(); head(s,f"{mdl} · {name}","附錄：逐組對照")
         data=rows_for(L,E,req)
         rowsn=len(data)+1
-        shp=s.shapes.add_table(rowsn,4,Inches(0.9),Inches(2.1),Inches(11.5),Inches(0.42*rowsn))
+        shp=s.shapes.add_table(rowsn,4,Inches(0.9),Inches(2.0),Inches(11.5),Inches(0.365*rowsn))
         t=shp.table
         t.columns[0].width=Inches(4.0); t.columns[1].width=Inches(2.9)
         t.columns[2].width=Inches(2.9); t.columns[3].width=Inches(1.7)
@@ -65,12 +68,13 @@ def add_table_slides(prs, blank, head, tb, rule):
             for c,txt in enumerate(row):
                 cell=t.cell(i,c); cell.text=""
                 p=cell.text_frame.paragraphs[0]; r=p.add_run(); r.text=str(txt)
-                r.font.size=Pt(13); r.font.name=FONT; r.font.color.rgb=INK
+                r.font.size=Pt(12.5); r.font.name=FONT; r.font.color.rgb=INK
                 r.font.bold = (c==3 and txt not in ("","—"))
                 if c==3 and txt=="相同": r.font.color.rgb=RGBColor(0x1b,0xaf,0x7a)
                 p.alignment=PP_ALIGN.LEFT if c==0 else PP_ALIGN.RIGHT
                 cell.fill.solid(); cell.fill.fore_color.rgb=SURF
-        y=2.1+0.42*rowsn+0.25
+        y=2.0+0.365*rowsn+0.2
         tb(s,0.9,y,11.5,0.8,
            "ISL / OSL 兩列為 parity 檢查：同一組數據在兩邊逐 percentile 完全相同，代表比的是同一件事。\n"
-           "「端點 / 本機」欄位：延遲類為端點慢幾倍，吞吐類為端點剩幾成。",11,False,MUTED,space=3)
+           "「端點 / 本機」欄位：延遲類為端點慢幾倍，吞吐類為本機是端點的幾倍。\n"
+           "Prefill / Decode 為 per-user 速率；Output throughput, system 為伺服器整體輸出。",11,False,MUTED,space=3)
