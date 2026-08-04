@@ -1,0 +1,67 @@
+======== repro llama31 start 2026-08-04 04:33:02 ========
+### w2_chatbot_c1  chatbot_flat c1 reqs=10 warmup=2  start 2026-08-04 04:33:02
+================ RUN_NVFP4 node=spark_repro_llama31 start 2026-08-04 04:33:02 ================
+   [aiperf] chatbot_flat c1 (try 1, warmup=2, reqs=10, tlimit=9000s) 04:33:02
+================ RUN_NVFP4 node=spark_repro_llama31 DONE 2026-08-04 04:37:17 ================
+### w2_chatbot_c1  end 2026-08-04 04:37:17
+### w2_chatbot_c2  chatbot_flat c2 reqs=20 warmup=2  start 2026-08-04 04:37:17
+================ RUN_NVFP4 node=spark_repro_llama31 start 2026-08-04 04:37:17 ================
+   [aiperf] chatbot_flat c2 (try 1, warmup=2, reqs=20, tlimit=9000s) 04:37:17
+================ RUN_NVFP4 node=spark_repro_llama31 DONE 2026-08-04 04:41:32 ================
+### w2_chatbot_c2  end 2026-08-04 04:41:32
+### w2_chatbot_c1_rep  chatbot_flat c1 reqs=10 warmup=2  start 2026-08-04 04:41:32
+================ RUN_NVFP4 node=spark_repro_llama31 start 2026-08-04 04:41:32 ================
+   [aiperf] chatbot_flat c1 (try 1, warmup=2, reqs=10, tlimit=9000s) 04:41:32
+================ RUN_NVFP4 node=spark_repro_llama31 DONE 2026-08-04 04:45:47 ================
+### w2_chatbot_c1_rep  end 2026-08-04 04:45:47
+### w2_agent_c1  agent_flat c1 reqs=10 warmup=2  start 2026-08-04 04:45:47
+================ RUN_NVFP4 node=spark_repro_llama31 start 2026-08-04 04:45:47 ================
+   [aiperf] agent_flat c1 (try 1, warmup=2, reqs=10, tlimit=9000s) 04:45:47
+================ RUN_NVFP4 node=spark_repro_llama31 DONE 2026-08-04 04:49:32 ================
+### w2_agent_c1  end 2026-08-04 04:49:32
+### w0_chatbot_c1  chatbot_flat c1 reqs=20 warmup=0  start 2026-08-04 04:49:32
+================ RUN_NVFP4 node=spark_repro_llama31 start 2026-08-04 04:49:32 ================
+   [aiperf] chatbot_flat c1 (try 1, warmup=0, reqs=20, tlimit=9000s) 04:49:33
+================ RUN_NVFP4 node=spark_repro_llama31 DONE 2026-08-04 04:57:03 ================
+### w0_chatbot_c1  end 2026-08-04 04:57:03
+### w0_agent_c1  agent_flat c1 reqs=20 warmup=0  start 2026-08-04 04:57:03
+================ RUN_NVFP4 node=spark_repro_llama31 start 2026-08-04 04:57:03 ================
+   [aiperf] agent_flat c1 (try 1, warmup=0, reqs=20, tlimit=9000s) 04:57:03
+================ RUN_NVFP4 node=spark_repro_llama31 DONE 2026-08-04 05:03:03 ================
+### w0_agent_c1  end 2026-08-04 05:03:03
+### w0_chatbot_c1_rep  chatbot_flat c1 reqs=20 warmup=0  start 2026-08-04 05:03:03
+================ RUN_NVFP4 node=spark_repro_llama31 start 2026-08-04 05:03:03 ================
+   [aiperf] chatbot_flat c1 (try 1, warmup=0, reqs=20, tlimit=9000s) 05:03:03
+================ RUN_NVFP4 node=spark_repro_llama31 DONE 2026-08-04 05:10:33 ================
+### w0_chatbot_c1_rep  end 2026-08-04 05:10:33
+### w0_agent_c2  agent_flat c2 reqs=20 warmup=0  start 2026-08-04 05:10:33
+================ RUN_NVFP4 node=spark_repro_llama31 start 2026-08-04 05:10:33 ================
+   [aiperf] agent_flat c2 (try 1, warmup=0, reqs=20, tlimit=9000s) 05:10:33
+================ RUN_NVFP4 node=spark_repro_llama31 DONE 2026-08-04 05:13:33 ================
+### w0_agent_c2  end 2026-08-04 05:13:33
+### r100_chatbot_c1  chatbot_flat c1 reqs=100 warmup=0  start 2026-08-04 05:13:33
+================ RUN_NVFP4 node=spark_repro_llama31 start 2026-08-04 05:13:33 ================
+   [aiperf] chatbot_flat c1 (try 1, warmup=0, reqs=100, tlimit=9000s) 05:13:33
+================ RUN_NVFP4 node=spark_repro_llama31 DONE 2026-08-04 05:43:48 ================
+### r100_chatbot_c1  end 2026-08-04 05:43:48
+### r100_agent_c1  agent_flat c1 reqs=100 warmup=0  start 2026-08-04 05:43:48
+================ RUN_NVFP4 node=spark_repro_llama31 start 2026-08-04 05:43:48 ================
+   [aiperf] agent_flat c1 (try 1, warmup=0, reqs=100, tlimit=9000s) 05:43:48
+================ RUN_NVFP4 node=spark_repro_llama31 DONE 2026-08-04 06:11:19 ================
+### r100_agent_c1  end 2026-08-04 06:11:19
+### r100_chatbot_c2  chatbot_flat c2 reqs=100 warmup=0  start 2026-08-04 06:11:19
+================ RUN_NVFP4 node=spark_repro_llama31 start 2026-08-04 06:11:19 ================
+   [aiperf] chatbot_flat c2 (try 1, warmup=0, reqs=100, tlimit=9000s) 06:11:19
+================ RUN_NVFP4 node=spark_repro_llama31 DONE 2026-08-04 06:25:49 ================
+### r100_chatbot_c2  end 2026-08-04 06:25:49
+### r100_agent_c2  agent_flat c2 reqs=100 warmup=0  start 2026-08-04 06:25:49
+================ RUN_NVFP4 node=spark_repro_llama31 start 2026-08-04 06:25:49 ================
+   [aiperf] agent_flat c2 (try 1, warmup=0, reqs=100, tlimit=9000s) 06:25:49
+================ RUN_NVFP4 node=spark_repro_llama31 DONE 2026-08-04 06:39:04 ================
+### r100_agent_c2  end 2026-08-04 06:39:04
+### c32_chatbot  chatbot_flat c32 reqs=320 warmup=16  start 2026-08-04 06:39:04
+================ RUN_NVFP4 node=spark_repro_llama31 start 2026-08-04 06:39:04 ================
+   [aiperf] chatbot_flat c32 (try 1, warmup=16, reqs=320, tlimit=9000s) 06:39:04
+================ RUN_NVFP4 node=spark_repro_llama31 DONE 2026-08-04 06:43:34 ================
+### c32_chatbot  end 2026-08-04 06:43:34
+======== repro llama31 DONE 2026-08-04 06:43:34 ========
