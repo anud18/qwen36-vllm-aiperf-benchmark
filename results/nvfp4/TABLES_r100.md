@@ -14,6 +14,11 @@ agent c2 — so no round is preceded by the same workload.
 > with a provably empty KV cache reported the identical cache-read total. Alternating costs
 > nothing, so it was done as asked, but it does not change the numbers.
 
+
+> **Reproduced locally.** Every point here was re-run on spark against a local vLLM at the same
+> 4096 context, with ISL matched exactly. See [`SPARK_REPRO.md`](SPARK_REPRO.md) — the endpoint's
+> prefill turns out to be 30–237× slower than the same model on the same box.
+
 ## Filtered datasets
 
 Entries whose `ISL + OSL` exceeds the 4096 context cap were removed, tokenising with the Llama 3.1

@@ -12,6 +12,11 @@ Two models were measured on the same physical box through two different tunnels:
 | B | `Llama-3.1-8B-Instruct-optimumxt` | Cloudflare — `athens-move-ted-convertible.trycloudflare.com` | **dead** — trycloudflare quick tunnels are ephemeral, DNS record gone |
 | B′ | `Llama-3.1-8B-Instruct-optimumxt` | Cloudflare — `arena-iii-chains-rings.trycloudflare.com` | same model and box, worker restarted (port 38103 → 42471) |
 
+
+> **Reproduced locally.** Every point here was re-run on spark against a local vLLM at the same
+> 4096 context, with ISL matched exactly. See [`SPARK_REPRO.md`](SPARK_REPRO.md) — the endpoint's
+> prefill turns out to be 30–237× slower than the same model on the same box.
+
 ## Reports (start here)
 
 | file | contents |
@@ -20,6 +25,7 @@ Two models were measured on the same physical box through two different tunnels:
 | `TABLES_w0.md` | Result tables for the `WARMUP=0 / REQS=20 / c1` series on model A (TTFT, ITL=TPOT, E2E, ISL, OSL, req/s, token throughput; avg / p50 / p90 / p95 / p99 / min / max / std) |
 | `TABLES_llama31_cf.md` | Same tables for model B, plus the cross-model comparison at identical settings |
 | `TABLES_r100.md` | 100-request series on model B — chatbot and agent at c1 and c2, run alternating, on context-filtered datasets |
+| [`SPARK_REPRO.md`](SPARK_REPRO.md) | Local reproduction of all these points on spark against vLLM, with endpoint and spark figures side by side |
 | `INDEX_optimumxt.md` | This file |
 
 ## Benchmark points

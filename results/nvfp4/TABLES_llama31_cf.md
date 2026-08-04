@@ -26,6 +26,11 @@ Validity: all points completed **20 / 20** requests, **0 errors**, `osl_mismatch
 (`arena-iii-chains-rings.trycloudflare.com`) **after the worker was restarted** — the Dynamo
 instance moved from port 38103 to 42471, so its KV cache started empty. See *Repeatability*.
 
+
+> **Reproduced locally.** Every point here was re-run on spark against a local vLLM at the same
+> 4096 context, with ISL matched exactly. See [`SPARK_REPRO.md`](SPARK_REPRO.md) — the endpoint's
+> prefill turns out to be 30–237× slower than the same model on the same box.
+
 ## Distribution metrics
 
 | workload | point | metric | avg | p50 (median) | p90 | p95 | p99 | min | max | std |
