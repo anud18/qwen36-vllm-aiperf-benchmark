@@ -155,4 +155,7 @@ tb(s,0.9,2.05,11.5,3.4,
 from endpoint_tables import add_endpoint_slides
 add_endpoint_slides(prs, blank, head, tb, rule)
 
+from endpoint_c1c2 import add_c1c2_slides
+add_c1c2_slides(prs, blank, head, tb, rule)
+
 prs.save(OUT); print("saved", OUT, len(prs.slides.__iter__.__self__._sldIdLst), "slides")
