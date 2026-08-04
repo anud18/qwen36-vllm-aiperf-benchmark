@@ -13,46 +13,50 @@ def add_c1c2_slides(prs, blank, head, tb, rule):
     B=json.load(open("results/nvfp4/r100_chatbot_flat_c2/chatbot_flat/c2/profile_export_aiperf.json"))
     s=blank(); head(s,"Dynamo 端點：併發 1 vs 併發 2","附錄：端點自身的併發比較　·　Llama-3.1-8B · chatbot_flat · 100 請求")
     def n(v,d=2): return f"{v:,.{d}f}"
-    def rat(a,b,inv=False):   # always c2 / c1 -- inv kept for call-site compatibility
+    def rat(a,b,inv=False):   # always c2 / c1
         return f"{b/a:.2f}×"
-    rows=[
-     ("TTFT avg (ms)",           n(g(A,'time_to_first_token'),1), n(g(B,'time_to_first_token'),1), rat(g(A,'time_to_first_token'),g(B,'time_to_first_token'))),
-     ("ITL = TPOT avg (ms)",     n(g(A,'inter_token_latency')),   n(g(B,'inter_token_latency')),   rat(g(A,'inter_token_latency'),g(B,'inter_token_latency'))),
-     ("E2E latency avg (ms)",    n(g(A,'request_latency'),1),     n(g(B,'request_latency'),1),     rat(g(A,'request_latency'),g(B,'request_latency'))),
-     ("Prefill throughput (tok/s/user)", n(g(A,'prefill_throughput_per_user'),1), n(g(B,'prefill_throughput_per_user'),1), rat(g(A,'prefill_throughput_per_user'),g(B,'prefill_throughput_per_user'),True)),
-     ("Decode throughput (tok/s/user)",  n(g(A,'output_token_throughput_per_user')), n(g(B,'output_token_throughput_per_user')), rat(g(A,'output_token_throughput_per_user'),g(B,'output_token_throughput_per_user'),True)),
-     ("Output throughput, system (tok/s)", n(g(A,'output_token_throughput')), n(g(B,'output_token_throughput')), rat(g(A,'output_token_throughput'),g(B,'output_token_throughput'),True)),
-     ("Request throughput (req/s)", n(g(A,'request_throughput'),4), n(g(B,'request_throughput'),4), rat(g(A,'request_throughput'),g(B,'request_throughput'),True)),
-     ("Benchmark duration (s)",  n(g(A,'benchmark_duration'),1),  n(g(B,'benchmark_duration'),1),  rat(g(A,'benchmark_duration'),g(B,'benchmark_duration'))),
-     ("Prefix cache 命中率 (%)", n(g(A,'overall_usage_prompt_cache_read_pct')), n(g(B,'overall_usage_prompt_cache_read_pct')), ""),
-     ("ISL total (tokens)",      f"{g(A,'total_isl'):,.0f}",      f"{g(B,'total_isl'):,.0f}",      "相同"),
-     ("OSL total (tokens)",      f"{g(A,'total_osl'):,.0f}",      f"{g(B,'total_osl'):,.0f}",      "相同"),
-     ("Successful requests",     f"{g(A,'request_count'):.0f} / 100", f"{g(B,'request_count'):.0f} / 100", ""),
+    def mk(lbl,d,key,nd):
+        a,b=g(A,key),g(B,key); r=b/a
+        worse=(r>1.02) if d=="↓" else ((r<0.98) if d=="↑" else False)
+        return (f"{d} {lbl}", n(a,nd), n(b,nd), (f"{r:.3f}×" if r<0.1 else f"{r:.2f}×"), worse)
+    rows=[mk("TTFT avg (ms)","↓","time_to_first_token",1),
+     mk("ITL = TPOT avg (ms)","↓","inter_token_latency",2),
+     mk("E2E latency avg (ms)","↓","request_latency",1),
+     mk("Prefill throughput (tok/s/user)","↑","prefill_throughput_per_user",1),
+     mk("Decode throughput (tok/s/user)","↑","output_token_throughput_per_user",2),
+     mk("Output throughput, system (tok/s)","↑","output_token_throughput",2),
+     mk("Request throughput (req/s)","↑","request_throughput",4),
+     mk("Benchmark duration (s)","↓","benchmark_duration",1),
+     mk("Prefix cache 命中率 (%)","↑","overall_usage_prompt_cache_read_pct",2),
+     ("ISL total (tokens)",      f"{g(A,'total_isl'):,.0f}",      f"{g(B,'total_isl'):,.0f}",      "相同", False),
+     ("OSL total (tokens)",      f"{g(A,'total_osl'):,.0f}",      f"{g(B,'total_osl'):,.0f}",      "相同", False),
+     ("Successful requests",     f"{g(A,'request_count'):.0f} / 100", f"{g(B,'request_count'):.0f} / 100", "", False),
     ]
     nrow=len(rows)+1
     t=s.shapes.add_table(nrow,4,Inches(0.9),Inches(1.9),Inches(11.5),Inches(0.325*nrow)).table
     t.columns[0].width=Inches(4.3); t.columns[1].width=Inches(2.5)
     t.columns[2].width=Inches(2.5); t.columns[3].width=Inches(2.2)
-    for c,txt in enumerate(["指標","併發 1","併發 2","c2 相對 c1"]):
+    for c,txt in enumerate(["指標　（↓ 越小越好　↑ 越大越好）","併發 1","併發 2","c2 ÷ c1"]):
         cell=t.cell(0,c); cell.text=""
         p=cell.text_frame.paragraphs[0]; r=p.add_run(); r.text=txt
         r.font.size=Pt(12.5); r.font.bold=True; r.font.name=FONT; r.font.color.rgb=ENDPT if c in (1,2) else INK
         p.alignment=PP_ALIGN.LEFT if c==0 else PP_ALIGN.RIGHT
         cell.fill.solid(); cell.fill.fore_color.rgb=HEADBG
-    for i,row in enumerate(rows,start=1):
-        for c,txt in enumerate(row):
+    for i,rw in enumerate(rows,start=1):
+        worse=rw[4]
+        for c,txt in enumerate(rw[:4]):
             cell=t.cell(i,c); cell.text=""
             p=cell.text_frame.paragraphs[0]; r=p.add_run(); r.text=str(txt)
             r.font.size=Pt(12.5); r.font.name=FONT; r.font.color.rgb=INK
             r.font.bold=(c==3 and txt not in ("",))
-            if c==3 and txt=="相同": r.font.color.rgb=GOOD
+            if c==3 and txt not in ("",): r.font.color.rgb = WARN if worse else GOOD
             p.alignment=PP_ALIGN.LEFT if c==0 else PP_ALIGN.RIGHT
             cell.fill.solid(); cell.fill.fore_color.rgb=SURF
     y=1.9+0.325*nrow+0.18
     tb(s,0.9,y,11.5,0.5,
        "總工作量固定 100 個請求，併發加倍後端點卻多花 13.6% 的時間才跑完 —— 加大併發是負效益。",13,True,INK)
     tb(s,0.9,y+0.34,11.5,0.4,
-       "比值欄一律為 c2 ÷ c1：延遲類 > 1 代表變慢，吞吐類 < 1 代表變差。",11,False,MUTED)
+       "比值欄一律為 c2 ÷ c1。紅色 = 併發加倍後變差，綠色 = 持平或變好；方向由指標本身決定。",11,False,MUTED)
     tb(s,0.9,y+0.7,11.5,0.8,
        "機制在 decode：ITL 67.4 → 181.7 ms（+170%），per-user decode 掉到 6.62 tok/s，系統輸出從 8.97 降到 7.89。\n"
        "同一組測試在 spark 本機是加速 2.09×、系統輸出 13.74 → 28.75 tok/s（見第 5 頁）。",11.5,False,MUTED,space=3)

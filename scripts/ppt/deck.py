@@ -137,6 +137,9 @@ tb(s,0.9,6.2,11.5,0.9,"完整報告：results/nvfp4/SPARK_REPRO.md　·　資料
 
 # 10..21  per-pair comparison tables
 import sys; sys.path.insert(0,"scripts/ppt")
+from glossary import add_glossary_slides
+add_glossary_slides(prs, blank, head, tb, rule)
+
 from tables import add_table_slides
 add_table_slides(prs, blank, head, tb, rule)
 
