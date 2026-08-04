@@ -135,4 +135,24 @@ tb(s,7.0,2.55,5.4,3.2,
 rule(s,0.9,5.95,11.5)
 tb(s,0.9,6.2,11.5,0.9,"完整報告：results/nvfp4/SPARK_REPRO.md　·　資料集說明：DATASETS_optimumxt.md　·　檔案索引：SPARK_INDEX.md",12,False,MUTED)
 
-prs.save(OUT); print("saved", OUT)
+# 10..21  per-pair comparison tables
+import sys; sys.path.insert(0,"scripts/ppt")
+from tables import add_table_slides
+add_table_slides(prs, blank, head, tb, rule)
+
+# 22  spark points without an endpoint counterpart
+s=blank(); head(s,"附錄：無端點對照的 spark 測試點","逐組對照")
+tb(s,0.9,2.05,11.5,3.4,
+ "以下 spark 點沒有可比的端點數據，因此不出現在前面的對照表：\n\n"
+ "•  Llama 的 w2 系列 4 個點 —— 端點從未跑過這組設定。\n"
+ "•  w0 agent c2（兩個模型）—— 端點該點 20 筆中有 6 筆撞上 ngrok 流量配額。\n"
+ "•  r100 agent c1 / c2（兩個模型）—— 端點分別遺失 3 筆與 10 筆（Cloudflare 逾時）。\n"
+ "    逾時砍掉的是最慢的請求，會讓端點數字看起來偏好，不能採用。\n"
+ "•  r100 chatbot / agent（Qwen）—— 100 請求系列只對 Llama 端點跑過。\n"
+ "•  c32（兩個模型）—— 端點該點 worker 卡死，未產出任何結果。\n\n"
+ "這些點在 spark 上全部完成、0 錯誤，數據見 results/nvfp4/SPARK_INDEX.md。",14,False,INK,space=7)
+
+from endpoint_tables import add_endpoint_slides
+add_endpoint_slides(prs, blank, head, tb, rule)
+
+prs.save(OUT); print("saved", OUT, len(prs.slides.__iter__.__self__._sldIdLst), "slides")
