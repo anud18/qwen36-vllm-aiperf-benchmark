@@ -98,7 +98,11 @@ run_point() {  # workload point dtype file  extra-args...
       # fixed-schedule: replay ALL entries at trace timing; no request-count/warmup
       args+=("${loadargs[@]}")
     else
-      args+=(--request-count "$REQS" --warmup-request-count "$wu" "${loadargs[@]}")
+      # WARMUP=0 means "no warmup phase": aiperf rejects --warmup-request-count 0
+      # (must be > 0), the flag has to be omitted entirely instead.
+      args+=(--request-count "$REQS")
+      [ "$wu" -gt 0 ] && args+=(--warmup-request-count "$wu")
+      args+=("${loadargs[@]}")
     fi
     if [ "$wl" = chatbot ]; then args+=(--public-dataset sharegpt --extra-inputs "$THINKOFF")
     elif [ "$wl" = toolagent ]; then args+=(--input-file "$file" --custom-dataset-type "$dtype" --extra-inputs "$THINKOFF")

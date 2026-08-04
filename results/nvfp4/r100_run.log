@@ -1,0 +1,21 @@
+### chatbot_flat c1  start 2026-07-30 03:23:03
+================ RUN_NVFP4 node=llama31_cf start 2026-07-30 03:23:03 ================
+   [aiperf] chatbot_flat c1 (try 1, warmup=0, reqs=100, tlimit=9000s) 03:23:04
+================ RUN_NVFP4 node=llama31_cf DONE 2026-07-30 04:09:19 ================
+### chatbot_flat c1  end   2026-07-30 04:09:19
+### agent_flat c1  start 2026-07-30 04:09:19
+================ RUN_NVFP4 node=llama31_cf start 2026-07-30 04:09:19 ================
+   [aiperf] agent_flat c1 (try 1, warmup=0, reqs=100, tlimit=9000s) 04:09:20
+================ RUN_NVFP4 node=llama31_cf DONE 2026-07-30 05:18:05 ================
+### agent_flat c1  end   2026-07-30 05:18:05
+### chatbot_flat c2  start 2026-07-30 05:18:05
+================ RUN_NVFP4 node=llama31_cf start 2026-07-30 05:18:05 ================
+   [aiperf] chatbot_flat c2 (try 1, warmup=0, reqs=100, tlimit=9000s) 05:18:05
+================ RUN_NVFP4 node=llama31_cf DONE 2026-07-30 06:10:36 ================
+### chatbot_flat c2  end   2026-07-30 06:10:36
+### agent_flat c2  start 2026-07-30 06:10:36
+================ RUN_NVFP4 node=llama31_cf start 2026-07-30 06:10:36 ================
+   [aiperf] agent_flat c2 (try 1, warmup=0, reqs=100, tlimit=9000s) 06:10:36
+================ RUN_NVFP4 node=llama31_cf DONE 2026-07-30 07:45:37 ================
+### agent_flat c2  end   2026-07-30 07:45:37
+### ALL DONE 2026-07-30 07:45:37

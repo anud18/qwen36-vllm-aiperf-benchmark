@@ -1,0 +1,730 @@
+{
+  "schema_version": "1.3",
+  "aiperf_version": "0.10.0",
+  "benchmark_id": "c0e1a21b210b",
+  "request_throughput": {
+    "unit": "requests/sec",
+    "avg": 0.023628898378146534
+  },
+  "request_latency": {
+    "unit": "ms",
+    "avg": 38451.123911659786,
+    "p1": 13702.90392912,
+    "p5": 15188.3921056,
+    "p10": 16182.7441738,
+    "p25": 21244.746325,
+    "p50": 30749.056632,
+    "p75": 45145.272098999994,
+    "p90": 72552.06718880002,
+    "p95": 88281.0308223999,
+    "p99": 116602.65472111996,
+    "min": 13619.284188,
+    "max": 120922.16589199999,
+    "std": 24059.89447432562,
+    "count": 97,
+    "sum": 3729759.0194309996
+  },
+  "request_count": {
+    "unit": "requests",
+    "avg": 97.0
+  },
+  "time_to_first_token": {
+    "unit": "ms",
+    "avg": 23615.898239041235,
+    "p1": 5662.22495716,
+    "p5": 7883.960221400001,
+    "p10": 8942.0584456,
+    "p25": 11341.235515,
+    "p50": 16205.076336,
+    "p75": 25424.872173,
+    "p90": 49218.559381600004,
+    "p95": 71024.09096499988,
+    "p99": 111973.83643027997,
+    "min": 3129.855577,
+    "max": 114246.438461,
+    "std": 21021.59156441049,
+    "count": 97,
+    "sum": 2290742.129187
+  },
+  "time_to_second_token": {
+    "unit": "ms",
+    "avg": 53.750581185567015,
+    "p1": 5.4590305599999995,
+    "p5": 6.2399844,
+    "p10": 7.2342938,
+    "p25": 55.833506,
+    "p50": 57.371502,
+    "p75": 59.893375,
+    "p90": 66.166249,
+    "p95": 76.7744083999996,
+    "p99": 109.20801723999996,
+    "min": 5.110924,
+    "max": 112.707751,
+    "std": 22.503755653469163,
+    "count": 97,
+    "sum": 5213.806375
+  },
+  "inter_token_latency": {
+    "unit": "ms",
+    "avg": 70.03097642761479,
+    "p1": 65.77654415979592,
+    "p5": 66.41404684581283,
+    "p10": 67.16372018925324,
+    "p25": 68.2208855614035,
+    "p50": 69.66823783333332,
+    "p75": 71.89835891578947,
+    "p90": 73.67545241349764,
+    "p95": 74.18455757324261,
+    "p99": 74.98762209976593,
+    "min": 65.02182524489795,
+    "max": 75.45477997058823,
+    "std": 2.3545161851630105,
+    "count": 97,
+    "sum": 6793.004713478637
+  },
+  "output_token_throughput": {
+    "unit": "tokens/sec",
+    "avg": 5.015416378429474
+  },
+  "output_token_throughput_per_user": {
+    "unit": "tokens/sec/user",
+    "avg": 14.295421955329909,
+    "p1": 13.33555564910713,
+    "p5": 13.479904773573763,
+    "p10": 13.573050887328552,
+    "p25": 13.908523297051104,
+    "p50": 14.353743270962166,
+    "p75": 14.658267651772576,
+    "p90": 14.888990859515028,
+    "p95": 15.057092500095786,
+    "p99": 15.203072148356476,
+    "min": 13.252970857377003,
+    "max": 15.379451380111272,
+    "std": 0.4770430608452581,
+    "count": 97,
+    "sum": 1386.6559296670007
+  },
+  "output_sequence_length": {
+    "unit": "tokens",
+    "avg": 212.2577319587629,
+    "p1": 48.36,
+    "p5": 80.0,
+    "p10": 88.80000000000001,
+    "p25": 114.0,
+    "p50": 171.0,
+    "p75": 291.0,
+    "p90": 395.4000000000002,
+    "p95": 436.0,
+    "p99": 524.9999999999989,
+    "min": 33.0,
+    "max": 669.0,
+    "std": 123.77792537989492,
+    "count": 97,
+    "sum": 20589.0
+  },
+  "input_sequence_length": {
+    "unit": "tokens",
+    "avg": 1601.0618556701031,
+    "p1": 408.88,
+    "p5": 501.8,
+    "p10": 683.4,
+    "p25": 1020.0,
+    "p50": 1448.0,
+    "p75": 2190.0,
+    "p90": 2733.4000000000005,
+    "p95": 2904.199999999999,
+    "p99": 3092.039999999998,
+    "min": 406.0,
+    "max": 3309.0,
+    "std": 749.5943069686799,
+    "count": 97,
+    "sum": 155303.0
+  },
+  "output_token_count": {
+    "unit": "tokens",
+    "avg": 212.2577319587629,
+    "p1": 48.36,
+    "p5": 80.0,
+    "p10": 88.80000000000001,
+    "p25": 114.0,
+    "p50": 171.0,
+    "p75": 291.0,
+    "p90": 395.4000000000002,
+    "p95": 436.0,
+    "p99": 524.9999999999989,
+    "min": 33.0,
+    "max": 669.0,
+    "std": 123.77792537989492,
+    "count": 97,
+    "sum": 20589.0
+  },
+  "inter_chunk_latency": {
+    "unit": "ms",
+    "avg": 70.90499582379897,
+    "p1": 21.068792512272726,
+    "p5": 62.444141263018196,
+    "p10": 64.85912981060928,
+    "p25": 67.0767451830778,
+    "p50": 69.78531664095186,
+    "p75": 72.85298898791355,
+    "p90": 78.21615524446639,
+    "p95": 82.91137831323019,
+    "p99": 122.65533209038462,
+    "min": 0.0,
+    "max": 278.149963,
+    "std": 13.733914345593476,
+    "count": 20295,
+    "sum": 1439016.890244
+  },
+  "total_output_tokens": {
+    "unit": "tokens",
+    "avg": 20589.0
+  },
+  "benchmark_duration": {
+    "unit": "sec",
+    "avg": 4105.142713285
+  },
+  "total_isl": {
+    "unit": "tokens",
+    "avg": 155303.0
+  },
+  "total_osl": {
+    "unit": "tokens",
+    "avg": 20589.0
+  },
+  "error_request_count": {
+    "unit": "requests",
+    "avg": 3.0
+  },
+  "telemetry_data": {
+    "summary": {
+      "endpoints_configured": [],
+      "endpoints_successful": [],
+      "start_time": "2026-07-29T20:09:24.310397",
+      "end_time": "2026-07-29T21:17:51.465136"
+    },
+    "endpoints": {},
+    "error_summary": []
+  },
+  "input_config": {
+    "models": {
+      "items": [
+        {
+          "name": "Llama-3.1-8B-Instruct-optimumxt"
+        }
+      ]
+    },
+    "endpoint": {
+      "urls": [
+        "https://arena-iii-chains-rings.trycloudflare.com"
+      ],
+      "type": "chat",
+      "streaming": true,
+      "use_server_token_count": true
+    },
+    "datasets": [
+      {
+        "name": "main",
+        "type": "file",
+        "path": "datasets/aiperf/le4096/nvfp4_agent_flat.jsonl",
+        "format": "mooncake_trace",
+        "entries": 100,
+        "random_seed": 42
+      }
+    ],
+    "phases": [
+      {
+        "name": "profiling",
+        "type": "concurrency",
+        "requests": 100,
+        "concurrency": 1
+      }
+    ],
+    "artifacts": {
+      "dir": "/work/results/nvfp4/r100_agent_flat_c1/agent_flat/c1",
+      "records": [
+        "jsonl"
+      ],
+      "auto_plot": false,
+      "plot_required": false
+    },
+    "tokenizer": {
+      "name": "NousResearch/Meta-Llama-3.1-8B-Instruct"
+    },
+    "gpu_telemetry": {
+      "enabled": true
+    },
+    "server_metrics": {
+      "enabled": true,
+      "urls": [],
+      "formats": [
+        "json",
+        "csv"
+      ]
+    },
+    "otel": {},
+    "mlflow": {},
+    "runtime": {
+      "ui": "none"
+    }
+  },
+  "run_info": {
+    "benchmark_id": "c0e1a21b210b",
+    "random_seed": 42,
+    "trial": 0,
+    "cli_command": "aiperf profile --model 'Llama-3.1-8B-Instruct-optimumxt' --url 'https://arena-iii-chains-rings.trycloudflare.com' --endpoint-type 'chat' --streaming --tokenizer 'NousResearch/Meta-Llama-3.1-8B-Instruct' --artifact-dir 'results/nvfp4/r100_agent_flat_c1/agent_flat/c1' --random-seed 42 --request-count 100 --concurrency 1 --input-file 'datasets/aiperf/le4096/nvfp4_agent_flat.jsonl' --custom-dataset-type 'mooncake_trace' --use-server-token-count"
+  },
+  "was_cancelled": false,
+  "error_summary": [
+    {
+      "error_details": {
+        "code": 524,
+        "type": "<none>",
+        "message": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\" lang=\"en-US\"> <!--<![endif]-->\n<head>\n\n<title>trycloudflare.com | 524: A timeout occurred</title>\n<meta charset=\"UTF-8\" />\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\" />\n<meta name=\"robots\" content=\"noindex, nofollow\" />\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" />\n<link rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/main.css\" />\n</head>\n<body>\n<div id=\"cf-wrapper\">\n    <div id=\"cf-error-details\" class=\"p-0\">\n        <header class=\"mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-8\">\n            <h1 class=\"inline-block sm:block sm:mb-2 font-light text-60 lg:text-4xl text-black-dark leading-tight mr-2\">\n                <span class=\"inline-block\">A timeout occurred</span>\n                <span class=\"code-label\">Error code 524</span>\n            </h1>\n            <div>\n                Visit <a href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&utm_campaign=arena-iii-chains-rings.trycloudflare.com\" target=\"_blank\" rel=\"noopener noreferrer\">cloudflare.com</a> for more information.\n            </div>\n            <div class=\"mt-3\">2026-07-29 20:34:03 UTC</div>\n        </header>\n        <div class=\"my-8 bg-gradient-gray\">\n            <div class=\"w-240 lg:w-full mx-auto\">\n                <div class=\"clearfix md:px-8\">\n                    <div id=\"cf-browser-status\" class=\" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center\">\n  <div class=\"relative mb-10 md:m-0\">\n    \n    <span class=\"cf-icon-browser block md:hidden h-20 bg-center bg-no-repeat\"></span>\n    <span class=\"cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4\"></span>\n    \n  </div>\n  <span class=\"md:block w-full truncate\">You</span>\n  <h3 class=\"md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3\">\n  \n    Browser\n  \n  </h3>\n  \n  <span class=\"leading-1.3 text-2xl text-green-success\">Working</span>\n  \n</div>\n                    <div id=\"cf-cloudflare-status\" class=\" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center\">\n  <div class=\"relative mb-10 md:m-0\">\n    <a href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&#38;utm_campaign=arena-iii-chains-rings.trycloudflare.com\" target=\"_blank\" rel=\"noopener noreferrer\">\n    <span class=\"cf-icon-cloud block md:hidden h-20 bg-center bg-no-repeat\"></span>\n    <span class=\"cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4\"></span>\n    </a>\n  </div>\n  <span class=\"md:block w-full truncate\">Taipei</span>\n  <h3 class=\"md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3\">\n  <a href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&utm_campaign=arena-iii-chains-rings.trycloudflare.com\" target=\"_blank\" rel=\"noopener noreferrer\">\n    Cloudflare\n  </a>\n  </h3>\n  \n  <span class=\"leading-1.3 text-2xl text-green-success\">Working</span>\n  \n</div>\n                    <div id=\"cf-host-status\" class=\"cf-error-source relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center\">\n  <div class=\"relative mb-10 md:m-0\">\n    \n    <span class=\"cf-icon-server block md:hidden h-20 bg-center bg-no-repeat\"></span>\n    <span class=\"cf-icon-error w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4\"></span>\n    \n  </div>\n  <span class=\"md:block w-full truncate\">arena-iii-chains-rings.trycloudflare.com</span>\n  <h3 class=\"md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3\">\n  \n    Host\n  \n  </h3>\n  \n  <span class=\"leading-1.3 text-2xl text-red-error\">Error</span>\n  \n</div>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"w-240 lg:w-full mx-auto mb-8 lg:px-8\">\n            <div class=\"clearfix\">\n                <div class=\"w-1/2 md:w-full float-left pr-6 md:pb-10 md:pr-0 leading-relaxed\">\n                    <h2 class=\"text-3xl font-normal leading-1.3 mb-4\">What happened?</h2>\n                    <p class=\"mb-2\">The origin web server timed out responding to this request.</p><p>The likely cause is an overloaded background task, database or application, stressing the resources on the host web server.</p>\n                </div>\n                <div class=\"w-1/2 md:w-full float-left leading-relaxed\">\n                    <h2 class=\"text-3xl font-normal leading-1.3 mb-4\">What can I do?</h2>\n                    \n              <h3 class=\"text-15 font-semibold mb-2\">If you're a visitor of this website:</h3>\n              <p class=\"mb-6\">Please try again in a few minutes.</p>\n\n              <h3 class=\"text-15 font-semibold mb-2\">If you're the owner of this website:</h3>\n              <p>Please refer to the <a rel=\"noopener noreferrer\" href=\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-5xx-errors/error-524/\">Error 524</a> article:</p>\n              <ul class=\"ml-4\">\n                <li>Contact your hosting provider; check for long-running processes or an overloaded web server.</li>\n                <li>Use status polling of large HTTP processes to avoid this error.</li>\n                <li>Run the long-running scripts on a <a rel=\"noopener noreferrer\" href=\"https://developers.cloudflare.com/dns/proxy-status/#dns-only-records\">grey-clouded subdomain</a>.</li>\n                <li>Enterprise customers can <a rel=\"noopener noreferrer\" href=\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-5xx-errors/error-524/#resolution-on-cloudflare\">increase the timeout setting</a> globally or for specific requests using Cache Rules.</li>\n              </ul>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300\">\n    <p class=\"text-13\">\n      <span class=\"cf-footer-item sm:block sm:mb-1\">Cloudflare Ray ID: <strong class=\"font-semibold\">a22ee3e89abf6b69</strong></span>\n      <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n      <span id=\"cf-footer-item-ip\" class=\"cf-footer-item hidden sm:block sm:mb-1\">\n        Your IP:\n        <button type=\"button\" id=\"cf-footer-ip-reveal\" class=\"cf-footer-ip-reveal-btn\">Click to reveal</button>\n        <span class=\"hidden\" id=\"cf-footer-ip\">140.113.86.239</span>\n        <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n      </span>\n      <span class=\"cf-footer-item sm:block sm:mb-1\"><span>Performance &amp; security by</span> <a rel=\"noopener noreferrer\" href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&#38;utm_campaign=arena-iii-chains-rings.trycloudflare.com\" id=\"brand_link\" target=\"_blank\">Cloudflare</a></span>\n      \n    </p>\n    <script>(function(){function d(){var b=a.getElementById(\"cf-footer-item-ip\"),c=a.getElementById(\"cf-footer-ip-reveal\");b&&\"classList\"in b&&(b.classList.remove(\"hidden\"),c.addEventListener(\"click\",function(){c.classList.add(\"hidden\");a.getElementById(\"cf-footer-ip\").classList.remove(\"hidden\")}))}var a=document;document.addEventListener&&a.addEventListener(\"DOMContentLoaded\",d)})();</script>\n  </div><!-- /.error-footer -->\n\n    </div>\n</div>\n</body>\n</html>"
+      },
+      "count": 1
+    },
+    {
+      "error_details": {
+        "code": 524,
+        "type": "<none>",
+        "message": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\" lang=\"en-US\"> <!--<![endif]-->\n<head>\n\n<title>trycloudflare.com | 524: A timeout occurred</title>\n<meta charset=\"UTF-8\" />\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\" />\n<meta name=\"robots\" content=\"noindex, nofollow\" />\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" />\n<link rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/main.css\" />\n</head>\n<body>\n<div id=\"cf-wrapper\">\n    <div id=\"cf-error-details\" class=\"p-0\">\n        <header class=\"mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-8\">\n            <h1 class=\"inline-block sm:block sm:mb-2 font-light text-60 lg:text-4xl text-black-dark leading-tight mr-2\">\n                <span class=\"inline-block\">A timeout occurred</span>\n                <span class=\"code-label\">Error code 524</span>\n            </h1>\n            <div>\n                Visit <a href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&utm_campaign=arena-iii-chains-rings.trycloudflare.com\" target=\"_blank\" rel=\"noopener noreferrer\">cloudflare.com</a> for more information.\n            </div>\n            <div class=\"mt-3\">2026-07-29 20:36:08 UTC</div>\n        </header>\n        <div class=\"my-8 bg-gradient-gray\">\n            <div class=\"w-240 lg:w-full mx-auto\">\n                <div class=\"clearfix md:px-8\">\n                    <div id=\"cf-browser-status\" class=\" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center\">\n  <div class=\"relative mb-10 md:m-0\">\n    \n    <span class=\"cf-icon-browser block md:hidden h-20 bg-center bg-no-repeat\"></span>\n    <span class=\"cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4\"></span>\n    \n  </div>\n  <span class=\"md:block w-full truncate\">You</span>\n  <h3 class=\"md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3\">\n  \n    Browser\n  \n  </h3>\n  \n  <span class=\"leading-1.3 text-2xl text-green-success\">Working</span>\n  \n</div>\n                    <div id=\"cf-cloudflare-status\" class=\" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center\">\n  <div class=\"relative mb-10 md:m-0\">\n    <a href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&#38;utm_campaign=arena-iii-chains-rings.trycloudflare.com\" target=\"_blank\" rel=\"noopener noreferrer\">\n    <span class=\"cf-icon-cloud block md:hidden h-20 bg-center bg-no-repeat\"></span>\n    <span class=\"cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4\"></span>\n    </a>\n  </div>\n  <span class=\"md:block w-full truncate\">Taipei</span>\n  <h3 class=\"md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3\">\n  <a href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&utm_campaign=arena-iii-chains-rings.trycloudflare.com\" target=\"_blank\" rel=\"noopener noreferrer\">\n    Cloudflare\n  </a>\n  </h3>\n  \n  <span class=\"leading-1.3 text-2xl text-green-success\">Working</span>\n  \n</div>\n                    <div id=\"cf-host-status\" class=\"cf-error-source relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center\">\n  <div class=\"relative mb-10 md:m-0\">\n    \n    <span class=\"cf-icon-server block md:hidden h-20 bg-center bg-no-repeat\"></span>\n    <span class=\"cf-icon-error w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4\"></span>\n    \n  </div>\n  <span class=\"md:block w-full truncate\">arena-iii-chains-rings.trycloudflare.com</span>\n  <h3 class=\"md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3\">\n  \n    Host\n  \n  </h3>\n  \n  <span class=\"leading-1.3 text-2xl text-red-error\">Error</span>\n  \n</div>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"w-240 lg:w-full mx-auto mb-8 lg:px-8\">\n            <div class=\"clearfix\">\n                <div class=\"w-1/2 md:w-full float-left pr-6 md:pb-10 md:pr-0 leading-relaxed\">\n                    <h2 class=\"text-3xl font-normal leading-1.3 mb-4\">What happened?</h2>\n                    <p class=\"mb-2\">The origin web server timed out responding to this request.</p><p>The likely cause is an overloaded background task, database or application, stressing the resources on the host web server.</p>\n                </div>\n                <div class=\"w-1/2 md:w-full float-left leading-relaxed\">\n                    <h2 class=\"text-3xl font-normal leading-1.3 mb-4\">What can I do?</h2>\n                    \n              <h3 class=\"text-15 font-semibold mb-2\">If you're a visitor of this website:</h3>\n              <p class=\"mb-6\">Please try again in a few minutes.</p>\n\n              <h3 class=\"text-15 font-semibold mb-2\">If you're the owner of this website:</h3>\n              <p>Please refer to the <a rel=\"noopener noreferrer\" href=\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-5xx-errors/error-524/\">Error 524</a> article:</p>\n              <ul class=\"ml-4\">\n                <li>Contact your hosting provider; check for long-running processes or an overloaded web server.</li>\n                <li>Use status polling of large HTTP processes to avoid this error.</li>\n                <li>Run the long-running scripts on a <a rel=\"noopener noreferrer\" href=\"https://developers.cloudflare.com/dns/proxy-status/#dns-only-records\">grey-clouded subdomain</a>.</li>\n                <li>Enterprise customers can <a rel=\"noopener noreferrer\" href=\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-5xx-errors/error-524/#resolution-on-cloudflare\">increase the timeout setting</a> globally or for specific requests using Cache Rules.</li>\n              </ul>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300\">\n    <p class=\"text-13\">\n      <span class=\"cf-footer-item sm:block sm:mb-1\">Cloudflare Ray ID: <strong class=\"font-semibold\">a22ee6f5fa6e6b69</strong></span>\n      <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n      <span id=\"cf-footer-item-ip\" class=\"cf-footer-item hidden sm:block sm:mb-1\">\n        Your IP:\n        <button type=\"button\" id=\"cf-footer-ip-reveal\" class=\"cf-footer-ip-reveal-btn\">Click to reveal</button>\n        <span class=\"hidden\" id=\"cf-footer-ip\">140.113.86.239</span>\n        <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n      </span>\n      <span class=\"cf-footer-item sm:block sm:mb-1\"><span>Performance &amp; security by</span> <a rel=\"noopener noreferrer\" href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&#38;utm_campaign=arena-iii-chains-rings.trycloudflare.com\" id=\"brand_link\" target=\"_blank\">Cloudflare</a></span>\n      \n    </p>\n    <script>(function(){function d(){var b=a.getElementById(\"cf-footer-item-ip\"),c=a.getElementById(\"cf-footer-ip-reveal\");b&&\"classList\"in b&&(b.classList.remove(\"hidden\"),c.addEventListener(\"click\",function(){c.classList.add(\"hidden\");a.getElementById(\"cf-footer-ip\").classList.remove(\"hidden\")}))}var a=document;document.addEventListener&&a.addEventListener(\"DOMContentLoaded\",d)})();</script>\n  </div><!-- /.error-footer -->\n\n    </div>\n</div>\n</body>\n</html>"
+      },
+      "count": 1
+    },
+    {
+      "error_details": {
+        "code": 524,
+        "type": "<none>",
+        "message": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\" lang=\"en-US\"> <!--<![endif]-->\n<head>\n\n<title>trycloudflare.com | 524: A timeout occurred</title>\n<meta charset=\"UTF-8\" />\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\" />\n<meta name=\"robots\" content=\"noindex, nofollow\" />\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" />\n<link rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/main.css\" />\n</head>\n<body>\n<div id=\"cf-wrapper\">\n    <div id=\"cf-error-details\" class=\"p-0\">\n        <header class=\"mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-8\">\n            <h1 class=\"inline-block sm:block sm:mb-2 font-light text-60 lg:text-4xl text-black-dark leading-tight mr-2\">\n                <span class=\"inline-block\">A timeout occurred</span>\n                <span class=\"code-label\">Error code 524</span>\n            </h1>\n            <div>\n                Visit <a href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&utm_campaign=arena-iii-chains-rings.trycloudflare.com\" target=\"_blank\" rel=\"noopener noreferrer\">cloudflare.com</a> for more information.\n            </div>\n            <div class=\"mt-3\">2026-07-29 20:47:19 UTC</div>\n        </header>\n        <div class=\"my-8 bg-gradient-gray\">\n            <div class=\"w-240 lg:w-full mx-auto\">\n                <div class=\"clearfix md:px-8\">\n                    <div id=\"cf-browser-status\" class=\" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center\">\n  <div class=\"relative mb-10 md:m-0\">\n    \n    <span class=\"cf-icon-browser block md:hidden h-20 bg-center bg-no-repeat\"></span>\n    <span class=\"cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4\"></span>\n    \n  </div>\n  <span class=\"md:block w-full truncate\">You</span>\n  <h3 class=\"md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3\">\n  \n    Browser\n  \n  </h3>\n  \n  <span class=\"leading-1.3 text-2xl text-green-success\">Working</span>\n  \n</div>\n                    <div id=\"cf-cloudflare-status\" class=\" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center\">\n  <div class=\"relative mb-10 md:m-0\">\n    <a href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&#38;utm_campaign=arena-iii-chains-rings.trycloudflare.com\" target=\"_blank\" rel=\"noopener noreferrer\">\n    <span class=\"cf-icon-cloud block md:hidden h-20 bg-center bg-no-repeat\"></span>\n    <span class=\"cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4\"></span>\n    </a>\n  </div>\n  <span class=\"md:block w-full truncate\">Taipei</span>\n  <h3 class=\"md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3\">\n  <a href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&utm_campaign=arena-iii-chains-rings.trycloudflare.com\" target=\"_blank\" rel=\"noopener noreferrer\">\n    Cloudflare\n  </a>\n  </h3>\n  \n  <span class=\"leading-1.3 text-2xl text-green-success\">Working</span>\n  \n</div>\n                    <div id=\"cf-host-status\" class=\"cf-error-source relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center\">\n  <div class=\"relative mb-10 md:m-0\">\n    \n    <span class=\"cf-icon-server block md:hidden h-20 bg-center bg-no-repeat\"></span>\n    <span class=\"cf-icon-error w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4\"></span>\n    \n  </div>\n  <span class=\"md:block w-full truncate\">arena-iii-chains-rings.trycloudflare.com</span>\n  <h3 class=\"md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3\">\n  \n    Host\n  \n  </h3>\n  \n  <span class=\"leading-1.3 text-2xl text-red-error\">Error</span>\n  \n</div>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"w-240 lg:w-full mx-auto mb-8 lg:px-8\">\n            <div class=\"clearfix\">\n                <div class=\"w-1/2 md:w-full float-left pr-6 md:pb-10 md:pr-0 leading-relaxed\">\n                    <h2 class=\"text-3xl font-normal leading-1.3 mb-4\">What happened?</h2>\n                    <p class=\"mb-2\">The origin web server timed out responding to this request.</p><p>The likely cause is an overloaded background task, database or application, stressing the resources on the host web server.</p>\n                </div>\n                <div class=\"w-1/2 md:w-full float-left leading-relaxed\">\n                    <h2 class=\"text-3xl font-normal leading-1.3 mb-4\">What can I do?</h2>\n                    \n              <h3 class=\"text-15 font-semibold mb-2\">If you're a visitor of this website:</h3>\n              <p class=\"mb-6\">Please try again in a few minutes.</p>\n\n              <h3 class=\"text-15 font-semibold mb-2\">If you're the owner of this website:</h3>\n              <p>Please refer to the <a rel=\"noopener noreferrer\" href=\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-5xx-errors/error-524/\">Error 524</a> article:</p>\n              <ul class=\"ml-4\">\n                <li>Contact your hosting provider; check for long-running processes or an overloaded web server.</li>\n                <li>Use status polling of large HTTP processes to avoid this error.</li>\n                <li>Run the long-running scripts on a <a rel=\"noopener noreferrer\" href=\"https://developers.cloudflare.com/dns/proxy-status/#dns-only-records\">grey-clouded subdomain</a>.</li>\n                <li>Enterprise customers can <a rel=\"noopener noreferrer\" href=\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-5xx-errors/error-524/#resolution-on-cloudflare\">increase the timeout setting</a> globally or for specific requests using Cache Rules.</li>\n              </ul>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300\">\n    <p class=\"text-13\">\n      <span class=\"cf-footer-item sm:block sm:mb-1\">Cloudflare Ray ID: <strong class=\"font-semibold\">a22ef754e9666b69</strong></span>\n      <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n      <span id=\"cf-footer-item-ip\" class=\"cf-footer-item hidden sm:block sm:mb-1\">\n        Your IP:\n        <button type=\"button\" id=\"cf-footer-ip-reveal\" class=\"cf-footer-ip-reveal-btn\">Click to reveal</button>\n        <span class=\"hidden\" id=\"cf-footer-ip\">140.113.86.239</span>\n        <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n      </span>\n      <span class=\"cf-footer-item sm:block sm:mb-1\"><span>Performance &amp; security by</span> <a rel=\"noopener noreferrer\" href=\"https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&#38;utm_campaign=arena-iii-chains-rings.trycloudflare.com\" id=\"brand_link\" target=\"_blank\">Cloudflare</a></span>\n      \n    </p>\n    <script>(function(){function d(){var b=a.getElementById(\"cf-footer-item-ip\"),c=a.getElementById(\"cf-footer-ip-reveal\");b&&\"classList\"in b&&(b.classList.remove(\"hidden\"),c.addEventListener(\"click\",function(){c.classList.add(\"hidden\");a.getElementById(\"cf-footer-ip\").classList.remove(\"hidden\")}))}var a=document;document.addEventListener&&a.addEventListener(\"DOMContentLoaded\",d)})();</script>\n  </div><!-- /.error-footer -->\n\n    </div>\n</div>\n</body>\n</html>"
+      },
+      "count": 1
+    }
+  ],
+  "start_time": "2026-07-29T20:09:24.310397",
+  "end_time": "2026-07-29T21:17:49.456581",
+  "http_req_chunks_received": {
+    "unit": "count",
+    "avg": 217.0721649484536,
+    "p1": 49.4,
+    "p5": 82.8,
+    "p10": 90.4,
+    "p25": 117.0,
+    "p50": 178.0,
+    "p75": 298.0,
+    "p90": 405.6000000000002,
+    "p95": 444.59999999999997,
+    "p99": 536.8399999999988,
+    "min": 35.0,
+    "max": 677.0,
+    "std": 125.90269908775205,
+    "count": 97,
+    "sum": 21056.0
+  },
+  "http_req_receiving": {
+    "unit": "ms",
+    "avg": 14836.056037195876,
+    "p1": 3284.7181357599998,
+    "p5": 5504.2501528,
+    "p10": 6112.9715628,
+    "p25": 8212.983221,
+    "p50": 11956.843687999999,
+    "p75": 20156.873387,
+    "p90": 28997.869839200004,
+    "p95": 31430.944450599996,
+    "p99": 37277.66545675993,
+    "min": 2106.304834,
+    "max": 45575.463371,
+    "std": 8799.546285922672,
+    "count": 97,
+    "sum": 1439097.435608
+  },
+  "usage_prompt_cache_read_tokens": {
+    "unit": "tokens",
+    "avg": 1157.8969072164948,
+    "p1": 42.48,
+    "p5": 43.0,
+    "p10": 43.0,
+    "p25": 497.0,
+    "p50": 1031.0,
+    "p75": 1699.0,
+    "p90": 2372.6000000000004,
+    "p95": 2549.3999999999996,
+    "p99": 2890.0399999999986,
+    "min": 30.0,
+    "max": 3035.0,
+    "std": 831.0420670501161,
+    "count": 97,
+    "sum": 112316.0
+  },
+  "http_req_connecting": {
+    "unit": "ms",
+    "avg": 0.1456768969072165,
+    "p1": 0.0,
+    "p5": 0.0,
+    "p10": 0.0,
+    "p25": 0.0,
+    "p50": 0.0,
+    "p75": 0.0,
+    "p90": 0.0,
+    "p95": 0.0,
+    "p99": 0.5652263599998875,
+    "min": 0.0,
+    "max": 14.130659,
+    "std": 1.4273362589388376,
+    "count": 97,
+    "sum": 14.130659
+  },
+  "http_req_blocked": {
+    "unit": "ms",
+    "avg": 0.0,
+    "p1": 0.0,
+    "p5": 0.0,
+    "p10": 0.0,
+    "p25": 0.0,
+    "p50": 0.0,
+    "p75": 0.0,
+    "p90": 0.0,
+    "p95": 0.0,
+    "p99": 0.0,
+    "min": 0.0,
+    "max": 0.0,
+    "std": 0.0,
+    "count": 97,
+    "sum": 0.0
+  },
+  "http_req_dns_lookup": {
+    "unit": "ms",
+    "avg": 0.016410546391752576,
+    "p1": 0.0,
+    "p5": 0.0,
+    "p10": 0.0,
+    "p25": 0.0,
+    "p50": 0.0,
+    "p75": 0.0,
+    "p90": 0.0,
+    "p95": 0.0,
+    "p99": 0.06367291999998732,
+    "min": 0.0,
+    "max": 1.591823,
+    "std": 0.16078986024026176,
+    "count": 97,
+    "sum": 1.591823
+  },
+  "usage_prompt_tokens": {
+    "unit": "tokens",
+    "avg": 1601.0618556701031,
+    "p1": 408.88,
+    "p5": 501.8,
+    "p10": 683.4,
+    "p25": 1020.0,
+    "p50": 1448.0,
+    "p75": 2190.0,
+    "p90": 2733.4000000000005,
+    "p95": 2904.199999999999,
+    "p99": 3092.039999999998,
+    "min": 406.0,
+    "max": 3309.0,
+    "std": 749.5943069686799,
+    "count": 97,
+    "sum": 155303.0
+  },
+  "http_req_duration": {
+    "unit": "ms",
+    "avg": 38451.90068507216,
+    "p1": 13702.876616799998,
+    "p5": 15188.5543466,
+    "p10": 16183.7001334,
+    "p25": 21245.276468,
+    "p50": 30749.380532,
+    "p75": 45145.630002,
+    "p90": 72552.81281700001,
+    "p95": 88282.28542379991,
+    "p99": 116603.33946767995,
+    "min": 13619.981931999999,
+    "max": 120923.206116,
+    "std": 24059.848760368437,
+    "count": 97,
+    "sum": 3729834.3664519996
+  },
+  "http_req_sending": {
+    "unit": "ms",
+    "avg": 0.2695558556701031,
+    "p1": 0.08056132,
+    "p5": 0.0828208,
+    "p10": 0.0859626,
+    "p25": 0.123122,
+    "p50": 0.12795099999999998,
+    "p75": 0.132304,
+    "p90": 0.1397716,
+    "p95": 0.14460159999999997,
+    "p99": 0.7293735599998856,
+    "min": 0.078289,
+    "max": 14.531619,
+    "std": 1.4557526005952646,
+    "count": 97,
+    "sum": 26.146918
+  },
+  "http_req_waiting": {
+    "unit": "ms",
+    "avg": 23615.575092020616,
+    "p1": 5662.03407956,
+    "p5": 7883.8214174,
+    "p10": 8941.878157399999,
+    "p25": 11341.108443,
+    "p50": 16204.944558,
+    "p75": 25424.691899999998,
+    "p90": 49218.40846400001,
+    "p95": 71023.91597739987,
+    "p99": 111973.70816207999,
+    "min": 3129.666365,
+    "max": 114246.309948,
+    "std": 21021.38806656805,
+    "count": 97,
+    "sum": 2290710.783926
+  },
+  "usage_completion_tokens": {
+    "unit": "tokens",
+    "avg": 212.2577319587629,
+    "p1": 48.36,
+    "p5": 80.0,
+    "p10": 88.80000000000001,
+    "p25": 114.0,
+    "p50": 171.0,
+    "p75": 291.0,
+    "p90": 395.4000000000002,
+    "p95": 436.0,
+    "p99": 524.9999999999989,
+    "min": 33.0,
+    "max": 669.0,
+    "std": 123.77792537989492,
+    "count": 97,
+    "sum": 20589.0
+  },
+  "http_req_chunks_sent": {
+    "unit": "count",
+    "avg": 1.0,
+    "p1": 1.0,
+    "p5": 1.0,
+    "p10": 1.0,
+    "p25": 1.0,
+    "p50": 1.0,
+    "p75": 1.0,
+    "p90": 1.0,
+    "p95": 1.0,
+    "p99": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "std": 0.0,
+    "count": 97,
+    "sum": 97.0
+  },
+  "usage_total_tokens": {
+    "unit": "tokens",
+    "avg": 1813.319587628866,
+    "p1": 589.56,
+    "p5": 747.8000000000001,
+    "p10": 844.4000000000001,
+    "p25": 1221.0,
+    "p50": 1660.0,
+    "p75": 2381.0,
+    "p90": 2883.4,
+    "p95": 3007.5999999999985,
+    "p99": 3432.3999999999996,
+    "min": 579.0,
+    "max": 3466.0,
+    "std": 763.0630021737575,
+    "count": 97,
+    "sum": 175892.0
+  },
+  "time_to_first_output_token": {
+    "unit": "ms",
+    "avg": 23615.898239041235,
+    "p1": 5662.22495716,
+    "p5": 7883.960221400001,
+    "p10": 8942.0584456,
+    "p25": 11341.235515,
+    "p50": 16205.076336,
+    "p75": 25424.872173,
+    "p90": 49218.559381600004,
+    "p95": 71024.09096499988,
+    "p99": 111973.83643027997,
+    "min": 3129.855577,
+    "max": 114246.438461,
+    "std": 21021.59156441049,
+    "count": 97,
+    "sum": 2290742.129187
+  },
+  "http_req_data_sent": {
+    "unit": "KB",
+    "avg": 6.620801788015464,
+    "p1": 1.7017578125,
+    "p5": 2.1966796875,
+    "p10": 3.0400390625,
+    "p25": 4.201171875,
+    "p50": 6.1171875,
+    "p75": 8.755859375,
+    "p90": 10.777734375,
+    "p95": 11.577734375,
+    "p99": 12.815078124999994,
+    "min": 1.6923828125,
+    "max": 13.462890625,
+    "std": 2.888447005504279,
+    "count": 97,
+    "sum": 642.2177734375
+  },
+  "http_req_data_received": {
+    "unit": "KB",
+    "avg": 67.92609334729381,
+    "p1": 16.005078125,
+    "p5": 26.0599609375,
+    "p10": 28.797460937500002,
+    "p25": 36.76953125,
+    "p50": 54.6826171875,
+    "p75": 92.7978515625,
+    "p90": 126.02714843750006,
+    "p95": 138.76679687499998,
+    "p99": 166.73949218749962,
+    "min": 11.181640625,
+    "max": 212.5888671875,
+    "std": 39.22257306330753,
+    "count": 97,
+    "sum": 6588.8310546875
+  },
+  "http_req_connection_reused": {
+    "unit": "ratio",
+    "avg": 0.9896907216494846,
+    "p1": 0.96,
+    "p5": 1.0,
+    "p10": 1.0,
+    "p25": 1.0,
+    "p50": 1.0,
+    "p75": 1.0,
+    "p90": 1.0,
+    "p95": 1.0,
+    "p99": 1.0,
+    "min": 0.0,
+    "max": 1.0,
+    "std": 0.10100988630033722,
+    "count": 97,
+    "sum": 96.0
+  },
+  "http_req_connection_overhead": {
+    "unit": "ms",
+    "avg": 0.16208744329896907,
+    "p1": 0.0,
+    "p5": 0.0,
+    "p10": 0.0,
+    "p25": 0.0,
+    "p50": 0.0,
+    "p75": 0.0,
+    "p90": 0.0,
+    "p95": 0.0,
+    "p99": 0.6288992799998748,
+    "min": 0.0,
+    "max": 15.722482,
+    "std": 1.5881261191790985,
+    "count": 97,
+    "sum": 15.722482
+  },
+  "http_req_total": {
+    "unit": "ms",
+    "avg": 38452.06277251546,
+    "p1": 13702.876616799998,
+    "p5": 15188.5543466,
+    "p10": 16183.7001334,
+    "p25": 21245.276468,
+    "p50": 30749.380532,
+    "p75": 45145.630002,
+    "p90": 72552.81281700001,
+    "p95": 88282.28542379991,
+    "p99": 116603.33946767995,
+    "min": 13619.981931999999,
+    "max": 120923.206116,
+    "std": 24060.095840944487,
+    "count": 97,
+    "sum": 3729850.0889339997
+  },
+  "prefill_throughput_per_user": {
+    "unit": "tokens/sec/user",
+    "avg": 105.31521426959385,
+    "p1": 19.431088680758954,
+    "p5": 20.250334691977642,
+    "p10": 21.029740308146106,
+    "p25": 45.88064293437917,
+    "p50": 87.56353538192062,
+    "p75": 139.3960115210096,
+    "p90": 219.1243619528466,
+    "p95": 280.8878404871858,
+    "p99": 328.7075180506349,
+    "min": 17.31622409034117,
+    "max": 349.73813090907095,
+    "std": 79.5986525698998,
+    "count": 97,
+    "sum": 10215.575784150606
+  },
+  "e2e_output_token_throughput": {
+    "unit": "tokens/sec/user",
+    "avg": 6.059125803028689,
+    "p1": 0.7791551829601557,
+    "p5": 2.166936113469898,
+    "p10": 3.1051029264936387,
+    "p25": 4.771631946586731,
+    "p50": 6.1866628093321525,
+    "p75": 7.430502644944112,
+    "p90": 8.658864275303715,
+    "p95": 9.402137376929764,
+    "p99": 11.013419787009683,
+    "min": 0.4253009103717342,
+    "max": 12.073942816773641,
+    "std": 2.1882998037166708,
+    "count": 97,
+    "sum": 587.735202893783
+  },
+  "osl_mismatch_diff_pct": {
+    "unit": "%",
+    "avg": 0.0,
+    "p1": 0.0,
+    "p5": 0.0,
+    "p10": 0.0,
+    "p25": 0.0,
+    "p50": 0.0,
+    "p75": 0.0,
+    "p90": 0.0,
+    "p95": 0.0,
+    "p99": 0.0,
+    "min": 0.0,
+    "max": 0.0,
+    "std": 0.0,
+    "count": 97,
+    "sum": 0.0
+  },
+  "osl_mismatch_count": {
+    "unit": "requests",
+    "avg": 0.0
+  },
+  "total_usage_prompt_cache_read_tokens": {
+    "unit": "tokens",
+    "avg": 112316.0
+  },
+  "total_usage_completion_tokens": {
+    "unit": "tokens",
+    "avg": 20589.0
+  },
+  "total_usage_prompt_tokens": {
+    "unit": "tokens",
+    "avg": 155303.0
+  },
+  "total_usage_total_tokens": {
+    "unit": "tokens",
+    "avg": 175892.0
+  },
+  "overall_usage_prompt_cache_read_pct": {
+    "unit": "%",
+    "avg": 72.32056045279228
+  },
+  "total_token_throughput": {
+    "unit": "tokens/sec",
+    "avg": 42.84674426318505
+  }
+}
