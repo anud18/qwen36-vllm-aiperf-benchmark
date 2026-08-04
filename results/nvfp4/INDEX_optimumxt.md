@@ -27,10 +27,14 @@ Two models were measured on the same physical box through two different tunnels:
 | [`TABLES_r100.md`](TABLES_r100.md) | 100-request series on model B — chatbot and agent at c1 and c2, run alternating, on context-filtered datasets |
 | [`SPARK_REPRO.md`](SPARK_REPRO.md) | Local reproduction of all these points on spark against vLLM, with endpoint and spark figures side by side |
 | `INDEX_optimumxt.md` | This file |
+| [`DATASETS_optimumxt.md`](DATASETS_optimumxt.md) | Dataset description — format, real content, session structure, ISL/OSL per tokenizer and slice, prefix-cache rate theory vs measured |
 | [`SPARK_INDEX.md`](SPARK_INDEX.md) | Index of the spark reproduction artifacts — all 26 local points, scripts and datasets |
 
 Metric formulas for every aiperf field, verified against the raw per-request records:
 [`SPARK_REPRO.md` § Metric definitions](SPARK_REPRO.md#metric-definitions).
+
+Dataset contents, ISL/OSL distributions and prefix-cache characteristics:
+[`DATASETS_optimumxt.md`](DATASETS_optimumxt.md).
 
 ## Benchmark points
 

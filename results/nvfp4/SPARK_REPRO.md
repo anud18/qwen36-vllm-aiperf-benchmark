@@ -26,6 +26,7 @@ artifacts committed earlier on this branch. Their full context, methodology and 
 | [`qwen3vl_ngrok/RESULTS.md`](qwen3vl_ngrok/RESULTS.md) | narrative report for the Qwen endpoint — config, repeatability, prefix-cache analysis, workload feasibility at 4096 |
 | [`TABLES_w0.md`](TABLES_w0.md) | Qwen endpoint, `WARMUP=0 / REQS=20 / c1` tables |
 | [`TABLES_llama31_cf.md`](TABLES_llama31_cf.md) | Llama endpoint tables + the cold-cache repeatability evidence |
+| [`DATASETS_optimumxt.md`](DATASETS_optimumxt.md) | What the datasets contain — format, session structure, ISL/OSL per tokenizer, per-slice figures, and where the prefix-cache rate comes from |
 | [`TABLES_r100.md`](TABLES_r100.md) | Llama endpoint, 100-request alternating series on context-filtered datasets |
 
 Per-point endpoint artifacts are linked inline from each comparison block below.

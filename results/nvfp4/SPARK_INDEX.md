@@ -15,6 +15,9 @@ itself** (NVIDIA GB10, aarch64, 119 GB unified memory) against `vllm/vllm-openai
 Metric formulas for every aiperf field, verified against the raw per-request records:
 [`SPARK_REPRO.md` § Metric definitions](SPARK_REPRO.md#metric-definitions).
 
+Dataset contents, ISL/OSL distributions and prefix-cache characteristics:
+[`DATASETS_optimumxt.md`](DATASETS_optimumxt.md).
+
 ## Benchmark points
 
 ### Llama-3.1-8B-Instruct — `spark_repro_llama31/`
