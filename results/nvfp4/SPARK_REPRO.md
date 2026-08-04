@@ -91,22 +91,40 @@ ISL anyway — these datasets run with `--use-server-token-count`.
 
 ## Prefill and decode throughput
 
-Two figures, both computed from the per-request records in `profile_export.jsonl` rather than
-taken from a single summary field, so the same definition applies to endpoint and spark alike:
+aiperf already reports both, per request with percentiles:
+
+| aiperf field | meaning |
+|---|---|
+| `prefill_throughput_per_user` | ISL ÷ TTFT per request — prefill throughput |
+| `output_token_throughput_per_user` | 1000 ÷ ITL per request — decode throughput |
+| `output_token_throughput` | total OSL ÷ wall clock — **system** output throughput |
+
+Those are the primary numbers in the per-pair tables below. `scripts/throughput_split.py`
+additionally computes a **weighted** variant straight from `profile_export.jsonl`:
 
 | | definition |
 |---|---|
-| **Prefill throughput, per stream** | `Σ ISL ÷ Σ TTFT` — input tokens per second of time-to-first-token |
-| **Decode throughput, per stream** | `Σ (OSL − 1) ÷ Σ (latency − TTFT)` — output tokens per second of decode time |
+| **Prefill throughput, weighted** | `Σ ISL ÷ Σ TTFT` — total input tokens per total time-to-first-token |
+| **Decode throughput, weighted** | `Σ (OSL − 1) ÷ Σ (latency − TTFT)` |
 
-Both are **per-stream** rates, weighted across requests. They are *not* system throughput: summing
-each request's decode time counts the same wall clock once per concurrent stream, so at c2 these
-figures describe what one client experiences, not what the server delivers in total. For
-system-level output the tables carry aiperf's `output_token_throughput` (total OSL ÷ wall clock)
-separately — at c32 on Llama that is 346 tok/s against a 12.1 tok/s per-stream rate.
+**Decode: the two agree to within 0.2 %**, so aiperf's field is used throughout and the weighted
+variant adds nothing.
 
-The tables also carry aiperf's own per-request `prefill_throughput_per_user` (ISL ÷ TTFT) with
-percentiles, for distribution shape.
+**Prefill: they differ by −16 % to +52 %, in both directions.** aiperf takes the unweighted mean of
+per-request ISL÷TTFT ratios; the weighted form is total work over total time. With ISL spanning
+13 to 3,300 tokens these diverge — a 13-token prompt with a 0.5 s TTFT scores terribly and yet
+carries the same weight as a 1,639-token one in an unweighted mean. Which is right depends on the
+question: weighted for "how fast does this server chew through input", unweighted for "what does a
+typical request see". Both are given below; the endpoint-vs-spark ratio is 30–237× either way.
+
+**All of these are per-stream rates, none is system throughput.** Summing each request's decode
+time counts the same wall clock once per concurrent stream, so at concurrency c they describe what
+one client experiences. Only `output_token_throughput` is system-level: at c32 on Llama it is
+346 tok/s against a 12.1 tok/s per-stream rate, and 12.1 × 32 ≈ 386 recovers it approximately
+(the gap is ramp-up and drain, when fewer than 32 slots are busy).
+
+Summary table below uses the weighted form; the per-pair tables carry aiperf's per-request fields
+with full percentiles.
 
 Computed by `scripts/throughput_split.py`, which takes any point directory:
 
@@ -120,7 +138,7 @@ python3 scripts/throughput_split.py results/nvfp4/spark_repro_llama31/w0_chatbot
 > (see *Known gap*), so no equivalent correction is possible. The gap below is therefore a
 > conservative lower bound on how much slower the endpoint's prefill is.
 
-| model | point | prefill/stream spark | prefill/stream endpoint | prefill × | decode/stream spark | decode/stream endpoint | decode × |
+| model | point | prefill spark | prefill endpoint | prefill × | decode spark | decode endpoint | decode × |
 |---|---|--:|--:|--:|--:|--:|--:|
 | Qwen3 | w2 chatbot c1 | 1,991 | 65 | **30×** | 30.5 | 19.5 | 1.56× |
 | Qwen3 | w2 chatbot c2 | 2,546 | 41 | **62×** | 22.9 | 6.5 | 3.53× |
@@ -176,8 +194,8 @@ spark [`spark_repro_qwen3vl/w2_chatbot_c1/chatbot_flat/c1/`](spark_repro_qwen3vl
 
 | aggregate | spark | endpoint | endpoint slower by |
 |---|--:|--:|--:|
-| **Prefill throughput, per stream (tok/s)** | **1,991** | **65** | **30×** |
-| **Decode throughput, per stream (tok/s)** | **30.5** | **19.5** | **1.56×** |
+| **Prefill throughput, weighted (tok/s)** | **1,991** | **65** | **30×** |
+| **Decode throughput, weighted (tok/s)** | **30.5** | **19.5** | **1.56×** |
 | Request throughput (req/s) | 0.1061 | 0.0428 | |
 | Output token throughput (tok/s) | 29.59 | 11.95 | |
 | Total token throughput (tok/s) | 92.57 | 37.37 | |
@@ -211,8 +229,8 @@ spark [`spark_repro_qwen3vl/w2_chatbot_c2/chatbot_flat/c2/`](spark_repro_qwen3vl
 
 | aggregate | spark | endpoint | endpoint slower by |
 |---|--:|--:|--:|
-| **Prefill throughput, per stream (tok/s)** | **2,546** | **41** | **62×** |
-| **Decode throughput, per stream (tok/s)** | **22.9** | **6.5** | **3.53×** |
+| **Prefill throughput, weighted (tok/s)** | **2,546** | **41** | **62×** |
+| **Decode throughput, weighted (tok/s)** | **22.9** | **6.5** | **3.53×** |
 | Request throughput (req/s) | 0.1457 | 0.0325 | |
 | Output token throughput (tok/s) | 44.30 | 9.87 | |
 | Total token throughput (tok/s) | 132.02 | 29.42 | |
@@ -246,8 +264,8 @@ spark [`spark_repro_qwen3vl/w2_chatbot_c1_rep/chatbot_flat/c1/`](spark_repro_qwe
 
 | aggregate | spark | endpoint | endpoint slower by |
 |---|--:|--:|--:|
-| **Prefill throughput, per stream (tok/s)** | **5,645** | **65** | **86×** |
-| **Decode throughput, per stream (tok/s)** | **30.5** | **19.7** | **1.54×** |
+| **Prefill throughput, weighted (tok/s)** | **5,645** | **65** | **86×** |
+| **Decode throughput, weighted (tok/s)** | **30.5** | **19.7** | **1.54×** |
 | Request throughput (req/s) | 0.1083 | 0.0432 | |
 | Output token throughput (tok/s) | 30.23 | 12.04 | |
 | Total token throughput (tok/s) | 94.55 | 37.67 | |
@@ -281,8 +299,8 @@ spark [`spark_repro_qwen3vl/w2_agent_c1/agent_flat/c1/`](spark_repro_qwen3vl/w2_
 
 | aggregate | spark | endpoint | endpoint slower by |
 |---|--:|--:|--:|
-| **Prefill throughput, per stream (tok/s)** | **5,358** | **95** | **56×** |
-| **Decode throughput, per stream (tok/s)** | **29.9** | **17.0** | **1.76×** |
+| **Prefill throughput, weighted (tok/s)** | **5,358** | **95** | **56×** |
+| **Decode throughput, weighted (tok/s)** | **29.9** | **17.0** | **1.76×** |
 | Request throughput (req/s) | 0.1232 | 0.0318 | |
 | Output token throughput (tok/s) | 28.88 | 7.45 | |
 | Total token throughput (tok/s) | 236.69 | 61.03 | |
@@ -316,8 +334,8 @@ spark [`spark_repro_qwen3vl/w0_chatbot_c1/chatbot_flat/c1/`](spark_repro_qwen3vl
 
 | aggregate | spark | endpoint | endpoint slower by |
 |---|--:|--:|--:|
-| **Prefill throughput, per stream (tok/s)** | **5,323** | **67** | **79×** |
-| **Decode throughput, per stream (tok/s)** | **30.5** | **20.0** | **1.53×** |
+| **Prefill throughput, weighted (tok/s)** | **5,323** | **67** | **79×** |
+| **Decode throughput, weighted (tok/s)** | **30.5** | **20.0** | **1.53×** |
 | Request throughput (req/s) | 0.1013 | 0.0424 | |
 | Output token throughput (tok/s) | 30.24 | 12.65 | |
 | Total token throughput (tok/s) | 89.48 | 37.45 | |
@@ -351,8 +369,8 @@ spark [`spark_repro_qwen3vl/w0_agent_c1/agent_flat/c1/`](spark_repro_qwen3vl/w0_
 
 | aggregate | spark | endpoint | endpoint slower by |
 |---|--:|--:|--:|
-| **Prefill throughput, per stream (tok/s)** | **8,984** | **80** | **112×** |
-| **Decode throughput, per stream (tok/s)** | **30.0** | **16.8** | **1.78×** |
+| **Prefill throughput, weighted (tok/s)** | **8,984** | **80** | **112×** |
+| **Decode throughput, weighted (tok/s)** | **30.0** | **16.8** | **1.78×** |
 | Request throughput (req/s) | 0.1233 | 0.0288 | |
 | Output token throughput (tok/s) | 29.39 | 6.86 | |
 | Total token throughput (tok/s) | 233.87 | 54.62 | |
@@ -386,8 +404,8 @@ spark [`spark_repro_qwen3vl/w0_chatbot_c1_rep/chatbot_flat/c1/`](spark_repro_qwe
 
 | aggregate | spark | endpoint | endpoint slower by |
 |---|--:|--:|--:|
-| **Prefill throughput, per stream (tok/s)** | **5,362** | **67** | **80×** |
-| **Decode throughput, per stream (tok/s)** | **30.5** | **19.8** | **1.54×** |
+| **Prefill throughput, weighted (tok/s)** | **5,362** | **67** | **80×** |
+| **Decode throughput, weighted (tok/s)** | **30.5** | **19.8** | **1.54×** |
 | Request throughput (req/s) | 0.1014 | 0.0422 | |
 | Output token throughput (tok/s) | 30.26 | 12.59 | |
 | Total token throughput (tok/s) | 89.55 | 37.27 | |
@@ -424,8 +442,8 @@ spark [`spark_repro_llama31/w0_chatbot_c1/chatbot_flat/c1/`](spark_repro_llama31
 
 | aggregate | spark | endpoint | endpoint slower by |
 |---|--:|--:|--:|
-| **Prefill throughput, per stream (tok/s)** | **7,673** | **53** | **144×** |
-| **Decode throughput, per stream (tok/s)** | **13.8** | **14.6** | **0.95×** |
+| **Prefill throughput, weighted (tok/s)** | **7,673** | **53** | **144×** |
+| **Decode throughput, weighted (tok/s)** | **13.8** | **14.6** | **0.95×** |
 | Request throughput (req/s) | 0.0462 | 0.0314 | |
 | Output token throughput (tok/s) | 13.78 | 9.36 | |
 | Total token throughput (tok/s) | 41.90 | 28.46 | |
@@ -459,8 +477,8 @@ spark [`spark_repro_llama31/w0_agent_c1/agent_flat/c1/`](spark_repro_llama31/w0_
 
 | aggregate | spark | endpoint | endpoint slower by |
 |---|--:|--:|--:|
-| **Prefill throughput, per stream (tok/s)** | **14,825** | **62** | **237×** |
-| **Decode throughput, per stream (tok/s)** | **13.6** | **13.8** | **0.99×** |
+| **Prefill throughput, weighted (tok/s)** | **14,825** | **62** | **237×** |
+| **Decode throughput, weighted (tok/s)** | **13.6** | **13.8** | **0.99×** |
 | Request throughput (req/s) | 0.0571 | 0.0228 | |
 | Output token throughput (tok/s) | 13.61 | 5.44 | |
 | Total token throughput (tok/s) | 108.46 | 43.34 | |
@@ -494,8 +512,8 @@ spark [`spark_repro_llama31/w0_chatbot_c1_rep/chatbot_flat/c1/`](spark_repro_lla
 
 | aggregate | spark | endpoint | endpoint slower by |
 |---|--:|--:|--:|
-| **Prefill throughput, per stream (tok/s)** | **7,701** | **54** | **142×** |
-| **Decode throughput, per stream (tok/s)** | **13.8** | **14.8** | **0.93×** |
+| **Prefill throughput, weighted (tok/s)** | **7,701** | **54** | **142×** |
+| **Decode throughput, weighted (tok/s)** | **13.8** | **14.8** | **0.93×** |
 | Request throughput (req/s) | 0.0461 | 0.0320 | |
 | Output token throughput (tok/s) | 13.75 | 9.54 | |
 | Total token throughput (tok/s) | 41.80 | 29.01 | |
@@ -529,8 +547,8 @@ spark [`spark_repro_llama31/r100_chatbot_c1/chatbot_flat/c1/`](spark_repro_llama
 
 | aggregate | spark | endpoint | endpoint slower by |
 |---|--:|--:|--:|
-| **Prefill throughput, per stream (tok/s)** | **6,862** | **60** | **115×** |
-| **Decode throughput, per stream (tok/s)** | **13.8** | **14.8** | **0.93×** |
+| **Prefill throughput, weighted (tok/s)** | **6,862** | **60** | **115×** |
+| **Decode throughput, weighted (tok/s)** | **13.8** | **14.8** | **0.93×** |
 | Request throughput (req/s) | 0.0556 | 0.0363 | |
 | Output token throughput (tok/s) | 13.74 | 8.97 | |
 | Total token throughput (tok/s) | 50.18 | 32.73 | |
@@ -564,8 +582,8 @@ spark [`spark_repro_llama31/r100_chatbot_c2/chatbot_flat/c2/`](spark_repro_llama
 
 | aggregate | spark | endpoint | endpoint slower by |
 |---|--:|--:|--:|
-| **Prefill throughput, per stream (tok/s)** | **3,106** | **37** | **84×** |
-| **Decode throughput, per stream (tok/s)** | **14.6** | **5.5** | **2.65×** |
+| **Prefill throughput, weighted (tok/s)** | **3,106** | **37** | **84×** |
+| **Decode throughput, weighted (tok/s)** | **14.6** | **5.5** | **2.65×** |
 | Request throughput (req/s) | 0.1163 | 0.0319 | |
 | Output token throughput (tok/s) | 28.75 | 7.89 | |
 | Total token throughput (tok/s) | 104.98 | 28.82 | |
