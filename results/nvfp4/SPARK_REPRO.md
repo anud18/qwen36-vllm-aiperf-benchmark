@@ -687,6 +687,5 @@ MODEL_KEY=qwen3vl bash scripts/run_optimumxt_repro.sh
 Weights: `NousResearch/Meta-Llama-3.1-8B-Instruct` (15 GB; the official `meta-llama` repo is gated)
 and `Qwen/Qwen3-VL-30B-A3B-Instruct` (58 GB).
 
-Artifacts: `results/nvfp4/spark_repro_{llama31,qwen3vl}/`, logs
-`results/nvfp4/spark_repro_{llama31,qwen3vl}.log`.
+Artifacts and the full file inventory: [`SPARK_INDEX.md`](SPARK_INDEX.md).
 Endpoint-side data and its caveats: [`INDEX_optimumxt.md`](INDEX_optimumxt.md).

@@ -21,12 +21,13 @@ Two models were measured on the same physical box through two different tunnels:
 
 | file | contents |
 |---|---|
-| `qwen3vl_ngrok/RESULTS.md` | Full narrative report for model A — config, methodology caveats, all points, repeatability, prefix-cache analysis, prefill diagnosis, workload feasibility at 4096 context |
-| `TABLES_w0.md` | Result tables for the `WARMUP=0 / REQS=20 / c1` series on model A (TTFT, ITL=TPOT, E2E, ISL, OSL, req/s, token throughput; avg / p50 / p90 / p95 / p99 / min / max / std) |
-| `TABLES_llama31_cf.md` | Same tables for model B, plus the cross-model comparison at identical settings |
-| `TABLES_r100.md` | 100-request series on model B — chatbot and agent at c1 and c2, run alternating, on context-filtered datasets |
+| [`qwen3vl_ngrok/RESULTS.md`](qwen3vl_ngrok/RESULTS.md) | Full narrative report for model A — config, methodology caveats, all points, repeatability, prefix-cache analysis, prefill diagnosis, workload feasibility at 4096 context |
+| [`TABLES_w0.md`](TABLES_w0.md) | Result tables for the `WARMUP=0 / REQS=20 / c1` series on model A (TTFT, ITL=TPOT, E2E, ISL, OSL, req/s, token throughput; avg / p50 / p90 / p95 / p99 / min / max / std) |
+| [`TABLES_llama31_cf.md`](TABLES_llama31_cf.md) | Same tables for model B, plus the cross-model comparison at identical settings |
+| [`TABLES_r100.md`](TABLES_r100.md) | 100-request series on model B — chatbot and agent at c1 and c2, run alternating, on context-filtered datasets |
 | [`SPARK_REPRO.md`](SPARK_REPRO.md) | Local reproduction of all these points on spark against vLLM, with endpoint and spark figures side by side |
 | `INDEX_optimumxt.md` | This file |
+| [`SPARK_INDEX.md`](SPARK_INDEX.md) | Index of the spark reproduction artifacts — all 26 local points, scripts and datasets |
 
 ## Benchmark points
 
@@ -36,23 +37,23 @@ Every point directory contains the same ten files — see *Artifact layout* belo
 
 | point directory | workload | conc. | reqs | warmup | slice | duration | valid |
 |---|---|--:|--:|--:|---|--:|---|
-| `qwen3vl_ngrok/chatbot_flat/c1/` | chatbot_flat | 1 | 10 | 2 | `[2:12]` | 233.5 s | ✅ |
-| `qwen3vl_ngrok/chatbot_flat/c2/` | chatbot_flat | 2 | 20 | 2 | `[2:22]` | 615.9 s | ✅ |
-| `qwen3vl_ngrok_run2/chatbot_flat/c1/` | chatbot_flat | 1 | 10 | 2 | `[2:12]` | 231.7 s | ✅ repeat of the above, 90 min later |
-| `qwen3vl_ngrok/agent_flat/c1/` | agent_flat | 1 | 10 | 2 | `[2:12]` | 314.7 s | ✅ |
-| `w0_chatbot/chatbot_flat/c1/` | chatbot_flat | 1 | 20 | **0** | `[0:20]` | 471.8 s | ✅ |
-| `w0_agent/agent_flat/c1/` | agent_flat | 1 | 20 | **0** | `[0:20]` | 694.4 s | ✅ |
-| `w0_chatbot_rep/chatbot_flat/c1/` | chatbot_flat | 1 | 20 | **0** | `[0:20]` | 474.1 s | ✅ cache-carryover probe |
-| `w0_agent/agent_flat/c2/` | agent_flat | 2 | 20 | **0** | `[0:20]` | 646.0 s | ❌ **INVALID** — 6/20 requests got ngrok 403 `ERR_NGROK_725` |
-| `qwen3vl_ngrok/chatbot_flat/c32/` | chatbot_flat | 32 | 320 | 16 | `[16:336]` | — | ❌ **INVALID** — worker wedged, run aborted, no summary produced |
+| [`qwen3vl_ngrok/chatbot_flat/c1/`](qwen3vl_ngrok/chatbot_flat/c1/) | chatbot_flat | 1 | 10 | 2 | `[2:12]` | 233.5 s | ✅ |
+| [`qwen3vl_ngrok/chatbot_flat/c2/`](qwen3vl_ngrok/chatbot_flat/c2/) | chatbot_flat | 2 | 20 | 2 | `[2:22]` | 615.9 s | ✅ |
+| [`qwen3vl_ngrok_run2/chatbot_flat/c1/`](qwen3vl_ngrok_run2/chatbot_flat/c1/) | chatbot_flat | 1 | 10 | 2 | `[2:12]` | 231.7 s | ✅ repeat of the above, 90 min later |
+| [`qwen3vl_ngrok/agent_flat/c1/`](qwen3vl_ngrok/agent_flat/c1/) | agent_flat | 1 | 10 | 2 | `[2:12]` | 314.7 s | ✅ |
+| [`w0_chatbot/chatbot_flat/c1/`](w0_chatbot/chatbot_flat/c1/) | chatbot_flat | 1 | 20 | **0** | `[0:20]` | 471.8 s | ✅ |
+| [`w0_agent/agent_flat/c1/`](w0_agent/agent_flat/c1/) | agent_flat | 1 | 20 | **0** | `[0:20]` | 694.4 s | ✅ |
+| [`w0_chatbot_rep/chatbot_flat/c1/`](w0_chatbot_rep/chatbot_flat/c1/) | chatbot_flat | 1 | 20 | **0** | `[0:20]` | 474.1 s | ✅ cache-carryover probe |
+| [`w0_agent/agent_flat/c2/`](w0_agent/agent_flat/c2/) | agent_flat | 2 | 20 | **0** | `[0:20]` | 646.0 s | ❌ **INVALID** — 6/20 requests got ngrok 403 `ERR_NGROK_725` |
+| [`qwen3vl_ngrok/chatbot_flat/c32/`](qwen3vl_ngrok/chatbot_flat/c32/) | chatbot_flat | 32 | 320 | 16 | `[16:336]` | — | ❌ **INVALID** — worker wedged, run aborted, no summary produced |
 
 ### Model B — Llama-3.1-8B via Cloudflare
 
 | point directory | workload | conc. | reqs | warmup | slice | duration | valid |
 |---|---|--:|--:|--:|---|--:|---|
-| `cf_llama31_chatbot/chatbot_flat/c1/` | chatbot_flat | 1 | 20 | **0** | `[0:20]` | 637.6 s | ✅ |
-| `cf_llama31_agent/agent_flat/c1/` | agent_flat | 1 | 20 | **0** | `[0:20]` | 876.5 s | ✅ |
-| `cf_llama31_chatbot_rep/chatbot_flat/c1/` | chatbot_flat | 1 | 20 | **0** | `[0:20]` | 625.5 s | ✅ repeat, cold cache after worker restart |
+| [`cf_llama31_chatbot/chatbot_flat/c1/`](cf_llama31_chatbot/chatbot_flat/c1/) | chatbot_flat | 1 | 20 | **0** | `[0:20]` | 637.6 s | ✅ |
+| [`cf_llama31_agent/agent_flat/c1/`](cf_llama31_agent/agent_flat/c1/) | agent_flat | 1 | 20 | **0** | `[0:20]` | 876.5 s | ✅ |
+| [`cf_llama31_chatbot_rep/chatbot_flat/c1/`](cf_llama31_chatbot_rep/chatbot_flat/c1/) | chatbot_flat | 1 | 20 | **0** | `[0:20]` | 625.5 s | ✅ repeat, cold cache after worker restart |
 
 ### Model B′ — Llama-3.1-8B, 100 requests, filtered datasets
 
@@ -61,10 +62,10 @@ against `datasets/aiperf/le4096/` — entries over the 4096 cap removed.
 
 | point directory | workload | conc. | reqs | warmup | slice | duration | valid |
 |---|---|--:|--:|--:|---|--:|---|
-| `r100_chatbot_flat_c1/` | chatbot_flat | 1 | 100 | **0** | `[0:100]` | 2,757.6 s | ✅ 100/100 |
-| `r100_agent_flat_c1/` | agent_flat | 1 | 100 | **0** | `[0:100]` | 4,105.1 s | ⚠️ 97/100 — 3 × Cloudflare 524 |
-| `r100_chatbot_flat_c2/` | chatbot_flat | 2 | 100 | **0** | `[0:100]` | 3,132.2 s | ✅ 100/100 |
-| `r100_agent_flat_c2/` | agent_flat | 2 | 100 | **0** | `[0:100]` | 5,683.7 s | ⚠️ 90/100 — 10 × Cloudflare 524 |
+| [`r100_chatbot_flat_c1/`](r100_chatbot_flat_c1/) | chatbot_flat | 1 | 100 | **0** | `[0:100]` | 2,757.6 s | ✅ 100/100 |
+| [`r100_agent_flat_c1/`](r100_agent_flat_c1/) | agent_flat | 1 | 100 | **0** | `[0:100]` | 4,105.1 s | ⚠️ 97/100 — 3 × Cloudflare 524 |
+| [`r100_chatbot_flat_c2/`](r100_chatbot_flat_c2/) | chatbot_flat | 2 | 100 | **0** | `[0:100]` | 3,132.2 s | ✅ 100/100 |
+| [`r100_agent_flat_c2/`](r100_agent_flat_c2/) | agent_flat | 2 | 100 | **0** | `[0:100]` | 5,683.7 s | ⚠️ 90/100 — 10 × Cloudflare 524 |
 
 The 524s are the tunnel's ~100 s origin timeout. They drop the *slowest* requests, so the agent
 latency distributions are truncated on the right and read optimistically — the true avg and upper
@@ -74,15 +75,15 @@ percentiles are higher than reported. Both chatbot points are clean.
 
 | file | what it covers |
 |---|---|
-| `qwen3vl_ngrok_run.log` | first `c32` attempt — the run that wedged the worker |
-| `qwen3vl_ngrok_c1c2.log` | recovery watcher + `c1` (10 reqs) and `c2` (20 reqs) |
-| `qwen3vl_ngrok_run2.log` | `c1` repeat for reproducibility |
-| `qwen3vl_ngrok_agent.log` | `agent_flat` `c1`, 10 requests |
-| `w0_run.log` | the three `WARMUP=0` points, with Dynamo `cached_tokens` sampled around each |
-| `w0_agent_c2.log` | `agent_flat` `c2` — the point killed by the ngrok quota |
-| `cf_llama31_run.log` | both Cloudflare / Llama points |
-| `cf_llama31_chatbot_rep.log` | `chatbot_flat` c1 repeat on the second tunnel, cold cache |
-| `r100_run.log` | the four alternating 100-request points, with per-point start/end timestamps |
+| [`qwen3vl_ngrok_run.log`](qwen3vl_ngrok_run.log) | first `c32` attempt — the run that wedged the worker |
+| [`qwen3vl_ngrok_c1c2.log`](qwen3vl_ngrok_c1c2.log) | recovery watcher + `c1` (10 reqs) and `c2` (20 reqs) |
+| [`qwen3vl_ngrok_run2.log`](qwen3vl_ngrok_run2.log) | `c1` repeat for reproducibility |
+| [`qwen3vl_ngrok_agent.log`](qwen3vl_ngrok_agent.log) | `agent_flat` `c1`, 10 requests |
+| [`w0_run.log`](w0_run.log) | the three `WARMUP=0` points, with Dynamo `cached_tokens` sampled around each |
+| [`w0_agent_c2.log`](w0_agent_c2.log) | `agent_flat` `c2` — the point killed by the ngrok quota |
+| [`cf_llama31_run.log`](cf_llama31_run.log) | both Cloudflare / Llama points |
+| [`cf_llama31_chatbot_rep.log`](cf_llama31_chatbot_rep.log) | `chatbot_flat` c1 repeat on the second tunnel, cold cache |
+| [`r100_run.log`](r100_run.log) | the four alternating 100-request points, with per-point start/end timestamps |
 
 ## Artifact layout
 
@@ -94,7 +95,7 @@ Each point directory holds:
 | `profile_export_aiperf.csv` | same summary, CSV |
 | `profile_export.jsonl` | **per-request records** — one line per request with TTFT, ITL, latency, ISL, OSL, `usage_prompt_cache_read_tokens`, timestamps, worker id |
 | `inputs.json` | the exact payloads aiperf sent, in order |
-| `run.log` | aiperf stdout, including phase transitions and any HTTP errors |
+| [`run.log`](run.log) | aiperf stdout, including phase transitions and any HTTP errors |
 | `logs/aiperf.log` | aiperf's internal debug log |
 | `meta.json` | node, workload, point, start/end epoch, request count, warmup, attempt number, `remote: true` |
 | `prefix.json` | `{"unavailable": true}` on every point — the run script reads vLLM's `vllm:prefix_cache_*` counters, which Dynamo does not expose. **Use `overall_usage_prompt_cache_read_pct` from the aiperf summary instead** |
